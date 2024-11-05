@@ -2,7 +2,7 @@ package com.hocs.server.saas.demo.controller;
 
 import com.hocs.server.saas.demo.service.DemoFacadeService;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
-import com.hocs.server.saas.apidoc.controller.StaticApiDocService;
+import com.hocs.server.saas.apidoc.service.StaticApiDocService;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.saas.user.oauth.dto.FilesData;
 import com.hocs.server.saas.user.oauth.dto.GetContentRequest;
