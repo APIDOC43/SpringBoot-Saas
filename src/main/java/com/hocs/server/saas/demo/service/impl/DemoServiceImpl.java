@@ -31,6 +31,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 
 	public void generateApiDoc(GitRepo gitRepo, String userId, Model model) throws Exception {
 		MemoryProcessPercentage.clear(userId);
+		MemoryProcessPercentage.save(userId,1,10);
 
 		Path clonedDir = gitHubFacadeService.gitClone(gitRepo)
 			.orElseThrow(() -> new GithubCloneException("Clone 실패"));
