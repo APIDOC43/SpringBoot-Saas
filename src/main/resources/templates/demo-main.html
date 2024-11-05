@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Git URL Submit</title>
+  <style>
+    body, html {
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 600px;
+      margin-bottom: 100px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXSTQMC5TC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-KXSTQMC5TC');
+  </script>
+</head>
+<body>
+<div class="container">
+  <a href="https://apidoc43.softr.app"><h1>Introduce Page</h1></a>
+</div>
+
+
+<div class="container">
+  <h2>Enter Git URL</h2>
+  <!-- 입력창 -->
+  <input type="text" id="repoUrlInput" placeholder="If you enter the git url, a document will be created.">
+  <!-- 제출 버튼 -->
+  <button type="button" onclick="submitrepoUrl()">Submit</button>
+</div>
+
+<script>
+  function submitrepoUrl() {
+    // 입력된 값을 가져옴
+    const repoUrl = document.getElementById("repoUrlInput").value;
+    if (repoUrl) {
+      // /demo-clone 경로로 GET 요청 쿼리 파라미터 추가
+      const queryUrl = `/demo/progress?repoUrl=${encodeURIComponent(repoUrl)}`;
+      // 새로운 URL로 이동하여 GET 요청 전송
+      window.location.href = queryUrl;
+    } else {
+      alert("Please enter a Git URL.");
+    }
+  }
+</script>
+</body>
+</html>

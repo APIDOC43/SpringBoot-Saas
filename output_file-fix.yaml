@@ -1,0 +1,346 @@
+openapi: 3.0.1
+info:
+  title: 플젝 제목
+  description: 플젝 설명
+  version: 버전
+
+paths:
+  
+  /store-owner/sign-in:
+    post:
+      summary: "스토어 소유자 로그인 작업"
+      x_audience:
+      - "FE"
+      parameters:
+      - name: "userType"
+        in: "query"
+        description: "사용자 유형 (예: USER, STORE_OWNER, ADMIN)"
+        required: true
+        schema:
+          type: "string"
+          enum:
+          - "USER"
+          - "STORE_OWNER"
+          - "ADMIN"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserLoginRequest"
+      responses:
+        "200":
+          description: "로그인 성공"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  status:
+                    type: "integer"
+                    description: "HTTP 상태 코드 (예: 2000)"
+                    example: "2000"
+                  responseMessage:
+                    type: "string"
+                    description: "응답 메시지 (예: SUCCESS)"
+                    example: "SUCCESS"
+                  response:
+                    $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: "잘못된 요청"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "권한 없음"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  responseMessage:
+                    type: "string"
+                    description: "에러 메시지 (예: DENIED_UNAUTHORIZED_USER)"
+                    example: "DENIED_UNAUTHORIZED_USER"
+                  status:
+                    type: "integer"
+                    description: "HTTP 상태 코드"
+                    example: "401"
+                  response:
+                    type: "string"
+                    description: "에러 세부 정보"
+                    example: "로그인 되지 않은 사용자 접근"
+
+  
+  /store-owner/sign-up:
+    post:
+      summary: "스토어 소유자 회원가입 요청"
+      x_audience:
+      - "FE"
+      - "BE"
+      requestBody:
+        description: "스토어 소유자 등록을 위한 요청 정보"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StoreOwnerRegisterRequest"
+      responses:
+        "201":
+          description: "회원가입이 성공적으로 이루어짐"
+        "400":
+          description: "잘못된 요청으로 인한 에러 또는 중복 ID 에러 발생"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "인증되지 않은 사용자 접근"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  
+  /product/search/:
+    post:
+      summary: "상품 검색 API"
+      description: "사용자가 상품을 검색하기 위한 API로, 상품 이름, 카테고리 ID, 가맹점 이름 및 정렬 상태를 입력받아 사용할\
+        \ 수 있습니다."
+      x_audience:
+      - "FE"
+      - "BE"
+      requestBody:
+        description: "상품 검색 요청"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductSearchRequest"
+      responses:
+        "200":
+          description: "상품 검색에 성공한 경우"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponseList"
+        "400":
+          description: "잘못된 요청 시"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: "인증되지 않은 사용자 접근 시"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    ProductSearchRequest:
+      
+      type: "object"
+      description: "상품 검색 요청 정보"
+      properties:
+        productName:
+          type: "string"
+          description: "상품이름 (예: example)"
+          example: "example"
+        categoryId:
+          type: "integer"
+          format: "int64"
+          description: "카테고리ID (예: 1)"
+          example: "1"
+        storeOwnerName:
+          type: "string"
+          description: "가맹점 이름 (예: storeOwner)"
+          example: "storeOwner"
+        sortStatus:
+          type: "string"
+          description: "정렬 상태. 가능한 값: NEWEST, OLDEST, PRICE_HIGH, PRICE_LOW (예: NEWEST)"
+          example: "NEWEST"
+      required:
+      - "sortStatus"
+
+    UserResponse:
+      
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "사용자 ID (예: 101)"
+          example: "101"
+        userId:
+          type: "string"
+          description: "사용자 로그인 ID (예: storeowner123)"
+          example: "storeowner123"
+        nickName:
+          type: "string"
+          description: "닉네임 (예: JohnDoe)"
+          example: "JohnDoe"
+        address:
+          description: "주소"
+          $ref: "#/components/schemas/Address"
+        isWithDraw:
+          type: "boolean"
+          description: "탈퇴여부 (예: false)"
+          example: "false"
+        createdTime:
+          type: "string"
+          format: "date-time"
+          description: "계정 생성 시간 (예: 2023-01-01T12:00:00Z)"
+          example: "2023-01-01T12:00:00Z"
+        updatedTime:
+          type: "string"
+          format: "date-time"
+          description: "계정 갱신 시간 (예: 2023-01-02T12:00:00Z)"
+          example: "2023-01-02T12:00:00Z"
+
+    Address:
+      
+      type: "object"
+      properties:
+        si:
+          type: "string"
+          description: "시 (예: 서울시)"
+          example: "서울시"
+        gu:
+          type: "string"
+          description: "구 (예: 강남구)"
+          example: "강남구"
+        doro:
+          type: "string"
+          description: "도로명 주소 (예: 테헤란로 123)"
+          example: "테헤란로 123"
+        jibun:
+          type: "string"
+          description: "지번 주소 (예: 123-45)"
+          example: "123-45"
+
+    UserLoginRequest:
+      
+      type: "object"
+      properties:
+        loginId:
+          type: "string"
+          description: "사용자 로그인 ID (예: storeowner123)"
+          example: "storeowner123"
+        password:
+          type: "string"
+          description: "비밀번호 (예: password123)"
+          example: "password123"
+
+    ProductResponse:
+      
+      type: "object"
+      description: "상품 응답 정보"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "상품 ID (예: 12345)"
+          example: "12345"
+        name:
+          type: "string"
+          description: "상품 이름 (예: Product A)"
+          example: "Product A"
+        price:
+          type: "integer"
+          description: "상품 가격 (예: 10000)"
+          example: "10000"
+        categoryName:
+          type: "string"
+          description: "카테고리 이름 (예: Electronics)"
+          example: "Electronics"
+        reviewResponse:
+          type: "array"
+          items:
+            description: "리뷰 응답 리스트"
+            $ref: "#/components/schemas/ReviewResponse"
+
+    StoreOwnerRegisterRequest:
+      
+      type: "object"
+      properties:
+        loginId:
+          type: "string"
+          description: "사용자 ID"
+          example: "storeOwner123"
+        password:
+          type: "string"
+          description: "사용자 비밀번호"
+          example: "password123!"
+        nickName:
+          type: "string"
+          description: "사용자 별명"
+          example: "StoreOwnerNick"
+        address:
+          type: "string"
+          description: "사용자 주소"
+          example: "서울시 강남구 도로명 주소"
+
+    ProductResponseList:
+      
+      type: "object"
+      description: "상품 응답 정보 목록"
+      properties:
+        status:
+          type: "integer"
+          description: "응답 상태 코드 (예: 2000)"
+          example: "2000"
+        responseMessage:
+          type: "string"
+          description: "응답 메시지 (예: SUCCESS)"
+          example: "SUCCESS"
+        response:
+          type: "array"
+          items:
+            description: "상품 리스트"
+            $ref: "#/components/schemas/ProductResponse"
+
+    ReviewResponse:
+      
+      type: "object"
+      description: "리뷰 응답"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "리뷰 ID (예: 1001)"
+          example: "1001"
+        content:
+          type: "string"
+          description: "리뷰 내용 (예: Great product!)"
+          example: "Great product!"
+        star:
+          type: "number"
+          format: "float"
+          description: "별점 (예: 4.5)"
+          example: "4.5"
+        replyCount:
+          type: "integer"
+          description: "리뷰답글 수. 기본값 0 (예: 0)"
+          example: "0"
+
+    ErrorResponse:
+      
+      type: "object"
+      description: "에러 응답 정보"
+      properties:
+        status:
+          type: "integer"
+          description: "에러 상태 코드 또는 HTTP 상태 코드 (예: 400)"
+          example: "400"
+        responseMessage:
+          type: "string"
+          description: "에러 메시지 또는 오류에 대한 이름 (예: BAD_REQUEST_BODY, INVALID_LOGIN_INFO)"
+          example: "BAD_REQUEST_BODY"
+        response:
+          type: "string"
+          description: "에러 세부 사항 또는 상세 오류 메시지 (예: 잘못된 요청 내용입니다., 요청 본문이 잘못되었습니다., 아이디 또는\
+            \ 비밀번호가 일치하지 않습니다.)"
+          example: "BAD_REQUEST_BODY"
+

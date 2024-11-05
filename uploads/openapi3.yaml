@@ -1,0 +1,57 @@
+openapi: 3.0.1
+info:
+  title: 플젝 제목
+  description: 플젝 설명
+  version: 버전
+servers:
+- url: http://localhost
+tags: []
+paths:
+  /api/v3:
+    get:
+      tags:
+      - api
+      summary: This is a test summary
+      description: This is a test description
+      operationId: This is a test identifier
+      parameters:
+      - name: Content-Type
+        in: header
+        description: Content Type Header
+        required: true
+        schema:
+          type: string
+        example: application/json;charset=UTF-8
+      responses:
+        "200":
+          description: "200"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/api-v3-627787284'
+              examples:
+                This is a test identifier:
+                  value: "{\"status\":200,\"responseMessage\":\"SUCCESS\",\"response\"\
+                    :{\"data\":\"hello world!\"}}"
+components:
+  schemas:
+    api-v3-627787284:
+      required:
+      - responseMessage
+      - status
+      type: object
+      properties:
+        response:
+          required:
+          - data
+          type: object
+          properties:
+            data:
+              type: string
+              description: ""
+        responseMessage:
+          type: string
+          description: 커스텀 상태 코드
+        status:
+          type: number
+          description: 커스텀 상태 코드

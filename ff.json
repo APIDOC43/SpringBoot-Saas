@@ -1,0 +1,63 @@
+{
+  "paths": {
+    "patternProperties": {
+      "^/.*$": {
+        "get": {
+          "summary": "반려동물 추가 페이지",
+          "description": "소유자 ID에 따라 새 반려동물 추가 페이지를 초기화합니다.",
+          "x_audience": [
+            "FE"
+          ],
+          "parameters": [
+            {
+              "name": "ownerId",
+              "in": "path",
+              "description": "소유자 ID (예: 1)",
+              "required": true,
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "patternProperties": {
+              "^\\d{3}$": {
+                "description": "응답 설명",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/ErrorResponse"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "patternProperties": {
+        "^/.*$": {
+          "type": "object",
+          "properties": {
+            "patternProperties": {
+              "^/.*$": {
+
+              }
+            },
+            "patternProperties": {
+              "^/.*$": {
+                "type": "string",
+                "description": "방문에 대한 설명 (예: 일반 건강검진, 정기검진, 접종, 소모임)",
+                "example": "일반 건강검진"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
