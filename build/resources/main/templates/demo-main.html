@@ -4,14 +4,52 @@
   <meta charset="UTF-8">
   <title>Git URL Submit</title>
   <style>
+    /* 기존 스타일 유지 */
     body, html {
       height: 100%;
-      margin: 0;
+      font-family: Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
+
+    /* 상단 메뉴 스타일 */
+    .top-menu {
+      width: 100%;
+      background-color: #33b39c;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 18px;
+      position: fixed;
+      top: 0;
+      z-index: 1000;
+      display: flex;
       justify-content: center;
-      font-family: Arial, sans-serif;
+      gap: 30px;
+    }
+
+    .top-menu a {
+      color: white;
+      width: 100px;
+      text-decoration: none;
+      margin: 0 15px;
+      position: relative;
+    }
+
+    .top-menu a::after {
+      content: "";
+      position: absolute;
+      right: -15px;
+      top: 0;
+      height: 100%;
+      width: 1px;
+      background-color: #ffffff;
+      opacity: 0.5;
+    }
+
+    .top-menu a:hover {
+      text-decoration: underline;
     }
 
     .container {
@@ -21,7 +59,9 @@
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 600px;
-      margin-bottom: 100px;
+      margin-top: 10px;
+      margin-bottom: 50px;
+      background-color: #ffffff;
     }
 
     input[type="text"] {
@@ -47,45 +87,115 @@
     button:hover {
       background-color: #0056b3;
     }
-  </style>
-  <!-- Google tag (gtag.js) -->
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXSTQMC5TC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
 
-    gtag('config', 'G-KXSTQMC5TC');
-  </script>
+    /* 리스트 스타일 */
+    .repo-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .repo-item {
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      width: 250px;
+      padding: 15px;
+      text-align: left;
+      transition: box-shadow 0.3s;
+      cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    }
+
+    .repo-item:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .repo-link {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .repo-link:hover {
+      text-decoration: underline;
+    }
+
+    .repo-description {
+      color: #555;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+  <!-- Google Analytics 및 기타 스크립트 유지 -->
 </head>
 <body>
-<div class="container">
-  <a href="https://apidoc43.softr.app"><h1>Introduce Page</h1></a>
+
+<!-- 상단 메뉴 -->
+<div class="top-menu">
+  <a href="https://apidoc43.softr.app">소개페이지</a>
+  <a href="#container">체험해보기</a>
 </div>
 
 
-<div class="container">
-  <h2>Enter Git URL</h2>
+<img width="1400px" height="310px" src="/클릭한번으로 문서를 생성하고 관리하세요.png">
+<img src="/지금바로 체험해보세요.png">
+<img style="padding-bottom: 100px" width="80%" src="/example_view.png">
+
+
+
+<!-- 추가 컨텐츠가 필요하다면 여기에 추가 -->
+
+<div style="margin-bottom: 0">
+  <div class="container">
+    <h2>예제 저장소를 사용해보세요</h2>
+    <p>원하시는 공개 저장소 URL을 직접 입력해도 됩니다.</p>
+    <ul class="repo-list">
+      <li class="repo-item" th:each="repo : ${repoList}" th:data-url="${repo.url}"
+          onclick="populateRepoUrl(this)">
+        <div class="repo-link" th:text="${repo.name}"></div>
+        <p class="repo-description" th:text="${repo.description}">저장소 설명이 여기에 표시됩니다.</p>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div style="border-color:#33b39c; border-width: medium; padding: 80px" class="container"
+     id="container">
+  <h2>Git URL을 입력하면 API문서를 확인할 수 있습니다.</h2>
   <!-- 입력창 -->
-  <input type="text" id="repoUrlInput" placeholder="If you enter the git url, a document will be created.">
+  <input type="text" id="repoUrlInput" placeholder="Git URL을 입력하면 문서가 생성됩니다.">
   <!-- 제출 버튼 -->
-  <button type="button" onclick="submitrepoUrl()">Submit</button>
+  <button type="button" onclick="submitRepoUrl()">생성하기</button>
 </div>
+
+
+<a style="background-color: white" href="https://apidoc43.softr.app" class="logo">
+  <img src="/logo.png" alt="Logo">
+</a>
 
 <script>
-  function submitrepoUrl() {
-    // 입력된 값을 가져옴
+  function populateRepoUrl(element) {
+    const repoUrl = element.getAttribute('data-url');
+    document.getElementById('repoUrlInput').value = repoUrl;
+    // 입력창으로 스크롤 이동
+    document.getElementById('repoUrlInput').scrollIntoView({behavior: 'smooth'});
+  }
+
+  function submitRepoUrl() {
     const repoUrl = document.getElementById("repoUrlInput").value;
     if (repoUrl) {
-      // /demo-clone 경로로 GET 요청 쿼리 파라미터 추가
       const queryUrl = `/demo/progress?repoUrl=${encodeURIComponent(repoUrl)}`;
-      // 새로운 URL로 이동하여 GET 요청 전송
       window.location.href = queryUrl;
     } else {
-      alert("Please enter a Git URL.");
+      alert("Git URL을 입력해주세요.");
     }
   }
 </script>
+
 </body>
 </html>

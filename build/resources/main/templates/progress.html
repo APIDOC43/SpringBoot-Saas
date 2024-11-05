@@ -15,11 +15,11 @@
     }
 
     #runner {
-      width: 50px;
-      height: 50px;
+      width: 100px;
+      height: 100px;
       background-image: url('https://cdn.pixabay.com/animation/2024/05/04/22/05/22-05-59-607_512.gif');
       background-size: cover;
-      animation: run 2s infinite linear;
+      animation: run 5s infinite linear;
     }
 
     @keyframes run {
@@ -27,7 +27,7 @@
         transform: translateX(-50px);
       }
       100% {
-        transform: translateX(50px);
+        transform: translateX(700px);
       }
     }
 
@@ -55,7 +55,7 @@
 
           // 퍼센티지가 줄어들면 상태 텍스트를 변경합니다
           if (percentage < previousPercentage) {
-            statusText.innerHTML = "문서 생성중";
+            statusText.innerHTML = "저장소 분석 완료 (DONE) \n 문서 생성중 \n ";
           }
 
           // 이전 값을 업데이트
