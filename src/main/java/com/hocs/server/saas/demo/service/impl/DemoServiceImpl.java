@@ -5,7 +5,7 @@ import com.hocs.server.saas.demo.service.DemoFacadeService;
 import com.hocs.server.extractor.main.SourceCodeParser;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.saas.user.gitapi.service.GitHubFacadeService;
-import com.hocs.server.saas.apidoc.controller.StaticApiDocService;
+import com.hocs.server.saas.apidoc.service.impl.StaticApiDocServiceImpl;
 import com.hocs.server.openai.llm.GenerateOasUsingLLM;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
@@ -26,7 +26,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 	private final GitHubFacadeService gitHubFacadeService;
 	private final GenerateOasUsingLLM llmService;
 	private final SourceCodeParser sourceCodeParser;
-	private final StaticApiDocService staticApiDocService;
+	private final StaticApiDocServiceImpl staticApiDocServiceImpl;
 
 
 	public void generateApiDoc(GitRepo gitRepo, String userId, Model model) throws Exception {
@@ -42,7 +42,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 		MemoryProcessPercentage.clear(userId);
 
 		HttpClient.toSaas(clonedDir.toFile(), userId);
-		List<FilesData> htmlFiles = staticApiDocService.loadApiDocLoadToFilesData(userId);
+		List<FilesData> htmlFiles = staticApiDocServiceImpl.findApiListByUserId(userId);
 
 		model.addAttribute("htmlFiles", htmlFiles);
 

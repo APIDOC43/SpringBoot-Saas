@@ -5,55 +5,23 @@
   <title>HTML 파일 목록</title>
 
   <script th:inline="javascript">
-    function loadContent(filename) {
-      fetch('/demo/content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ filename })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById('content').innerHTML = data;
-      })
-      .catch(error => console.error('파일 로드 오류:', error));
+    function loadContent(index) {
+      // 현재 URL에서 userId 파라미터 추출
+      const urlParams = new URLSearchParams(window.location.search);
+      const userId = urlParams.get('userId');
+
+      if (!userId) {
+        console.error('userId가 URL에 존재하지 않습니다.');
+        return;
+      }
+
+      // URL에 userId와 index를 포함하여 GET 요청
+      const url = `/demo/layout?userId=${encodeURIComponent(userId)}&index=${index}`;
+      document.location.href = url;
+
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const resizer = document.getElementById('dragbar');
-      const sidebar = document.getElementById('sidebar');
-      let startX, startWidth;
 
-      resizer.addEventListener('mousedown', function(e) {
-        e.preventDefault();
-        startX = e.clientX;
-        startWidth = sidebar.offsetWidth;
-
-        document.addEventListener('mousemove', resizeSidebar);
-        document.addEventListener('mouseup', stopResizing);
-      });
-
-      function resizeSidebar(e) {
-        const dx = e.clientX - startX;
-        const newWidth = startWidth + dx;
-
-        // 최소 및 최대 너비 설정 (예: 150px ~ 600px)
-        if (newWidth > 150 && newWidth < 600) {
-          sidebar.style.width = `${newWidth}px`;
-        }
-      }
-
-      function stopResizing() {
-        document.removeEventListener('mousemove', resizeSidebar);
-        document.removeEventListener('mouseup', stopResizing);
-      }
-    });
   </script>
 
   <style>
@@ -183,7 +151,11 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXSTQMC5TC"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
     gtag('js', new Date());
 
     gtag('config', 'G-KXSTQMC5TC');
@@ -194,7 +166,7 @@
   <nav>
     <ul>
       <li><a href="https://apidoc43.softr.app/">홈</a></li>
-<!--      <li><a href="/page1">페이지 1</a></li>-->
+      <!--      <li><a href="/page1">페이지 1</a></li>-->
     </ul>
   </nav>
 </header>
@@ -204,13 +176,16 @@
     <nav>
       <ul>
         <!-- HTML 파일 목록을 사이드바에 표시 -->
-        <li th:each="file : ${htmlFiles}">
+        <li th:each="file, iterStat : ${htmlFiles}">
           <button
               th:text="${file.filename}"
-              th:onclick="loadContent([[${file.filePath}]])"></button>
+              th:onclick="loadContent([[${iterStat.index}]])"></button>
         </li>
         <li>
-          <button style="background-color: lightgoldenrodyellow; font-weight: bold" onclick="window.open('https://forms.gle/ragoigXmFGd2fo7V7', '_blank')">설문조사 참여 후 리워드받기</button>
+          <button style="background-color: lightgoldenrodyellow; font-weight: bold"
+                  onclick="window.open('https://forms.gle/ragoigXmFGd2fo7V7', '_blank')">설문조사 참여 후
+            리워드받기
+          </button>
         </li>
       </ul>
     </nav>
@@ -228,9 +203,9 @@
 
 <!-- 인라인 편집 및 API 통신을 위한 JavaScript -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', function () {
     // 전체 문서에 더블클릭 이벤트 위임
-    document.addEventListener('dblclick', function(event) {
+    document.addEventListener('dblclick', function (event) {
       const target = event.target;
 
       // 클릭된 요소가 '설명' 셀인지 확인
@@ -240,7 +215,9 @@
     });
 
     function makeEditable(cell) {
-      if (cell.querySelector('input')) return; // 이미 편집 중인 경우 방지
+      if (cell.querySelector('input')) {
+        return;
+      } // 이미 편집 중인 경우 방지
 
       const originalText = cell.textContent.trim();
       cell.classList.add('editing');
@@ -250,7 +227,7 @@
       input.focus();
 
       // 입력 필드에서 포커스를 잃을 때 변경 사항 저장
-      input.addEventListener('blur', function() {
+      input.addEventListener('blur', function () {
         const newText = input.value.trim();
         cell.innerHTML = newText;
         cell.classList.remove('editing');
@@ -262,7 +239,7 @@
       });
 
       // 선택 사항: Enter 키로 편집 완료
-      input.addEventListener('keydown', function(e) {
+      input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           input.blur();
         }

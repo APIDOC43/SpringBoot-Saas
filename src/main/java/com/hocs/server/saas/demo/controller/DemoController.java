@@ -1,8 +1,9 @@
 package com.hocs.server.saas.demo.controller;
 
+import com.hocs.server.saas.apidoc.service.StaticApiDocService;
 import com.hocs.server.saas.demo.service.DemoFacadeService;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
-import com.hocs.server.saas.apidoc.controller.StaticApiDocService;
+import com.hocs.server.saas.apidoc.service.impl.StaticApiDocServiceImpl;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.saas.user.oauth.dto.FilesData;
 import com.hocs.server.saas.user.oauth.dto.GetContentRequest;
@@ -40,7 +41,7 @@ public class DemoController {
 		throws Exception {
 
 		demoService.generateApiDoc(GitRepo.of(repoUrl),userId,model);
-		return "redirect:/demo/layout?userId=" + userId;
+		return "redirect:/demo/layout?userId=" + userId+"?index=0";
 	}
 	@GetMapping("/demo")
 	public String demo(Model model) {
@@ -72,15 +73,18 @@ public class DemoController {
 	}
 
 	@GetMapping("/demo/layout")
-	public String getLayOut(@RequestParam(name = "userId") String userId, Model model)
-		throws IOException {
+	public String getLayOut(
+		@RequestParam(name = "userId") String userId,
+		@RequestParam(name = "index") Integer index,
+		Model model) {
 		try {
-			List<FilesData> htmlFiles = staticApiDocService.loadApiDocLoadToFilesData(
-				userId);
+			List<FilesData> htmlFiles = staticApiDocService.findApiListByUserId(userId);
+
 			model.addAttribute("htmlFiles", htmlFiles);
-			String response = HttpClient.findHtmlRequest(htmlFiles.get(0).getFilePath());
+			String response = HttpClient.findHtmlRequest(htmlFiles.get(index).getFilePath());
 			model.addAttribute("content", response);
-		} catch (NoSuchFileException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			return "redirect:/demo/error/busy";
 		}
 		return "layout";

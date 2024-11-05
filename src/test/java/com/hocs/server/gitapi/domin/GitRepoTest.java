@@ -13,5 +13,6 @@ class GitRepoTest {
 
 		String url = gitRepo.getUrl();
 		Assertions.assertEquals("https://github.com/spring-projects/spring-petclinic",url);
+
 	}
 }
