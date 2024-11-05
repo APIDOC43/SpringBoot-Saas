@@ -5,7 +5,7 @@ import com.hocs.server.saas.demo.service.DemoFacadeService;
 import com.hocs.server.extractor.main.SourceCodeParser;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.saas.user.gitapi.service.GitHubFacadeService;
-import com.hocs.server.saas.apidoc.controller.StaticApiDocService;
+import com.hocs.server.saas.apidoc.service.StaticApiDocService;
 import com.hocs.server.openai.llm.GenerateOasUsingLLM;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
