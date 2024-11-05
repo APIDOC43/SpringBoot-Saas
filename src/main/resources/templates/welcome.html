@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Welcome</title>
+</head>
+<body>
+<h1>환영합니다, <span th:text="${userName}"></span> 님!</h1>
+
+<h2>저장소 목록</h2>
+<ul>
+  <li th:each="repo : ${repos}">
+    <span th:text="${repo['name']}"></span>
+    <form th:action="@{/clone}" method="get">
+      <input type="hidden" name="repoUrl" th:value="${repo['clone_url']}" />
+      <button type="submit">클론하기</button>
+    </form>
+  </li>
+</ul>
+</body>
+</html>

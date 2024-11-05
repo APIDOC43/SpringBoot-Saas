@@ -1,0 +1,3 @@
+path:
+  generate-doc-html-dir: "/home/ubuntu/WAS/src/main/resources/static"
+  SSG-root : "/home/ubuntu/static-site-generator/"

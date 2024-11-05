@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML 파일 목록</title>
+
+  <script th:inline="javascript">
+    function loadContent(filename) {
+      fetch('/demo/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('content').innerHTML = data;
+      })
+      .catch(error => console.error('파일 로드 오류:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const resizer = document.getElementById('dragbar');
+      const sidebar = document.getElementById('sidebar');
+      let startX, startWidth;
+
+      resizer.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+        startX = e.clientX;
+        startWidth = sidebar.offsetWidth;
+
+        document.addEventListener('mousemove', resizeSidebar);
+        document.addEventListener('mouseup', stopResizing);
+      });
+
+      function resizeSidebar(e) {
+        const dx = e.clientX - startX;
+        const newWidth = startWidth + dx;
+
+        // 최소 및 최대 너비 설정 (예: 150px ~ 600px)
+        if (newWidth > 150 && newWidth < 600) {
+          sidebar.style.width = `${newWidth}px`;
+        }
+      }
+
+      function stopResizing() {
+        document.removeEventListener('mousemove', resizeSidebar);
+        document.removeEventListener('mouseup', stopResizing);
+      }
+    });
+  </script>
+
+  <style>
+    /* 색상 변수 정의 */
+    :root {
+      --primary-color: #388E3C;
+      --secondary-color: #C8E6C9;
+      --accent-color: #A5D6A7;
+      --hover-color: #81C784;
+      --background-color: #F5F5F5;
+      --content-bg-color: #FFFFFF;
+      --text-color: #000000;
+    }
+
+    /* 기본 설정 */
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--background-color);
+      color: var(--text-color);
+    }
+
+    /* 헤더 스타일 */
+    header {
+      background-color: var(--primary-color);
+      padding: 1em;
+      text-align: center;
+      color: white;
+    }
+
+    header nav ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    header nav li {
+      display: inline-block;
+      margin-right: 15px;
+    }
+
+    header nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    /* 레이아웃 컨테이너 */
+    main {
+      display: flex;
+      min-height: calc(100vh - 70px);
+      background-color: var(--background-color);
+    }
+
+    /* 왼쪽 사이드바 스타일 */
+    #sidebar {
+      width: 300px;
+      background-color: var(--secondary-color);
+      padding: 15px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    #sidebar nav ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* 사이드바 버튼 스타일 */
+    #sidebar button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      text-align: left;
+      font-size: 1em;
+      color: var(--text-color);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #sidebar button:hover {
+      background-color: var(--hover-color);
+    }
+
+    /* 드래그 바 스타일 */
+    #dragbar {
+      width: 5px;
+      cursor: col-resize;
+      background-color: var(--text-color);
+    }
+
+    /* 메인 콘텐츠 영역 스타일 */
+    #content {
+      flex: 1;
+      padding: 15px;
+      background-color: var(--content-bg-color);
+      box-sizing: border-box;
+      overflow: auto;
+      border-left: 1px solid #ddd;
+      word-wrap: break-word;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+      main {
+        flex-direction: column;
+      }
+
+      #sidebar {
+        width: 100%;
+        height: auto;
+      }
+
+      #dragbar {
+        display: none; /* 모바일에서는 드래그 바 숨김 */
+      }
+    }
+  </style>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXSTQMC5TC"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-KXSTQMC5TC');
+  </script>
+</head>
+<body>
+<header>
+  <nav>
+    <ul>
+      <li><a href="https://apidoc43.softr.app/">홈</a></li>
+<!--      <li><a href="/page1">페이지 1</a></li>-->
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <div id="sidebar">
+    <nav>
+      <ul>
+        <!-- HTML 파일 목록을 사이드바에 표시 -->
+        <li th:each="file : ${htmlFiles}">
+          <button
+              th:text="${file.filename}"
+              th:onclick="loadContent([[${file.filePath}]])"></button>
+        </li>
+        <li>
+          <button style="background-color: lightgoldenrodyellow; font-weight: bold" onclick="window.open('https://forms.gle/ragoigXmFGd2fo7V7', '_blank')">설문조사 참여 후 리워드받기</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- 드래그 바 추가 -->
+  <div id="dragbar"></div>
+
+  <!-- 콘텐츠를 로드할 영역 -->
+  <div id="content" th:utext="${content}"></div>
+</main>
+
+</body>
+</html>
+
+<!-- 인라인 편집 및 API 통신을 위한 JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 전체 문서에 더블클릭 이벤트 위임
+    document.addEventListener('dblclick', function(event) {
+      const target = event.target;
+
+      // 클릭된 요소가 '설명' 셀인지 확인
+      if (target.matches('td') && target.getAttribute('data-editable') === 'true') {
+        makeEditable(target);
+      }
+    });
+
+    function makeEditable(cell) {
+      if (cell.querySelector('input')) return; // 이미 편집 중인 경우 방지
+
+      const originalText = cell.textContent.trim();
+      cell.classList.add('editing');
+      cell.innerHTML = `<input type="text" class="edit-input" value="${originalText}">`;
+      const input = cell.querySelector('input');
+
+      input.focus();
+
+      // 입력 필드에서 포커스를 잃을 때 변경 사항 저장
+      input.addEventListener('blur', function() {
+        const newText = input.value.trim();
+        cell.innerHTML = newText;
+        cell.classList.remove('editing');
+
+        if (newText !== originalText) {
+          // 변경 사항을 포함하여 API 요청 전송
+          sendUpdateRequest(cell, newText);
+        }
+      });
+
+      // 선택 사항: Enter 키로 편집 완료
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          input.blur();
+        }
+      });
+    }
+
+    function sendUpdateRequest(cell, newText) {
+      // 셀에 대한 정보 수집
+      const tableRow = cell.closest('tr');
+      const table = cell.closest('table');
+      const rowIndex = Array.from(table.tBodies[0].rows).indexOf(tableRow);
+      const cellIndex = Array.from(tableRow.cells).indexOf(cell);
+
+      // 전송할 데이터 준비
+      const data = {
+        rowIndex: rowIndex,
+        cellIndex: cellIndex,
+        newText: newText,
+        fieldName: cell.getAttribute('data-field-name') || '설명',
+      };
+
+      // 변경 사항을 서버에 전송
+      fetch('/api/update-description', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('네트워크 응답이 올바르지 않습니다');
+        }
+        // 필요한 경우 응답 처리
+        return response.json();
+      })
+      .then(result => {
+        console.log('업데이트 성공:', result);
+      })
+      .catch(error => {
+        console.error('설명 업데이트 오류:', error);
+      });
+    }
+  });
+</script>

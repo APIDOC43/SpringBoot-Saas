@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.hocs.server.extractor.main.SourceCodeParserTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-11-04T08:12:37" hostname="hongseogjun-ui-MacBookPro.local" time="1.238">
+  <properties/>
+  <testcase name="testcode()" classname="com.hocs.server.extractor.main.SourceCodeParserTest" time="1.238"/>
+  <system-out><![CDATA[17:12:36.028 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.hocs.server.extractor.main.SourceCodeParserTest]: SourceCodeParserTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+17:12:36.094 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.hocs.server.HocsserverApplication for test class com.hocs.server.extractor.main.SourceCodeParserTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v3.3.4)
+
+2024-11-04T17:12:36.310+09:00  WARN 56100 --- [hocsserver] [    Test worker] ory$DuplicateJsonObjectContextCustomizer : 
+
+Found multiple occurrences of org.json.JSONObject on the class path:
+
+	jar:file:/Users/hong/.gradle/caches/modules-2/files-2.1/com.vaadin.external.google/android-json/0.0.20131108.vaadin1/fa26d351fe62a6a17f5cda1287c1c6110dec413f/android-json-0.0.20131108.vaadin1.jar!/org/json/JSONObject.class
+	jar:file:/Users/hong/.gradle/caches/modules-2/files-2.1/org.json/json/20240303/ebb88e8fb5122b7506d5cf1d69f1ccdb790d22a/json-20240303.jar!/org/json/JSONObject.class
+
+You may wish to exclude one of them to ensure predictable runtime behavior
+
+2024-11-04T17:12:36.318+09:00  INFO 56100 --- [hocsserver] [    Test worker] c.h.s.e.main.SourceCodeParserTest        : Starting SourceCodeParserTest using Java 21.0.2 with PID 56100 (started by hong in /Users/hong/Desktop/hong/soma/alone/practice/saas-server/hocsserver)
+2024-11-04T17:12:36.319+09:00  INFO 56100 --- [hocsserver] [    Test worker] c.h.s.e.main.SourceCodeParserTest        : No active profile set, falling back to 1 default profile: "default"
+2024-11-04T17:12:37.086+09:00  INFO 56100 --- [hocsserver] [    Test worker] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2024-11-04T17:12:37.454+09:00  INFO 56100 --- [hocsserver] [    Test worker] c.h.s.e.main.SourceCodeParserTest        : Started SourceCodeParserTest in 1.284 seconds (process running for 1.933)
+percentage = 0
+percentage = 33
+Output saved to /Users/hong/Desktop/hong/soma/alone/practice/saas-server/hocsserver/src/main/java/output-66682747-ae3e-4896-a422-cdf33b3d0bb7.yaml
+]]></system-out>
+  <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/Users/hong/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.14.19/154da3a65b4f4a909d3e5bdec55d1b2b4cbb6ce1/byte-buddy-agent-1.14.19.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+</testsuite>
