@@ -12,11 +12,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class GitRepo {
 	private final String url;
+	private final String owner;
+	private final String repoName;
 
 	public static GitRepo of(String repoUrl) {
 		if (repoUrl.endsWith(".git")) {
 			repoUrl = repoUrl.substring(0, repoUrl.indexOf(".git"));
 		}
-		return new GitRepo(repoUrl);
+
+		String[] urlParts = repoUrl.split("/");
+		return new GitRepo(repoUrl,urlParts[3],urlParts[4]);
 	}
 }

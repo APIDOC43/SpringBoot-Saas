@@ -5,6 +5,7 @@ import com.hocs.server.extractor.ClassifiedDataContainer;
 import com.hocs.server.extractor.CodeCategorizer;
 import com.hocs.server.extractor.CodeStructuresAnalyzer;
 import com.hocs.server.extractor.config.ExtractorConfig;
+import com.hocs.server.extractor.service.GitApiService;
 import com.hocs.server.extractor.util.FileManager;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
@@ -26,6 +27,7 @@ public class SourceCodeParser {
 
 	private final CodeCategorizer codeCategorizer;
 	private final CodeStructuresAnalyzer codeStructuresAnalyzer;
+	private final GitApiService gitApiService;
 
 
 	public Path createMetaData(File PROJECT_ROOT_DIR, GitRepo gitRepo,String userId) throws Exception {
@@ -58,7 +60,10 @@ public class SourceCodeParser {
 			String entryPath = classifiedDataContainer.getClassToFilePath()
 				.get(controllerClassName);
 			String entrySrcPath = entryPath.substring(entryPath.lastIndexOf("src"));
-			apiCodeExtractor.traceControllerApis(gitrepoUrl+"/blob/main/"+entrySrcPath,controllerClassName,outputData);
+
+			String sourceCodeUrl = gitApiService.buildSourceCodeUrl(GitRepo.of(gitrepoUrl),
+				entrySrcPath);
+			apiCodeExtractor.traceControllerApis(sourceCodeUrl,controllerClassName,outputData);
 		}
 
 		// Global Dependencies를 출력 데이터에 추가
