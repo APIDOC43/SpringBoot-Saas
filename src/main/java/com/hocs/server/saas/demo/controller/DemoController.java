@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -43,6 +45,29 @@ public class DemoController {
 	@GetMapping("/demo")
 	public String demo(Model model) {
 		log.info("HomeController.demo---");
+		List<Map<String, String>> repoList = Arrays.asList(
+			Map.of(
+				"url", "https://github.com/osopromadze/Spring-Boot-Blog-REST-API.git",
+				"name", "mosopromadze/Spring-Boot-Blog-REST-API",
+				"description", "Steps to Setup · 1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Run the app using maven."
+			),
+			Map.of(
+				"url", "https://github.com/givanthak/spring-boot-rest-api-tutorial.git",
+				"name", "givanthak/spring-boot-rest-api-tutorial",
+				"description", "1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Build and run the app using maven."
+			),
+			Map.of(
+				"url", "https://github.com/bezkoder/spring-boot-3-rest-api-example.git",
+				"name", "bezkoder/spring-boot-3-rest-api-example",
+				"description", "In this tutorial, we're gonna build a Spring Boot 3 Rest API example with Maven that implement CRUD operations. You'll know: Way to define Spring Rest ..."
+			),
+			Map.of(
+				"url", "https://github.com/khoubyari/spring-boot-rest-example.git",
+				"name", "khoubyari/spring-boot-rest-example",
+				"description", "This is a sample Java / Maven / Spring Boot (version 1.5.6) application that can be used as a starter for creating a microservice complete with built-in health ..."
+			)
+		);
+		model.addAttribute("repoList", repoList);
 		return "demo-main";
 	}
 
