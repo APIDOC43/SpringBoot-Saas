@@ -40,8 +40,21 @@ public class DemoController {
 		@PathVariable(name = "userId") String userId, Model model)
 		throws Exception {
 
+		if(repoUrl.equals("https://github.com/osopromadze/Spring-Boot-Blog-REST-API.git")){
+			return "redirect:/demo/layout?userId=554b1aa3-12bc-460e-8a4d-f2f60f1d7438&index=0";
+		}
+		if(repoUrl.equals("https://github.com/givanthak/spring-boot-rest-api-tutorial.git")){
+			return "redirect:/demo/layout?userId=93dd2440-d36e-48f5-84c4-f87aed3fdf63&index=0";
+		}
+		if(repoUrl.equals("https://github.com/bezkoder/spring-boot-3-rest-api-example.git")){
+			return "redirect:/demo/layout?userId=ede47c20-47a4-4c34-a543-308fd57fcfd5&index=0";
+		}
+		if(repoUrl.equals("https://github.com/khoubyari/spring-boot-rest-example.git")){
+			return "redirect:/demo/layout?userId=1432dc97-7a61-4b66-b280-40fd995e229d&index=0";
+		}
+
 		demoService.generateApiDoc(GitRepo.of(repoUrl),userId,model);
-		return "redirect:/demo/layout?userId=" + userId+"?index=0";
+		return "redirect:/demo/layout?userId=" + userId+"&index=0";
 	}
 	@GetMapping("/demo")
 	public String demo(Model model) {
@@ -50,12 +63,12 @@ public class DemoController {
 			Map.of(
 				"url", "https://github.com/osopromadze/Spring-Boot-Blog-REST-API.git",
 				"name", "mosopromadze/Spring-Boot-Blog-REST-API",
-				"description", "Steps to Setup · 1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Run the app using maven."
+				"description", "Steps to Setup · 1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Run the app using maven ..."
 			),
 			Map.of(
 				"url", "https://github.com/givanthak/spring-boot-rest-api-tutorial.git",
 				"name", "givanthak/spring-boot-rest-api-tutorial",
-				"description", "1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Build and run the app using maven."
+				"description", "1. Clone the application · 2. Create Mysql database · 3. Change mysql username and password as per your installation · 4. Build and run the app using maven ..."
 			),
 			Map.of(
 				"url", "https://github.com/bezkoder/spring-boot-3-rest-api-example.git",
