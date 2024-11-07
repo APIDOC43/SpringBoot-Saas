@@ -52,7 +52,4 @@ public class ClassifiedDataContainer {
 	public void addGlobalDependencies(String absolutePath) {
 		getGlobalDependencies().get("AOP").add(absolutePath);
 	}
-	public void putSimpleToQualifiedName(String simpleName, String fullyQualifiedName) {
-		simpleClassNameToQualifiedNames.computeIfAbsent(simpleName, k -> new HashSet<>()).add(fullyQualifiedName);
-	}
 }

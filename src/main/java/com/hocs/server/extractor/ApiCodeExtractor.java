@@ -299,74 +299,6 @@ public class ApiCodeExtractor {
 		}
 	}
 
-	/**
-	 * 특정 메서드 내에서 호출되는 메서드를 추적하여 필요한 파일 경로를 수집합니다.
-//	 */
-//	private void traceMethodCalls(String className, String methodName, Set<String> requiredFiles, Set<String> visitedMethods) throws Exception {
-//		String methodSignature = className + "." + methodName;
-//		if (visitedMethods.contains(methodSignature)) {
-//			return;
-//		}
-//		visitedMethods.add(methodSignature);
-//
-//		String filePath = classifiedDataContainer.getClassToFilePath().get(className);
-//		if (filePath == null) {
-//			return;
-//		}
-//
-//		String content = new String(Files.readAllBytes(Paths.get(filePath)));
-//		CompilationUnit cu;
-//		try {
-//			cu = StaticJavaParser.parse(content);
-//		} catch (Exception e) {
-//			System.err.println("Failed to parse class: " + className);
-//			e.printStackTrace();
-//			return;
-//		}
-//
-//		// 지정된 메서드를 찾습니다.
-//		Optional<MethodDeclaration> methodOpt = cu.findAll(MethodDeclaration.class).stream()
-//			.filter(m -> m.getNameAsString().equals(methodName))
-//			.findFirst();
-//
-//		if (methodOpt.isPresent()) {
-//			MethodDeclaration method = methodOpt.get();
-//
-//			// 메서드 본문에서 호출되는 메서드들을 찾습니다.
-//			method.getBody().ifPresent(body -> {
-//				List<MethodCallExpr> methodCalls = body.findAll(MethodCallExpr.class);
-//				for (MethodCallExpr callExpr : methodCalls) {
-//					try {
-//						String scopeClassName = resolveScopeClassName(callExpr, className);
-//						if (scopeClassName != null) {
-//							String calledMethodName = callExpr.getNameAsString();
-//							String calledFilePath = classifiedDataContainer.getClassToFilePath().get(scopeClassName);
-//							if (calledFilePath != null) {
-//								requiredFiles.add(calledFilePath);
-//								// 인터페이스인 경우 구현체를 모두 추적
-//								if (classifiedDataContainer.getInterfaceImplementations().containsKey(scopeClassName)) {
-//									Set<String> implementations = classifiedDataContainer.getInterfaceImplementations().getOrDefault(scopeClassName, Collections.emptySet());
-//									for (String implClass : implementations) {
-//										String implFilePath = classifiedDataContainer.getClassToFilePath().get(implClass);
-//										if (implFilePath != null) {
-//											requiredFiles.add(implFilePath);
-//											// 구현 클래스의 메서드 호출도 추적
-//											traceMethodCalls(implClass, calledMethodName, requiredFiles, visitedMethods);
-//										}
-//									}
-//								} else {
-//									// 클래스인 경우 메서드 호출을 재귀적으로 추적
-//									traceMethodCalls(scopeClassName, calledMethodName, requiredFiles, visitedMethods);
-//								}
-//							}
-//						}
-//					} catch (Exception e) {
-//						e.printStackTrace();
-//					}
-//				}
-//			});
-//		}
-//	}
 
 	private void traceMethodCalls(String className, String methodName, Set<String> requiredFiles, Set<String> visitedMethods) throws Exception {
 		String methodSignature = className + "." + methodName;
@@ -450,46 +382,6 @@ public class ApiCodeExtractor {
 		}
 	}
 
-
-
-	/**
-	 * 메서드 호출의 스코프를 확인하여 해당 클래스 이름을 반환합니다.
-	 */
-//	private String resolveScopeClassName(MethodCallExpr callExpr, String currentClassName) {
-//		// 메서드 호출의 스코프를 확인합니다.
-//		Optional<com.github.javaparser.ast.expr.Expression> scopeOpt = callExpr.getScope();
-//		if (scopeOpt.isPresent()) {
-//			com.github.javaparser.ast.expr.Expression scope = scopeOpt.get();
-//			if (scope.isNameExpr()) {
-//				String name = scope.asNameExpr().getNameAsString();
-//				// 스코프가 클래스 이름인지 확인
-//				if (classifiedDataContainer.getInterfaceImplementations().containsKey(name)) {
-//					return name; // 클래스 이름인 경우
-//				} else {
-//					// 변수 이름인 경우 변수의 타입을 추론
-//					String varType = resolveVariableType(callExpr, name, currentClassName);
-//					return varType;
-//				}
-//			} else if (scope.isFieldAccessExpr()) {
-//				String name = scope.asFieldAccessExpr().getNameAsString();
-//				// 필드 접근인 경우 필드의 타입을 추론
-//				String varType = resolveVariableType(callExpr, name, currentClassName);
-//				return varType;
-//			} else if (scope.isThisExpr()) {
-//				return currentClassName;
-//			} else if (scope.isMethodCallExpr()) {
-//				// 스코프가 메서드 호출인 경우 재귀적으로 처리
-//				return resolveScopeClassName(scope.asMethodCallExpr(), currentClassName);
-//			} else if (scope.isSuperExpr()) {
-//				return currentClassName;
-//			}
-//		} else {
-//			// 스코프가 없는 경우 현재 클래스에서 메서드를 찾습니다.
-//			return currentClassName;
-//		}
-//		return null;
-//	}
-
 	private String resolveScopeClassName(Expression expr, String currentClassName) {
 		if (expr == null) {
 			// 스코프가 없는 경우 현재 클래스에서 메서드를 찾습니다.
@@ -524,46 +416,7 @@ public class ApiCodeExtractor {
 		}
 		return null;
 	}
-	/**
-	 * 변수의 타입을 추론하여 반환합니다.
-	 */
-//	private String resolveVariableType(MethodCallExpr callExpr, String varName, String currentClassName) {
-//		// 변수의 선언 위치를 찾아 타입을 추론합니다.
-//		Optional<com.github.javaparser.ast.Node> parentOpt = callExpr.getParentNode();
-//		com.github.javaparser.ast.Node node = callExpr;
-//		while (parentOpt.isPresent()) {
-//			node = parentOpt.get();
-//			if (node instanceof MethodDeclaration) {
-//				MethodDeclaration method = (MethodDeclaration) node;
-//				// 메서드의 매개변수에서 변수 타입을 찾습니다.
-//				for (Parameter param : method.getParameters()) {
-//					if (param.getNameAsString().equals(varName)) {
-//						return param.getType().asString();
-//					}
-//				}
-//				// 메서드 내의 변수 선언에서 타입을 찾습니다.
-//				List<VariableDeclarationExpr> vars = method.findAll(VariableDeclarationExpr.class);
-//				for (VariableDeclarationExpr varDecl : vars) {
-//					for (VariableDeclarator var : varDecl.getVariables()) {
-//						if (var.getNameAsString().equals(varName)) {
-//							return var.getType().asString();
-//						}
-//					}
-//				}
-//			} else if (node instanceof ClassOrInterfaceDeclaration) {
-//				ClassOrInterfaceDeclaration clazz = (ClassOrInterfaceDeclaration) node;
-//				for (FieldDeclaration field : clazz.getFields()) {
-//					for (VariableDeclarator var : field.getVariables()) {
-//						if (var.getNameAsString().equals(varName)) {
-//							return var.getType().asString();
-//						}
-//					}
-//				}
-//			}
-//			parentOpt = node.getParentNode();
-//		}
-//		return null;
-//	}
+
 	private String resolveVariableType(Node node, String varName, String currentClassName) {
 		// 현재 노드에서 부모를 탐색하여 변수 선언을 찾습니다.
 		Optional<Node> parentNode = node.getParentNode();
