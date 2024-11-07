@@ -12,3 +12,7 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
+  spring:
+    data:
+      mongodb:
+        uri: mongodb://localhost:27017/test
