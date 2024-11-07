@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.hocs.server.extractor.service.APISourceDependencyService;
+import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.saas.model.Components;
+import com.hocs.server.saas.model.OAS;
+import com.hocs.server.saas.model.OasInfo;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
@@ -36,21 +40,17 @@ public class GenerateOasUsingLLM {
 
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
+	private final OasRepository OasRepository;
 
-	public void generate(String userId,Path metaDataFilePath, File projectDir) throws IOException {
+	public void generate(String userId, Path metaDataFilePath, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
-
-//		String sourceCodeMetaData = projectRootPath + "/src/main/java/output-" + userId + ".yaml";
 		String sourceCodeMetaData = metaDataFilePath.toFile().getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
 		ChatClient chatClient4o = springAiCommandForLLM.createChatClient4o();
 
-		System.out.println("		/** output.yaml to APIEntry **/");
 		/** output.yaml to APIEntry **/
 		List<APIEntry> apiEntries = ApiEntryMapper.parse(sourceCodeMetaData);
-		System.out.println("		/** request OAS API Snippet **/");
-
 		if (apiEntries == null || apiEntries.size() == 0) {
 			throw new ApiEntriesNullException("APIEntry is empty");
 		}
@@ -58,15 +58,7 @@ public class GenerateOasUsingLLM {
 		Map<String, List<Schema>> schemasMap = new HashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();
 
-		//valid
-		String[] ExceptionSrc = springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(
-			projectRootPath, chatClient4o);
-
-		StringBuffer sb = new StringBuffer();
-		for (String src : ExceptionSrc) {
-			sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
-		}
-		String exceptionFormatSrc = sb.toString();
+		String exceptionFormatSrc = findRelatedExceptionSrc(projectRootPath, chatClient4o);
 
 		int totalTasks = Math.min(apiEntries.size(), 3); // 작업 개수 제한
 		AtomicInteger completedTasks = new AtomicInteger(0); // 완료된 작업 수
@@ -75,10 +67,10 @@ public class GenerateOasUsingLLM {
 		List<CompletableFuture<Void>> futures = apiEntries.stream()
 			.limit(totalTasks) // 처음 3개 항목에 대해서만 병렬 처리
 			.map(apiEntry -> CompletableFuture.runAsync(() ->
-				processApiEntry(client, apiEntry, schemasMap, pathList,exceptionFormatSrc)
+				processApiEntry(client, apiEntry, schemasMap, pathList, exceptionFormatSrc)
 			).thenRun(() -> { // 작업 완료 후 실행
 				int completed = completedTasks.incrementAndGet();
-				MemoryProcessPercentage.save(userId,completed,totalTasks); // 진행 상황 계산
+				MemoryProcessPercentage.save(userId, completed, totalTasks); // 진행 상황 계산
 			}))
 			.collect(Collectors.toList());
 
@@ -86,6 +78,44 @@ public class GenerateOasUsingLLM {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
 		//path integeration
+		List<Map<String, PathItem>> integrationPaths = pathIntegration(pathList);
+		//schema integration
+		removeDuplicates(chatClient4o, schemasMap);
+
+		OasRepository.save(
+			OAS.create(userId, OasInfo.create(userId, "", "", "", "", "3.0.1"), pathList,
+				schemasMap));
+
+		String result = merge(schemasMap, integrationPaths);
+
+		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
+
+	}
+
+	private String findRelatedExceptionSrc(String projectRootPath, ChatClient chatClient4o)
+		throws IOException {
+		String[] ExceptionSrc = springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(
+			projectRootPath, chatClient4o);
+
+		StringBuffer sb = new StringBuffer();
+		for (String src : ExceptionSrc) {
+			sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
+		}
+		return sb.toString();
+	}
+
+	private void removeDuplicates(ChatClient chatClient4o, Map<String, List<Schema>> schemasMap) {
+		for (String key : schemasMap.keySet()) {
+			List<Schema> schemas = schemasMap.get(key);
+			if (schemas.size() >= 2) {
+				removeDuplicatesByLLM(chatClient4o, schemasMap, key, schemas);
+			}
+		}
+
+	}
+
+	private static List<Map<String, PathItem>> pathIntegration(
+		Map<String, List<Map<String, PathItem>>> pathList) {
 		List<Map<String, PathItem>> integrationPaths = new ArrayList<>();
 		for (String key : pathList.keySet()) {
 			List<Map<String, PathItem>> maps = pathList.get(key);
@@ -93,7 +123,7 @@ public class GenerateOasUsingLLM {
 				PathItem integrationPathitem = new PathItem();
 				for (Map<String, PathItem> map : maps) {
 					PathItem pathItem = map.get(key);
-					if(pathItem.getX_link() != null){
+					if (pathItem.getX_link() != null) {
 						integrationPathitem.setX_link(pathItem.getX_link());
 					}
 					if (pathItem.getGet() != null) {
@@ -131,17 +161,14 @@ public class GenerateOasUsingLLM {
 				integrationPaths.add(maps.get(0));
 			}
 		}
-		//schema integration
-		for (String key : schemasMap.keySet()) {
-			List<Schema> schemas = schemasMap.get(key);
-			if (schemas.size() >= 2) {
-				integrationSchema(chatClient4o, schemasMap, key, schemas);
-			}
-		}
+		return integrationPaths;
+	}
 
+	private String merge(Map<String, List<Schema>> schemasMap,
+		List<Map<String, PathItem>> integrationPaths) {
 		ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
+		StringBuffer sb;
 		sb = new StringBuffer();
 		sb.append("""
 			openapi: 3.0.1
@@ -175,15 +202,13 @@ public class GenerateOasUsingLLM {
 			}
 		}
 		String result = sb.toString().replace("---", "");
-
-		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
-
+		return result;
 	}
 
 	private void processApiEntry(ChatClient client, APIEntry apiEntry,
 		Map<String, List<Schema>> schemasMap,
-		Map<String, List<Map<String, PathItem>>> pathList,String exceptionFormatSrc) {
-		OpenAPI openAPI = oasApiSnippet(client, apiEntry,exceptionFormatSrc);
+		Map<String, List<Map<String, PathItem>>> pathList, String exceptionFormatSrc) {
+		OpenAPI openAPI = oasApiSnippet(client, apiEntry, exceptionFormatSrc);
 		openAPI.getPaths().values().forEach(f -> f.setX_link(apiEntry.getAbsolutePath()));
 
 		Components components = openAPI.getComponents();
@@ -201,7 +226,7 @@ public class GenerateOasUsingLLM {
 		});
 	}
 
-	private void integrationSchema(ChatClient client, Map<String, List<Schema>> schemasMap,
+	private void removeDuplicatesByLLM(ChatClient client, Map<String, List<Schema>> schemasMap,
 		String key,
 		List<Schema> schemas) {
 		try {
@@ -222,21 +247,21 @@ public class GenerateOasUsingLLM {
 			} catch (InterruptedException ex) {
 				throw new RuntimeException(ex);
 			}
-			integrationSchema(client, schemasMap, key, schemas);
+			removeDuplicatesByLLM(client, schemasMap, key, schemas);
 		}
 
 	}
 
 
-
-	private OpenAPI oasApiSnippet(ChatClient client, APIEntry apiEntry,String exceptionFormatSrc) {
+	private OpenAPI oasApiSnippet(ChatClient client, APIEntry apiEntry, String exceptionFormatSrc) {
 
 		OpenAPI openAPI = null;
 		try {
-			openAPI = springAiCommandForLLM.requestOasApiSnippet(client, apiEntry, 0,exceptionFormatSrc);
+			openAPI = springAiCommandForLLM.requestOasApiSnippet(client, apiEntry, 0,
+				exceptionFormatSrc);
 		} catch (JsonProcessingException e) {
 			sleep(3000);
-			return oasApiSnippet(client, apiEntry,exceptionFormatSrc);
+			return oasApiSnippet(client, apiEntry, exceptionFormatSrc);
 		}
 		return openAPI;
 	}

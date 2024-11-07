@@ -5,7 +5,9 @@ import com.hocs.server.extractor.ClassifiedDataContainer;
 import com.hocs.server.extractor.CodeCategorizer;
 import com.hocs.server.extractor.CodeStructuresAnalyzer;
 import com.hocs.server.extractor.config.ExtractorConfig;
+import com.hocs.server.extractor.service.APISourceDependencyService;
 import com.hocs.server.extractor.service.GitApiService;
+import com.hocs.server.extractor.util.APISourceDependencyInfoMapper;
 import com.hocs.server.extractor.util.FileManager;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
@@ -28,6 +30,7 @@ public class SourceCodeParser {
 	private final CodeCategorizer codeCategorizer;
 	private final CodeStructuresAnalyzer codeStructuresAnalyzer;
 	private final GitApiService gitApiService;
+	private final APISourceDependencyService apiSourceDependencyService;
 
 
 	public Path createMetaData(File PROJECT_ROOT_DIR, GitRepo gitRepo,String userId) throws Exception {
@@ -71,6 +74,10 @@ public class SourceCodeParser {
 
 		// 출력 데이터를 YAML 파일로 저장합니다.
 		FileManager.saveOutputAsYaml(outputData, OUTPUT_FILE);
+
+		apiSourceDependencyService.save(
+			APISourceDependencyInfoMapper.mapToAPISourceDependencyInfo(outputData, userId)
+		);
 
 		return Path.of(OUTPUT_FILE);
 	}
