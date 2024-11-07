@@ -65,22 +65,9 @@ public class CodeCategorizer {
 			NodeList<AnnotationExpr> annotations = typeDecl.getAnnotations();
 			for (AnnotationExpr annotation : annotations) {
 				String annotationName = annotation.getNameAsString();
-//				Set<String> requiredFiles = new HashSet<>();
 				if (classifiedDataContainer.getSpecialAnnotations().containsKey(annotationName)) {
 					String category = classifiedDataContainer.getSpecialAnnotations().get(annotationName);
 					classifiedDataContainer.getGlobalDependencies().get(category).add(absolutePath);
-//					if (typeName.equals("GlobalExceptionHandler")) {
-//						System.out.println();
-//					}
-//
-//					try {
-//						new ApiCodeExtractor(classifiedDataContainer).collectClassDependencies(typeName, requiredFiles, new HashSet<>());
-//					} catch (Exception e) {
-//						throw new RuntimeException(e);
-//					}
-//					for (String requiredFile : requiredFiles) {
-//						classifiedDataContainer.addGlobalDependencies(requiredFile);
-//					}
 				}
 			}
 

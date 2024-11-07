@@ -13,9 +13,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CodeStructuresAnalyzer {
 
-	private final CodeCategorizer codeCategorizer;
-
-
 	public List<File> getNotUesedSrc(List<APIEntry> apiEntries,String PROJECT_ROOT){
 
 
