@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.service.APISourceDependencyService;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.saas.model.Components;
@@ -12,7 +13,7 @@ import com.hocs.server.saas.model.OasInfo;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
-import com.hocs.server.openai.llm.ApiEntryMapper.APIEntry;
+import com.hocs.server.openai.domain.APIEntry;
 import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.util.FileManager;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
@@ -42,15 +43,15 @@ public class GenerateOasUsingLLM {
 	private final SpringAICommandForLLM springAiCommandForLLM;
 	private final OasRepository OasRepository;
 
-	public void generate(String userId, Path metaDataFilePath, File projectDir) throws IOException {
+	public void generate(String userId, List<APIEntry> apiEntries, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
-		String sourceCodeMetaData = metaDataFilePath.toFile().getAbsolutePath();
+//		String sourceCodeMetaData = metaDataFilePath.toFile().getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
 		ChatClient chatClient4o = springAiCommandForLLM.createChatClient4o();
 
 		/** output.yaml to APIEntry **/
-		List<APIEntry> apiEntries = ApiEntryMapper.parse(sourceCodeMetaData);
+//		List<APIEntry> apiEntries = ApiEntryMapper.parse(sourceCodeMetaData);
 		if (apiEntries == null || apiEntries.size() == 0) {
 			throw new ApiEntriesNullException("APIEntry is empty");
 		}

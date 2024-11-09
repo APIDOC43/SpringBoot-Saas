@@ -1,4 +1,4 @@
-package com.hocs.server.extractor;
+package com.hocs.server.extractor.core.data;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -6,7 +6,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.hocs.server.extractor.util.GroupingStrategy;
+import com.hocs.server.extractor.core.util.GroupingStrategy;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -16,58 +16,58 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
+/**
+ * JavaClassifiedDataContainer을 초기화하는 책임을 가지고 있는 클래스입니다.
+ */
 @Service
 @RequiredArgsConstructor
-public class CodeCategorizer {
+public class JavaClassifiedDataGenerator {
 
-	private final ClassifiedDataContainer classifiedDataContainer;
+	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
 
-	public ClassifiedDataContainer parse(List<File> javaFiles) throws IOException {
+	public JavaClassifiedDataContainer init(List<File> files) throws IOException {
+
 		int i = 0;
-		for (File file : javaFiles) {
+		for (File file : files) {
 			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
 			try {
 				CompilationUnit cu = StaticJavaParser.parse(content);
 
 				// 클래스, 인터페이스, 열거형, 레코드 등을 모두 처리합니다.
-				addToListByType(file.getAbsolutePath(), cu);
+				SortAndSave(file.getAbsolutePath(), cu);
 			} catch (Exception e) {
 				System.err.println("Failed to parse file: " + file.getAbsolutePath());
 				e.printStackTrace();
 			}
 		}
-
-
-
-		return classifiedDataContainer;
+		return javaClassifiedDataContainer;
 	}
 
 
 
-	private void addToListByType(String absolutePath, CompilationUnit cu) {
+	private void SortAndSave(String absolutePath, CompilationUnit cu) {
 		cu.findAll(TypeDeclaration.class).forEach(typeDecl -> {
 			String typeName = typeDecl.getNameAsString();
 
-			classifiedDataContainer.putClassToFilePath(typeName,absolutePath);
+			javaClassifiedDataContainer.putClassToFilePath(typeName,absolutePath);
 
 			// 컨트롤러 클래스 식별
 			if (GroupingStrategy.isController(typeDecl)) {
-				classifiedDataContainer.addControllerClasses(typeName);
+				javaClassifiedDataContainer.addControllerClasses(typeName);
 			}
 
 			// AOP Aspect 클래스 식별
 			if (GroupingStrategy.isAspect(typeDecl)) {
-				classifiedDataContainer.addGlobalDependencies(absolutePath);
+				javaClassifiedDataContainer.addGlobalDependencies(absolutePath);
 			}
 
 			// 특수한 어노테이션이 붙은 클래스 식별
 			NodeList<AnnotationExpr> annotations = typeDecl.getAnnotations();
 			for (AnnotationExpr annotation : annotations) {
 				String annotationName = annotation.getNameAsString();
-				if (classifiedDataContainer.getSpecialAnnotations().containsKey(annotationName)) {
-					String category = classifiedDataContainer.getSpecialAnnotations().get(annotationName);
-					classifiedDataContainer.getGlobalDependencies().get(category).add(absolutePath);
+				if (javaClassifiedDataContainer.getSpecialAnnotations().containsKey(annotationName)) {
+					String category = javaClassifiedDataContainer.getSpecialAnnotations().get(annotationName);
+					javaClassifiedDataContainer.getGlobalDependencies().get(category).add(absolutePath);
 				}
 			}
 
@@ -79,16 +79,16 @@ public class CodeCategorizer {
 				if (!cid.isInterface()) {
 					cid.getImplementedTypes().forEach(implType -> {
 						String interfaceName = implType.getNameAsString();
-						classifiedDataContainer.getInterfaceImplementations().computeIfAbsent(interfaceName, k -> new HashSet<>()).add(typeName);
+						javaClassifiedDataContainer.getInterfaceImplementations().computeIfAbsent(interfaceName, k -> new HashSet<>()).add(typeName);
 
 						// Filter 인터페이스 구현 여부 확인
 						if (interfaceName.equals("Filter")) {
-							classifiedDataContainer.getGlobalDependencies().get("Filter").add(absolutePath);
+							javaClassifiedDataContainer.getGlobalDependencies().get("Filter").add(absolutePath);
 						}
 
 						// HandlerInterceptor 인터페이스 구현 여부 확인
 						if (interfaceName.equals("HandlerInterceptor") || interfaceName.equals("AsyncHandlerInterceptor") || interfaceName.equals("HandlerInterceptorAdapter")) {
-							classifiedDataContainer.getGlobalDependencies().get("Interceptor").add(absolutePath);
+							javaClassifiedDataContainer.getGlobalDependencies().get("Interceptor").add(absolutePath);
 						}
 					});
 				}
@@ -99,19 +99,15 @@ public class CodeCategorizer {
 
 					// Filter 상속 여부 확인
 					if (parentClassName.equals("GenericFilterBean") || parentClassName.equals("OncePerRequestFilter")) {
-						classifiedDataContainer.getGlobalDependencies().get("Filter").add(absolutePath);
+						javaClassifiedDataContainer.getGlobalDependencies().get("Filter").add(absolutePath);
 					}
 
 					// HandlerInterceptor 상속 여부 확인
 					if (parentClassName.equals("HandlerInterceptorAdapter")) {
-						classifiedDataContainer.getGlobalDependencies().get("Interceptor").add(absolutePath);
+						javaClassifiedDataContainer.getGlobalDependencies().get("Interceptor").add(absolutePath);
 					}
 				});
 			}
 		});
 	}
-
-
-
-
 }

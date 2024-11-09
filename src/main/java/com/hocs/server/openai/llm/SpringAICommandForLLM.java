@@ -7,11 +7,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.hocs.server.extractor.CodeStructuresAnalyzer;
+import com.hocs.server.extractor.core.SrcFileCollector;
+import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
-import com.hocs.server.openai.llm.ApiEntryMapper.APIEntry;
+import com.hocs.server.openai.domain.APIEntry;
 import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.util.FileManager;
 import com.hocs.server.util.OpenAPIParser;
@@ -125,10 +126,11 @@ public class SpringAICommandForLLM {
 
 	}
 
-	public String complementOas(OpenAPI result,List<APIEntry> apiEntries, CodeStructuresAnalyzer codeStructuresAnalyzer,
+	public String complementOas(OpenAPI result,List<APIEntry> apiEntries, SrcFileCollector srcFileCollector,
 		ChatClient client,String ProjectRoot) {
 
-		List<File> notUesedSrc = codeStructuresAnalyzer.getNotUesedSrc(apiEntries,ProjectRoot);
+		List<File> notUesedSrc = srcFileCollector.getNotUesedSrc(apiEntries,ProjectRoot,
+			ClientProjectType.SPRING_JAVA);
 
 		String src = FileManager.loadFileContents(
 			notUesedSrc.stream()
