@@ -1,8 +1,12 @@
 package com.hocs.server.saas.demo.service.impl;
 
+import com.hocs.server.extractor.domain.APISourceDependencyInfo;
+import com.hocs.server.extractor.domain.ClientProjectType;
+import com.hocs.server.extractor.service.APISourceDependencyService;
+import com.hocs.server.openai.domain.APIEntry;
 import com.hocs.server.saas.demo.controller.exception.GithubCloneException;
+import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEntryMapper;
 import com.hocs.server.saas.demo.service.DemoFacadeService;
-import com.hocs.server.extractor.main.SourceCodeParser;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.saas.user.gitapi.service.GitHubFacadeService;
 import com.hocs.server.saas.apidoc.service.impl.StaticApiDocServiceImpl;
@@ -25,7 +29,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 
 	private final GitHubFacadeService gitHubFacadeService;
 	private final GenerateOasUsingLLM llmService;
-	private final SourceCodeParser sourceCodeParser;
+	private final APISourceDependencyService apiSourceDependencyService;
 	private final StaticApiDocServiceImpl staticApiDocServiceImpl;
 
 
@@ -37,9 +41,13 @@ public class DemoServiceImpl implements DemoFacadeService {
 			.orElseThrow(() -> new GithubCloneException("Clone 실패"));
 		log.info("clonedDir absolute path = {}",clonedDir.toAbsolutePath());
 
-		Path metaDataFilePath = sourceCodeParser.createMetaData(clonedDir.toFile(),gitRepo, userId);
+		APISourceDependencyInfo apiSourceDependencyInfo = apiSourceDependencyService.extractApiSourceDependencyInfo(
+			ClientProjectType.SPRING_JAVA, clonedDir.toFile(), gitRepo, userId);
 
-		llmService.generate(userId,metaDataFilePath,clonedDir.toFile());
+		List<APIEntry> apiEntries = APISourceDependencyInfoToAPIEntryMapper.mapToAPIEntries(
+			apiSourceDependencyInfo);
+
+		llmService.generate(userId,apiEntries,clonedDir.toFile());
 		MemoryProcessPercentage.clear(userId);
 
 		HttpClient.toSaas(clonedDir.toFile(), userId);
@@ -50,6 +58,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 		String response = HttpClient.findHtmlRequest(htmlFiles.get(0).getFilePath());
 		model.addAttribute("content", response);
 	}
+
 
 
 }

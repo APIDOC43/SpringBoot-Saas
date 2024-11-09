@@ -1,4 +1,4 @@
-package com.hocs.server.extractor.util;
+package com.hocs.server.extractor.core.util;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
