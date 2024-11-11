@@ -94,7 +94,7 @@ public class PromptMessageHub {
 			데이터
 			```
 			아래는 """ + " "+ apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
-			"\n"+ apiEndpoint.getSrc()+"\n "+srcRelationErrorForamt+"```";
+			"\n"+ apiEndpoint.loadSrcString()+"\n "+srcRelationErrorForamt+"```";
 		return promptPath;
 	}
 

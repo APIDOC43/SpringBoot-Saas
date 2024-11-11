@@ -26,20 +26,19 @@ public class APIEndpoint {
 	private String API;
 	private String method;
 	private List<String> paths;
-	private String src;
 	private List<String> globalSrc;
 	private String absolutePath;
 
 	public static APIEndpoint create(String API, String method, List<String> paths, List<String> globalSrc,
 		String absolutePath) {
-		return new APIEndpoint(API, method, paths, loadSrc(paths), globalSrc, absolutePath);
+		return new APIEndpoint(API, method, paths, globalSrc, absolutePath);
 	}
 
 
-	public static String loadSrc(List<String> paths) {
+	public String loadSrcString() {
 		// 파일 내용을 읽어 명확하게 구분된 문자열로 결합하는 메서드
 		StringBuilder contents = new StringBuilder();
-		for (String path : paths) {
+		for (String path : this.paths) {
 			try (BufferedReader reader = new BufferedReader(
 				new FileReader(path, StandardCharsets.UTF_8))) {
 				String filename = Paths.get(path).getFileName().toString();
