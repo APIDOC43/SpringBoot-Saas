@@ -14,7 +14,7 @@ GenerateOas ->> SpringAICommandForLLM: requestOasApiSnippet(client, apiEntry, ex
 SpringAICommandForLLM ->> SpringAICommandForLLM: createOasPathSection(apiEntry,srcRelationErrorFormat);
 SpringAICommandForLLM ->> SpringAICommandForLLM: createOasDescriptionDetail(apiEntry,preResult);
 SpringAICommandForLLM ->> SpringAICommandForLLM: validErrorResponseFormat(srcRelationErrorForamt,preResult);
-SpringAICommandForLLM -->> GenerateOas: return OpenAPI object
+SpringAICommandForLLM -->> GenerateOas: return PathAndComponents object
 
 GenerateOas ->> GenerateOas: generatePathList
 GenerateOas ->> GenerateOas: generateSchemasMap
