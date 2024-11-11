@@ -3,7 +3,7 @@ package com.hocs.server.openai.llm;
 
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
-import com.hocs.server.openai.llm.ApiEntryMapper.APIEntry;
+import com.hocs.server.openai.domain.APIEntry;
 import java.util.List;
 import java.util.Map;
 

@@ -1,7 +1,5 @@
 package com.hocs.server.extractor.domain;
 
-import jakarta.persistence.Access;
-import jakarta.persistence.Entity;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

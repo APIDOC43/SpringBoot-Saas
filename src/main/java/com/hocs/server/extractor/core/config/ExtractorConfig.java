@@ -1,4 +1,4 @@
-package com.hocs.server.extractor.config;
+package com.hocs.server.extractor.core.config;
 
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ParserConfiguration.LanguageLevel;
