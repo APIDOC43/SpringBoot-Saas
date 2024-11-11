@@ -5,7 +5,7 @@ import com.github.javaparser.ast.expr.AnnotationExpr;
 import java.util.Arrays;
 import java.util.List;
 
-public class HttpMethodManager {
+public class HttpMethodUtil {
 	/**
 	 * 어노테이션 이름과 내용을 기반으로 HTTP 메서드를 추출합니다.
 	 * @param annotationName 어노테이션 이름 (e.g., GetMapping)

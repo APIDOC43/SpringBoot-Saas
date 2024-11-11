@@ -1,6 +1,6 @@
 package com.hocs.server.extractor.service;
 
-import com.hocs.server.extractor.core.entry.SpringJavaApiCodeClient;
+import com.hocs.server.extractor.core.client.SpringJavaApiCodeClient;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.respository.mongo.APISourceDependencyRepository;

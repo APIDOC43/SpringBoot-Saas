@@ -14,6 +14,7 @@ import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.hocs.server.extractor.core.data.JavaClassifiedDataContainer;
+import com.hocs.server.extractor.core.util.GenericTypeResolver;
 import com.hocs.server.extractor.core.util.GroupingStrategy;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -33,7 +34,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DependencyExplorer {
 	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
-	private final MethodChainingResolver methodChainingResolver;
+	private final ExpressionResolver expressionResolver;
+	private final GenericTypeResolver genericTypeResolver;
 
 
 	/**
@@ -49,7 +51,7 @@ public class DependencyExplorer {
 		visitedClasses.add(className);
 
 		// 제네릭 타입 일경우 실제 타입 인수 추출
-		List<String> extractedClassNames = extractClassNamesFromType(className);
+		List<String> extractedClassNames = genericTypeResolver.extractClassNamesFromType(className);
 
 		for (String extractedClassName : extractedClassNames) {
 			String actualClassName = extractedClassName;
@@ -147,29 +149,7 @@ public class DependencyExplorer {
 	}
 
 
-	/**
-	 * 주어진 타입 문자열에서 클래스 이름을 추출합니다.
-	 * @ex) : List-ProductResponse -> ["List", "ProductResponse"]
-	 */
-	private List<String> extractClassNamesFromType(String typeStr) {
-		List<String> classNames = new ArrayList<>();
-		if (typeStr.contains("<") && typeStr.contains(">")) {
-			// 제네릭 타입 처리
-			int start = typeStr.indexOf('<');
-			int end = typeStr.lastIndexOf('>');
-			String mainType = typeStr.substring(0, start).trim();
-			String genericTypes = typeStr.substring(start + 1, end).trim();
-			classNames.add(mainType);
-			// 제네릭 타입이 여러 개인 경우 쉼표로 분리
-			String[] generics = genericTypes.split(",");
-			for (String generic : generics) {
-				classNames.add(generic.trim());
-			}
-		} else {
-			classNames.add(typeStr);
-		}
-		return classNames;
-	}
+
 
 	/**
 	 * 메서드 호출을 추적하여 필요한 파일 경로를 수집합니다.
@@ -259,11 +239,14 @@ public class DependencyExplorer {
 				List<MethodCallExpr> methodCalls = body.findAll(MethodCallExpr.class);
 				for (MethodCallExpr callExpr : methodCalls) {
 					try {
-						String scopeClassName = methodChainingResolver.resolveMethodChainingClassName(callExpr.getScope().orElse(null), className);
+						Optional<String> scopeClassNameOpt = expressionResolver.resolveExpressionType(callExpr.getScope().orElse(null), className);
 
-						if (scopeClassName != null) {
+						if (scopeClassNameOpt.isPresent()) {
 							String calledMethodName = callExpr.getNameAsString();
-							String calledFilePath = javaClassifiedDataContainer.getClassToFilePath().get(scopeClassName);
+							String scopeClassName = scopeClassNameOpt.get();
+
+							String calledFilePath = javaClassifiedDataContainer.getClassToFilePath().get(
+								scopeClassName);
 							if (calledFilePath != null) {
 								requiredFiles.add(calledFilePath);
 								// 인터페이스인 경우 구현체를 모두 추적
@@ -292,9 +275,9 @@ public class DependencyExplorer {
 				List<FieldAccessExpr> fieldAccessExprs = body.findAll(FieldAccessExpr.class);
 				for (FieldAccessExpr fieldAccessExpr : fieldAccessExprs) {
 					try {
-						String scopeClassName = methodChainingResolver.resolveMethodChainingClassName(fieldAccessExpr.getScope(), className);
-						if (scopeClassName != null) {
-							String fieldFilePath = javaClassifiedDataContainer.getClassToFilePath().get(scopeClassName);
+						Optional<String> scopeClassName = expressionResolver.resolveExpressionType(fieldAccessExpr.getScope(), className);
+						if (scopeClassName.isPresent()) {
+							String fieldFilePath = javaClassifiedDataContainer.getClassToFilePath().get(scopeClassName.get());
 							if (fieldFilePath != null) {
 								requiredFiles.add(fieldFilePath);
 							}

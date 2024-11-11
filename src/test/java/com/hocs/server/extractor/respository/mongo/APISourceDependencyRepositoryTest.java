@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.hocs.server.extractor.domain.AOP;
 import com.hocs.server.extractor.domain.API;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
+import com.hocs.server.extractor.domain.ApiEndpoint;
 import com.hocs.server.extractor.domain.ExceptionHandler;
 import com.hocs.server.extractor.domain.GlobalSourceDependency;
 import java.util.Arrays;
@@ -31,11 +32,12 @@ class APISourceDependencyRepositoryTest {
 		repository.deleteAll();  // 테스트 환경 초기화
 
 		// 테스트용 APIConfiguration 객체 생성
-		API testAPI = API.create("api/v1/test", "POST", Arrays.asList("path1", "path2"));
+		API testAPI = API.create(
+			ApiEndpoint.create("api/v1/test", "POST"), Arrays.asList("path1", "path2"));
 		GlobalSourceDependency global = GlobalSourceDependency.create(
 			UUID.randomUUID().toString(),
 			AOP.create(Arrays.asList("aopPath1", "aopPath2")),
-			ExceptionHandler.create(UUID.randomUUID().toString(), List.of("exceptionHandlerPath")),
+			ExceptionHandler.create( List.of("exceptionHandlerPath")),
 			Arrays.asList("config1", "config2"),
 			Arrays.asList("component1", "component2")
 		);
@@ -65,7 +67,7 @@ class APISourceDependencyRepositoryTest {
 		List<APISourceDependencyInfo> apiDependencies = repository.findAll();
 
 		assertThat(apiDependencies).hasSize(1);
-		assertThat(apiDependencies.get(0).getApiSourceDependencies().get(0).getApi()).isEqualTo(
+		assertThat(apiDependencies.get(0).getApiSourceDependencies().get(0).getApiEndpoint().getApi()).isEqualTo(
 			"api/v1/test");
 	}
 
