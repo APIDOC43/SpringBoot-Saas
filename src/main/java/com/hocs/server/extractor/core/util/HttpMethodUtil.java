@@ -1,11 +1,11 @@
-package com.hocs.server.extractor.util;
+package com.hocs.server.extractor.core.util;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import java.util.Arrays;
 import java.util.List;
 
-public class HttpMethodManager {
+public class HttpMethodUtil {
 	/**
 	 * 어노테이션 이름과 내용을 기반으로 HTTP 메서드를 추출합니다.
 	 * @param annotationName 어노테이션 이름 (e.g., GetMapping)
@@ -42,7 +42,7 @@ public class HttpMethodManager {
 	/**
 	 * HTTP 메서드 어노테이션인지 확인합니다.
 	 */
-	public static boolean isHttpMethod(MethodDeclaration method) {
+	public static boolean haveHttpMethodAnnotation(MethodDeclaration method) {
 		List<String> httpAnnotations = Arrays.asList(
 			"GetMapping", "PostMapping", "PutMapping", "DeleteMapping", "PatchMapping",
 			"RequestMapping"
