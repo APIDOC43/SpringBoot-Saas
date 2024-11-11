@@ -4,7 +4,7 @@ package com.hocs.server.openai.llm;
 import static org.springframework.ai.openai.api.OpenAiApi.ChatModel.GPT_4_O;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.Schema;
@@ -33,33 +33,24 @@ public class SpringAICommandForLLM {
 	@Value("${openai.api-key}")
 	private String apiKey;
 
-	public String integrationOas(StringBuffer totalContent, ChatClient client) {
-		log.info("----------------------------");
-		ChatClientPromptRequestSpec requestPath = client.prompt(
-			new Prompt(PromptMessageHub.createOasBasedSnippet(totalContent.toString())));
-		String content = getResultContent(requestPath.call());
-		content = cleanYamlContent(content);
-		return content;
-	}
 
-
-
-	public OpenAPI requestOasApiSnippet(ChatClient client, APIEntry apiEntry, int time,String srcRelationErrorForamt)
+	public OpenAPI requestOasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, int time,String srcRelationErrorFormat)
 		throws JsonProcessingException {
 		threadSleep(time);
 		log.info("-------------------------------");
 
-		String promptStr = PromptMessageHub.createOasPathSection(apiEntry,srcRelationErrorForamt);
+		//createOasPathSection
+		String promptStr = PromptMessageHub.createOasPathSection(apiEndpoint,srcRelationErrorFormat);
 		ChatClientPromptRequestSpec requestPath = client.prompt(new Prompt(promptStr));
 		String pathContent = getResultContent(requestPath.call());
 
-		//valid
-		String validPrompt = PromptMessageHub.createOasDescriptionDetail(apiEntry,pathContent);
+		//createOasDescriptionDetail
+		String validPrompt = PromptMessageHub.createOasDescriptionDetail(apiEndpoint,pathContent);
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
 		String result = getResultContent(validRequest.call());
 
-		//errorResponse format valid
-		String formatValidPrompt = PromptMessageHub.vaildErrorResponseFormat(srcRelationErrorForamt,result);
+		//validErrorResponseFormat
+		String formatValidPrompt = PromptMessageHub.validErrorResponseFormat(srcRelationErrorFormat,result);
 		ChatClientPromptRequestSpec formatValidRequest = client.prompt(new Prompt(formatValidPrompt));
 		result = getResultContent(formatValidRequest.call());
 

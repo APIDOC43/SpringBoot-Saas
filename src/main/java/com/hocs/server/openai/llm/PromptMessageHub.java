@@ -1,14 +1,14 @@
 package com.hocs.server.openai.llm;
 
 
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.saas.model.Schema;
 import java.util.List;
 
 public class PromptMessageHub {
 
-	public static String createOasDescriptionDetail(APIEntry apiEntry, String oas) {
-		return "API: " + apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' 에 대한\n"+"""
+	public static String createOasDescriptionDetail(APIEndpoint apiEndpoint, String oas) {
+		return "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대한\n"+"""
 			OAS(OpenAPI Specification) 3.0.0 파일을 수정하려고 한다.
 			\n"""+oas+"\n"+"""
 						
@@ -45,11 +45,11 @@ public class PromptMessageHub {
 	}
 
 
-	public static String createOasPathSection(APIEntry apiEntry, String srcRelationErrorForamt) {
+	public static String createOasPathSection(APIEndpoint apiEndpoint, String srcRelationErrorForamt) {
 		String promptPath = """
 			목표 :
 			```
-			""" + "API: " + apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' 에 대해서\n" + """
+			""" + "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대해서\n" + """
 			OAS(Open api spec) 3.0.0 파일의 path만을 작성하려고 한다.
 			```
 
@@ -93,45 +93,11 @@ public class PromptMessageHub {
 
 			데이터
 			```
-			아래는 """ + " "+apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
-			"\n"+apiEntry.getSrc()+"\n "+srcRelationErrorForamt+"```";
+			아래는 """ + " "+ apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
+			"\n"+ apiEndpoint.getSrc()+"\n "+srcRelationErrorForamt+"```";
 		return promptPath;
 	}
 
-	public static String createOasBasedSnippet(String totalContent) {
-		return """
-			목표 :
-			```
-			조각난 OAS yaml파일을 조합하여 OAS(open api spec) 3.0.0 파일 전체를 생성한다.
-			```
-
-			조건:
-			```
-			1.데이터를 기반으로 적절하게 재구성하여 OAS 3.0.0 문법에 호환되도록 구성한다.
-			2.생략없이 전체코드를 답변하라.
-			3.답변은 yaml파일만 답변하라.
-			4.단 x_audience 키는 예외로 반드시 유지하라.(특이사항)
-			5.중복되는 요소는 하나로 중복을 제거한다.
-			6.responses 하위 계층은 아래 계층 구조를 반드시 지켜야 한다.
-			               '{Http Status code}':
-			            description: {description}
-			            content:
-			              application/json:
-			                schema:
-			                  $ref: "#/components/schemas/{your schema name}}"
-			7. components.schemas에서 아래와 같이 내부에 또다른 schema를 참조하는 경우 OAS형식을 무시하고 description을 포함한다.(특이사항)
-			         address:
-			           $ref: "#/components/schemas/Address"
-			           description: "주소"
-			8.마지막점검으로 특이사항을 제외하고 OAS문법을 준수했는지 확인한다.
-						
-			```
-
-			데이터
-			```
-			아래 yaml을 기반으로 조합하여 으로 OAS파일 전체를 생성한다. 설명은 한글로 작성
-			"""+"\n"+totalContent+"\n```";
-	}
 
 	public static String integrationSchema(List<Schema> schema) {
 		StringBuffer sb = new StringBuffer();
@@ -159,7 +125,7 @@ public class PromptMessageHub {
 			"""+sb;
 	}
 
-	public static String vaildErrorResponseFormat(String srcRelatedError, String result) {
+	public static String validErrorResponseFormat(String srcRelatedError, String result) {
 		return """
 						
 			아래는 API 하나에 대한 OAS 명세이다.

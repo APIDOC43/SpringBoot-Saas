@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.openai.util.FileManager;
@@ -40,21 +40,20 @@ public class GenerateOasUsingLLM {
 	private final SpringAICommandForLLM springAiCommandForLLM;
 	private final OasRepository OasRepository;
 
-	public void generate(String userId, List<APIEntry> apiEntries, File projectDir) throws IOException {
+	public void generate(String userId, List<APIEndpoint> apiEntries, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
-		ChatClient chatClient4o = springAiCommandForLLM.createChatClient4o();
 
-		/** output.yaml to APIEntry **/
+		/** output.yaml to APIEndpoint **/
 		if (apiEntries == null || apiEntries.size() == 0) {
-			throw new ApiEntriesNullException("APIEntry is empty");
+			throw new ApiEntriesNullException("APIEndpoint is empty");
 		}
 
 		Map<String, List<Schema>> schemasMap = new HashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();
 
-		String exceptionFormatSrc = findRelatedExceptionSrc(projectRootPath, chatClient4o);
+		String exceptionFormatSrc = findRelatedExceptionSrc(projectRootPath, client);
 
 		int totalTasks = Math.min(apiEntries.size(), 3); // 작업 개수 제한
 		AtomicInteger completedTasks = new AtomicInteger(0); // 완료된 작업 수
@@ -63,7 +62,7 @@ public class GenerateOasUsingLLM {
 		List<CompletableFuture<Void>> futures = apiEntries.stream()
 			.limit(totalTasks) // 처음 3개 항목에 대해서만 병렬 처리
 			.map(apiEntry -> CompletableFuture.runAsync(() ->
-				processApiEntry(client, apiEntry, schemasMap, pathList, exceptionFormatSrc)
+				generateOasPathSchemaSnippet(client, apiEntry, schemasMap, pathList, exceptionFormatSrc)
 			).thenRun(() -> { // 작업 완료 후 실행
 				int completed = completedTasks.incrementAndGet();
 				MemoryProcessPercentage.save(userId, completed, totalTasks); // 진행 상황 계산
@@ -76,7 +75,7 @@ public class GenerateOasUsingLLM {
 		//path integeration
 		List<Map<String, PathItem>> integrationPaths = pathIntegration(pathList);
 		//schema integration
-		removeDuplicates(chatClient4o, schemasMap);
+		removeDuplicates(client, schemasMap);
 
 		OasRepository.save(
 			OAS.create(userId, OasInfo.create(userId, "", "", "", "", "3.0.1"), pathList,
@@ -201,11 +200,11 @@ public class GenerateOasUsingLLM {
 		return result;
 	}
 
-	private void processApiEntry(ChatClient client, APIEntry apiEntry,
+	private void generateOasPathSchemaSnippet(ChatClient client, APIEndpoint apiEndpoint,
 		Map<String, List<Schema>> schemasMap,
 		Map<String, List<Map<String, PathItem>>> pathList, String exceptionFormatSrc) {
-		OpenAPI openAPI = oasApiSnippet(client, apiEntry, exceptionFormatSrc);
-		openAPI.getPaths().values().forEach(f -> f.setX_link(apiEntry.getAbsolutePath()));
+		OpenAPI openAPI = oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
+		openAPI.getPaths().values().forEach(f -> f.setX_link(apiEndpoint.getAbsolutePath()));
 
 		Components components = openAPI.getComponents();
 		if (components != null && components.getSchemas() != null) {
@@ -249,15 +248,15 @@ public class GenerateOasUsingLLM {
 	}
 
 
-	private OpenAPI oasApiSnippet(ChatClient client, APIEntry apiEntry, String exceptionFormatSrc) {
+	private OpenAPI oasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, String exceptionFormatSrc) {
 
 		OpenAPI openAPI = null;
 		try {
-			openAPI = springAiCommandForLLM.requestOasApiSnippet(client, apiEntry, 0,
+			openAPI = springAiCommandForLLM.requestOasApiSnippet(client, apiEndpoint, 0,
 				exceptionFormatSrc);
 		} catch (JsonProcessingException e) {
 			sleep(3000);
-			return oasApiSnippet(client, apiEntry, exceptionFormatSrc);
+			return oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
 		}
 		return openAPI;
 	}
