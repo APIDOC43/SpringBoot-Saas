@@ -47,7 +47,7 @@ public class SrcFileCollectorTest {
 		file3 = Files.createFile(java.resolve("Test3.java"));
 
 		apiEntries = new ArrayList<>();
-		APIEndpoint entry = new APIEndpoint("test", "test", new ArrayList<>(), "test");
+		APIEndpoint entry = APIEndpoint.create("test", "test", new ArrayList<>(), new ArrayList<>(), "test");
 		apiEntries.add(entry);
 
 	}
