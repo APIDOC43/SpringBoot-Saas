@@ -1,6 +1,5 @@
 package com.hocs.server.openai.domain;
 
-import com.hocs.server.extractor.domain.ApiEndpoint;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 // APIEndpoint 클래스 정의
