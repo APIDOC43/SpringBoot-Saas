@@ -3,9 +3,9 @@ package com.hocs.server.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.hocs.server.openai.domain.output.PathAndComponents;
 import com.hocs.server.openai.util.OpenAPIParser;
 import com.hocs.server.openai.domain.output.MediaType;
-import com.hocs.server.openai.domain.output.OpenAPI;
 import com.hocs.server.openai.domain.output.Operation;
 import com.hocs.server.openai.domain.output.Parameter;
 import com.hocs.server.openai.domain.output.PathItem;
@@ -13,7 +13,7 @@ import com.hocs.server.openai.domain.output.Response;
 import com.hocs.server.openai.domain.output.Schema;
 import org.junit.jupiter.api.Test;
 
-public class OpenAPIParserTest {
+public class PathAndComponentsParserTest {
 
 	@Test
 	public void testParseOpenAPI() throws JsonProcessingException {
@@ -52,15 +52,15 @@ public class OpenAPIParserTest {
 			          type: "integer"
 			""";
 
-		OpenAPI openAPI = OpenAPIParser.parse(oasYaml);
+		PathAndComponents pathAndComponents = OpenAPIParser.parse(oasYaml);
 
-//		assertNotNull(openAPI);
-//		assertEquals("Sample API", openAPI.getInfo().getTitle());
-//		assertEquals("This is a sample API", openAPI.getInfo().getDescription());
-//		assertEquals("1.0.0", openAPI.getInfo().getVersion());
+//		assertNotNull(pathAndComponents);
+//		assertEquals("Sample API", pathAndComponents.getInfo().getTitle());
+//		assertEquals("This is a sample API", pathAndComponents.getInfo().getDescription());
+//		assertEquals("1.0.0", pathAndComponents.getInfo().getVersion());
 
-		assertTrue(openAPI.getPaths().containsKey("/example"));
-		PathItem examplePath = openAPI.getPaths().get("/example");
+		assertTrue(pathAndComponents.getPaths().containsKey("/example"));
+		PathItem examplePath = pathAndComponents.getPaths().get("/example");
 		assertNotNull(examplePath.getGet());
 		assertEquals("Example GET", examplePath.getGet().getSummary());
 		assertEquals("Get example item", examplePath.getGet().getDescription());
@@ -81,7 +81,7 @@ public class OpenAPIParserTest {
 		assertEquals("#/components/schemas/ExampleSchema",
 			response200.getContent().get("application/json").getSchema().getRef());
 
-		Schema exampleSchema = openAPI.getComponents().getSchemas().get("ExampleSchema");
+		Schema exampleSchema = pathAndComponents.getComponents().getSchemas().get("ExampleSchema");
 		assertNotNull(exampleSchema);
 		assertEquals("object", exampleSchema.getType());
 		assertEquals("Example schema", exampleSchema.getDescription());

@@ -3,15 +3,15 @@ package com.hocs.server.openai.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.hocs.server.openai.domain.output.OpenAPI;
+import com.hocs.server.openai.domain.output.PathAndComponents;
 import com.hocs.server.openai.domain.output.PathItem;
 import com.hocs.server.openai.domain.output.Schema;
 
 public class OpenAPIParser {
-	public static OpenAPI parse(String oasYaml) throws JsonProcessingException {
+	public static PathAndComponents parse(String oasYaml) throws JsonProcessingException {
 		System.out.println(oasYaml);
 		ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-		return objectMapper.readValue(oasYaml, OpenAPI.class);
+		return objectMapper.readValue(oasYaml, PathAndComponents.class);
 
 	}
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.output.PathAndComponents;
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
 import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
@@ -13,7 +14,6 @@ import com.hocs.server.openai.util.MemoryProcessPercentage;
 import com.hocs.server.openai.domain.output.Components;
 import com.hocs.server.openai.domain.output.OAS;
 import com.hocs.server.openai.domain.output.OasInfo;
-import com.hocs.server.openai.domain.output.OpenAPI;
 import com.hocs.server.openai.domain.output.PathItem;
 import com.hocs.server.openai.domain.output.Schema;
 import java.io.File;
@@ -143,10 +143,10 @@ public class GenerateOasFacadeService {
 		Map<String, List<Map<String, PathItem>>> pathList, String exceptionFormatSrc) {
 
 
-		OpenAPI openAPI = oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
-		openAPI.getPaths().values().forEach(f -> f.setX_link(apiEndpoint.getAbsolutePath()));
+		PathAndComponents pathAndComponents = oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
+		pathAndComponents.getPaths().values().forEach(f -> f.setX_link(apiEndpoint.getAbsolutePath()));
 
-		Components components = openAPI.getComponents();
+		Components components = pathAndComponents.getComponents();
 		if (components != null && components.getSchemas() != null) {
 			components.getSchemas().forEach((key, schema) -> {
 				schemasMap.putIfAbsent(key, new ArrayList<>());
@@ -154,7 +154,7 @@ public class GenerateOasFacadeService {
 			});
 		}
 
-		Map<String, PathItem> paths = openAPI.getPaths();
+		Map<String, PathItem> paths = pathAndComponents.getPaths();
 		paths.forEach((key, pathItem) -> {
 			pathList.putIfAbsent(key, new ArrayList<>());
 			pathList.get(key).add(paths);
@@ -163,17 +163,17 @@ public class GenerateOasFacadeService {
 
 
 
-	private OpenAPI oasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, String exceptionFormatSrc) {
+	private PathAndComponents oasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, String exceptionFormatSrc) {
 
-		OpenAPI openAPI = null;
+		PathAndComponents pathAndComponents = null;
 		try {
-			openAPI = springAiCommandForLLM.requestOasApiSnippet(client, apiEndpoint, 0,
+			pathAndComponents = springAiCommandForLLM.requestOasApiSnippet(client, apiEndpoint, 0,
 				exceptionFormatSrc);
 		} catch (JsonProcessingException e) {
 			sleep(3000);
 			return oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
 		}
-		return openAPI;
+		return pathAndComponents;
 	}
 
 	private void sleep(int time) {

@@ -5,9 +5,9 @@ import static org.springframework.ai.openai.api.OpenAiApi.ChatModel.GPT_4_O;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.output.PathAndComponents;
 import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.llm.util.LLMResponseUtil;
-import com.hocs.server.openai.domain.output.OpenAPI;
 import com.hocs.server.openai.domain.output.Schema;
 import com.hocs.server.openai.util.OpenAPIParser;
 import com.hocs.server.saas.util.cli.CLIManager;
@@ -38,7 +38,7 @@ public class SpringAICommandForLLM {
 
 	private final LLMResponseUtil llmResponseUtil;
 
-	public OpenAPI requestOasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, int time,String srcRelationErrorFormat)
+	public PathAndComponents requestOasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, int time,String srcRelationErrorFormat)
 		throws JsonProcessingException {
 		threadSleep(time);
 		log.info("-------------------------------");
@@ -59,7 +59,7 @@ public class SpringAICommandForLLM {
 		result = getResultContent(formatValidRequest.call());
 
 		String str = llmResponseUtil.cleanYamlContent(result);
-		OpenAPI parse = OpenAPIParser.parse(str);
+		PathAndComponents parse = OpenAPIParser.parse(str);
 
 		return parse;
 	}
