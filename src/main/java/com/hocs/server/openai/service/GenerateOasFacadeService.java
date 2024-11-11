@@ -76,7 +76,7 @@ public class GenerateOasFacadeService {
 		//path integeration
 		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
 		//schema integration
-		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.shemaIntegration(client, schemasMap);
+		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
 
 		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
 		String result = merge(schemasMap, integrationPaths);

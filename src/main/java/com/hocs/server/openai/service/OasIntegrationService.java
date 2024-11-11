@@ -20,7 +20,7 @@ public class OasIntegrationService {
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
 
-	public HashMap<String, List<Schema>> shemaIntegration(ChatClient chatClient4o, Map<String, List<Schema>> schemasMap) {
+	public HashMap<String, List<Schema>> schemaIntegration(ChatClient chatClient4o, Map<String, List<Schema>> schemasMap) {
 		HashMap<String, List<Schema>> temp = new HashMap<>();
 		for (String key : schemasMap.keySet()) {
 			List<Schema> schemas = schemasMap.get(key);
