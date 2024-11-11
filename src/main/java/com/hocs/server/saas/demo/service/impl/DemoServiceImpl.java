@@ -3,7 +3,7 @@ package com.hocs.server.saas.demo.service.impl;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.service.APISourceDependencyService;
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.saas.demo.controller.exception.GithubCloneException;
 import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEntryMapper;
 import com.hocs.server.saas.demo.service.DemoFacadeService;
@@ -44,7 +44,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 		APISourceDependencyInfo apiSourceDependencyInfo = apiSourceDependencyService.extractApiSourceDependencyInfo(
 			ClientProjectType.SPRING_JAVA, clonedDir.toFile(), gitRepo, userId);
 
-		List<APIEntry> apiEntries = APISourceDependencyInfoToAPIEntryMapper.mapToAPIEntries(
+		List<APIEndpoint> apiEntries = APISourceDependencyInfoToAPIEntryMapper.mapToAPIEntries(
 			apiSourceDependencyInfo);
 
 		llmService.generate(userId,apiEntries,clonedDir.toFile());
