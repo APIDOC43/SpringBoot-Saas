@@ -11,7 +11,6 @@ import java.util.List;
 
 public class FileManager {
 
-	private final static String IMPORT_PARSE_REGEX = "(?m)^\\s*import\\s+.*?;\\s*";
 	public static void saveToFile(String content,String name) {
 		try {
 			Files.writeString(Paths.get(name), content);
@@ -19,56 +18,5 @@ public class FileManager {
 			throw new RuntimeException(e);
 		}
 	}
-
-
-	// 파일 내용을 읽어 명확하게 구분된 문자열로 결합하는 메서드
-	public static String loadFileContents(List<String> filePaths) {
-		StringBuilder contents = new StringBuilder();
-		for (String path : filePaths) {
-			try (BufferedReader reader = new BufferedReader(new FileReader(path, StandardCharsets.UTF_8))) {
-				String filename = Paths.get(path).getFileName().toString();
-				StringBuilder fileContent = new StringBuilder();
-				String line;
-				while ((line = reader.readLine()) != null) {
-					fileContent.append(line).append("\n");
-				}
-
-				// import 문 제거
-				String leanedContent = fileContent.toString().replaceAll(IMPORT_PARSE_REGEX, "");
-				// 파일 이름을 헤더로 추가하고, 코드 블록으로 소스 코드를 감쌉니다.
-				contents.append("### File: ").append(filename).append("\n")
-					.append("```java\n")
-					.append(leanedContent)
-					.append("```\n\n");
-			} catch (IOException e) {
-				System.out.println("Error reading file " + path + ": " + e.getMessage());
-			}
-		}
-
-
-		return contents.toString();
-	}
-
-	// 단일 파일 내용을 읽어 명확하게 구분된 문자열로 결합하는 메서드
-	public static String loadSingleFileContents(String filePath) {
-		StringBuilder contents = new StringBuilder();
-		try (BufferedReader reader = new BufferedReader(new FileReader(filePath, StandardCharsets.UTF_8))) {
-			String filename = Paths.get(filePath).getFileName().toString();
-			StringBuilder fileContent = new StringBuilder();
-			String line;
-			while ((line = reader.readLine()) != null) {
-				fileContent.append(line).append("\n");
-			}
-			// 파일 이름을 헤더로 추가하고, 코드 블록으로 소스 코드를 감쌉니다.
-			contents.append("### File: ").append(filename).append("\n")
-				.append("```java\n")
-				.append(fileContent.toString())
-				.append("```\n\n");
-		} catch (IOException e) {
-			System.out.println("Error reading file " + filePath + ": " + e.getMessage());
-		}
-		return contents.toString();
-	}
-
 
 }

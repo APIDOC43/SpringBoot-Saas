@@ -4,24 +4,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.hocs.server.extractor.domain.APISourceDependencyInfo;
-import com.hocs.server.extractor.service.APISourceDependencyService;
+import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
+import com.hocs.server.openai.util.FileManager;
+import com.hocs.server.openai.util.MemoryProcessPercentage;
 import com.hocs.server.saas.model.Components;
 import com.hocs.server.saas.model.OAS;
 import com.hocs.server.saas.model.OasInfo;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
-import com.hocs.server.openai.domain.APIEntry;
-import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
-import com.hocs.server.openai.util.FileManager;
-import com.hocs.server.openai.util.MemoryProcessPercentage;
 import com.hocs.server.util.OpenAPIParser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,13 +42,11 @@ public class GenerateOasUsingLLM {
 
 	public void generate(String userId, List<APIEntry> apiEntries, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
-//		String sourceCodeMetaData = metaDataFilePath.toFile().getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
 		ChatClient chatClient4o = springAiCommandForLLM.createChatClient4o();
 
 		/** output.yaml to APIEntry **/
-//		List<APIEntry> apiEntries = ApiEntryMapper.parse(sourceCodeMetaData);
 		if (apiEntries == null || apiEntries.size() == 0) {
 			throw new ApiEntriesNullException("APIEntry is empty");
 		}
