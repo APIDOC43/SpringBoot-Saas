@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
  * OAS 관련처리, static html 생성까지만 책임을 가지는 도메인
  */
 @RestController
+@Slf4j
 public class OasController {
 	@Value("${path.SSG-root}")
 	private String renderRootPath;
@@ -32,7 +34,7 @@ public class OasController {
 
 	@PostMapping("/demo/api/v1/oas")
 	public ResponseEntity<String> uploadFile(@RequestParam(name = "file") MultipartFile file,@RequestParam(name = "userId") String userId) {
-		System.out.println("OasController.uploadFile");
+		log.info("OasController.uploadFile");
 		if (file.isEmpty()) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("파일이 없습니다.");
 		}

@@ -4,7 +4,7 @@ import com.hocs.server.extractor.domain.API;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ApiEndpoint;
 import com.hocs.server.extractor.domain.GlobalSourceDependency;
-import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,26 +1,24 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
-import jakarta.persistence.Access;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "requestBody")
+@Document(collection = "response")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RequestBody {
+public class Response {
 
 	private String description;
-	private boolean required = false;
 	private Map<String, MediaType> content;
+	private Object headers;
 
-	public static RequestBody create(String description, boolean required,
-		Map<String, MediaType> content) {
-		return new RequestBody(description, required, content);
+	public static Response create(String description, Map<String, MediaType> content,
+		Object headers) {
+		return new Response(description, content, headers);
 	}
 }

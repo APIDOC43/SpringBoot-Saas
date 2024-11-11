@@ -1,4 +1,4 @@
-package com.hocs.server.openai.domain;
+package com.hocs.server.openai.domain.input;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -1,4 +1,4 @@
-package com.hocs.server.util.cli;
+package com.hocs.server.saas.util.cli;
 
 import java.io.BufferedReader;
 import java.io.IOException;
