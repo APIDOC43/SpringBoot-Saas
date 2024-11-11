@@ -1,4 +1,4 @@
-package com.hocs.server.extractor.core.entry;
+package com.hocs.server.extractor.core.client;
 
 import com.hocs.server.extractor.core.DependencyAnalyzer;
 import com.hocs.server.extractor.core.SrcFileCollector;

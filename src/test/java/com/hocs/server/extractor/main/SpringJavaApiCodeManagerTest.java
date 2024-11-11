@@ -2,7 +2,7 @@ package com.hocs.server.extractor.main;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hocs.server.extractor.core.entry.SpringJavaApiCodeClient;
+import com.hocs.server.extractor.core.client.SpringJavaApiCodeClient;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
@@ -12,9 +12,11 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 
 @SpringBootTest
+@ActiveProfiles("dev")
 class SpringJavaApiCodeManagerTest {
 
 	@Autowired
@@ -30,7 +32,7 @@ class SpringJavaApiCodeManagerTest {
 		ClientProjectType clientProjectType = ClientProjectType.SPRING_JAVA;
 		Path SOURCE_ROOT = new File(PROJECT_ROOT_DIR, clientProjectType.srcRootPath()).toPath();
 		APISourceDependencyInfo metaData = springJavaApiCodeManager.findDependencyInfo(
-			ClientProjectType.SPRING_JAVA, SOURCE_ROOT, GitRepo.of(""), userId);
+			ClientProjectType.SPRING_JAVA, SOURCE_ROOT, GitRepo.of("https://github.com/givanthak/spring-boot-rest-api-tutorial.githttps://github.com/givanthak/spring-boot-rest-api-tutorial.git"), userId);
 
 		assertThat(metaData).isNotNull();
 	}

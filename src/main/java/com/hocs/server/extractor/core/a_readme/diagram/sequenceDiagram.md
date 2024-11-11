@@ -6,7 +6,7 @@ participant SrcFileCollector
 participant JavaClassifiedDataGenerator
 participant DependencyAnalyzer
 participant DependencyExplorer
-participant MethodChainingResolver
+participant ExpressionResolver
 participant GitApiService
 participant JavaClassifiedDataContainer
 participant APISourceDependencyRepository
@@ -23,9 +23,9 @@ SpringJavaApiCodeClient->>DependencyAnalyzer: findDependency(controllerClassName
 DependencyAnalyzer->>DependencyExplorer: 파라미터 의존성 추적, findClassDependencies()
 DependencyAnalyzer->>DependencyExplorer: 반환 타입 의존성 추적, findClassDependencies()
 DependencyAnalyzer->>DependencyExplorer: 메소드 바디에 있는 의존성 추적,findClassDependencies()
-DependencyExplorer->>DependencyExplorer: 클래스,인터페이스,레코드,enumm 의존성 추적
-DependencyExplorer->>MethodChainingResolver: 메소드 체이닝의 경우 루트 클래스 이름확인, resolveMethodChainingClassName()
-MethodChainingResolver-->>DependencyExplorer: 클래스 이름 반환
+DependencyExplorer->>DependencyExplorer: 클래스,인터페이스,레코드,enum 의존성 추적
+DependencyExplorer->>ExpressionResolver: Expresssion 표현식 타입 출론 , resolveExpressionType()
+ExpressionResolver-->>DependencyExplorer: 표현식 타입 반환
 DependencyExplorer->>DependencyExplorer: 메소드 호출 의존성 추적
 DependencyExplorer-->>DependencyAnalyzer: 의존성 클래스 경로 추가
 DependencyAnalyzer-->>SpringJavaApiCodeClient: API 의존성 정보 반환

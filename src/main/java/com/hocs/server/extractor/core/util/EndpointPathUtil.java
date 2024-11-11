@@ -1,6 +1,6 @@
 package com.hocs.server.extractor.core.util;
 
-import static com.hocs.server.extractor.core.util.HttpMethodManager.extractHttpMethod;
+import static com.hocs.server.extractor.core.util.HttpMethodUtil.extractHttpMethod;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  *  API Endpoint에 관한 책임을 가지는 클래스입니다.
  */
-public class EndpointPathManager {
+public class EndpointPathUtil {
 
 
 	/**
@@ -32,7 +32,7 @@ public class EndpointPathManager {
 		}
 
 		String fullApiPath = combinePaths(basePath, methodPath);
-		return ApiEndpoint.create(httpMethod, fullApiPath);
+		return ApiEndpoint.create(fullApiPath,httpMethod);
 	}
 
 

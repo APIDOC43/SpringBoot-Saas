@@ -1,7 +1,8 @@
 package com.hocs.server.extractor.core;
 
 
-import static com.hocs.server.extractor.core.util.HttpMethodManager.haveHttpMethodAnnotation;
+import static com.hocs.server.extractor.core.util.HttpMethodUtil.haveHttpMethodAnnotation;
+import static com.hocs.server.extractor.core.util.ParameterSupportAnnotations.supportedAnnotations;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -10,7 +11,7 @@ import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.hocs.server.extractor.core.data.JavaClassifiedDataContainer;
-import com.hocs.server.extractor.core.util.EndpointPathManager;
+import com.hocs.server.extractor.core.util.EndpointPathUtil;
 import com.hocs.server.extractor.domain.API;
 import com.hocs.server.extractor.domain.ApiEndpoint;
 import java.nio.file.Files;
@@ -61,14 +62,14 @@ public class DependencyAnalyzer {
 		TypeDeclaration<?> classDeclaration = srcContentUnit.getType(0);
 
 		// 클래스의 @RequestMapping 경로 추출
-		String basePath = EndpointPathManager.findRequestMappingValue(classDeclaration);
+		String basePath = EndpointPathUtil.findRequestMappingValue(classDeclaration);
 
 		// 클래스의 모든 메서드를 순회합니다.
 		for (MethodDeclaration method : classDeclaration.getMethods()) {
 			if (haveHttpMethodAnnotation(method)) {
 
 				// endpoint 정보 추출 = http method, url
-				ApiEndpoint apiEndpoint = EndpointPathManager.generateApiEndpoint(basePath, method);
+				ApiEndpoint apiEndpoint = EndpointPathUtil.generateApiEndpoint(basePath, method);
 
 				// API별로 필요한 파일 경로를 추적합니다.
 				Set<String> requiredFiles = new HashSet<>();
@@ -79,13 +80,19 @@ public class DependencyAnalyzer {
 				// 컨트롤러 클래스의 의존성도 추적
 				dependencyExplorer.findClassDependencies(className, requiredFiles, visitedClasses);
 
-				// 메소드 파라미터 의존성 추적 [확인결과 requestBody만 추적중 다양한 어노테이션 지원해야됨]
+				// 메소드 파라미터 의존성 추적 [지원하는 모든 파라미터 어노테이션 및 MultipartFile 처리]
 				for (Parameter param : method.getParameters()) {
+					boolean isSupported = false;
 					for (AnnotationExpr paramAnnotation : param.getAnnotations()) {
-						if (paramAnnotation.getNameAsString().equals("RequestBody")) {
-							String requestType = param.getType().asString();
-							dependencyExplorer.findClassDependencies(requestType, requiredFiles, visitedClasses);
+						if (supportedAnnotations.contains(paramAnnotation.getNameAsString())) {
+							isSupported = true;
+							break;
 						}
+					}
+					// 파라미터 어노테이션이 지원되거나 타입이 MultipartFile인 경우 처리
+					if (isSupported || param.getType().asString().equals("MultipartFile")) {
+						String paramType = param.getType().asString();
+						dependencyExplorer.findClassDependencies(paramType, requiredFiles, visitedClasses);
 					}
 				}
 
