@@ -1,5 +1,6 @@
 package com.hocs.server.extractor.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class AOP {
 
 	@Field("paths")
-	private List<String> paths;
+	private List<String> paths = new ArrayList<>();
 
 	public static AOP create(List<String> paths) {
 		return new AOP(paths);

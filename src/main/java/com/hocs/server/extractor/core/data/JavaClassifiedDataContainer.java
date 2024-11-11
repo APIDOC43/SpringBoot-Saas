@@ -63,7 +63,7 @@ public class JavaClassifiedDataContainer {
 	}
 
 	public GlobalSourceDependency getGlobalDependencies(String id) {
-		AOP aop = null;
+		AOP aop = AOP.create(new ArrayList<>());
 		ExceptionHandler exceptionHandler = null;
 		List<String> configuration = new ArrayList<>();
 		List<String> component = new ArrayList<>();
