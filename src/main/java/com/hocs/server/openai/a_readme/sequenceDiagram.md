@@ -21,9 +21,13 @@ GenerateOas -> GenerateOas: generateSchemasMap
 
 end
 
-GenerateOas -> GenerateOas: merge paths
-GenerateOas -> SpringAICommandForLLM: removeDuplicates(client, schemasMap) // merge schema;
-SpringAICommandForLLM -> SpringAICommandForLLM: integrationSchema(schemas, client);
+GenerateOas -> GenerateOas: merge paths(삭제예정);
+GenerateOas -> SpringAICommandForLLM: removeDuplicates(client, schemasMap) // merge schema (삭제예정) 실제 소스코드 객체와의 매핑정보를 이용하면 제거할 수 있음. ;
+SpringAICommandForLLM -> SpringAICommandForLLM: integrationSchema(schemas, client) ;
+
+GenerateOas -> SpringAICommandForLLM: Oas Info 생성 요청
+SpringAICommandForLLM -> SpringAICommandForLLM: OasInfo 생성
+SpringAICommandForLLM --> GenerateOas: OasInfo 반환
 
 GenerateOas -> OasRepository: save(OAS)
 

@@ -6,11 +6,13 @@ import static org.springframework.ai.openai.api.OpenAiApi.ChatModel.GPT_4_O;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.openai.llm.exception.LLMException;
+import com.hocs.server.openai.llm.util.LLMResponseUtil;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.Schema;
 import com.hocs.server.util.OpenAPIParser;
 import com.hocs.server.util.cli.CLIManager;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.CallPromptResponseSpec;
@@ -27,12 +29,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 @Slf4j
 public class SpringAICommandForLLM {
 
 	@Value("${openai.api-key}")
 	private String apiKey;
 
+	private final LLMResponseUtil llmResponseUtil;
 
 	public OpenAPI requestOasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, int time,String srcRelationErrorFormat)
 		throws JsonProcessingException {
@@ -54,7 +58,7 @@ public class SpringAICommandForLLM {
 		ChatClientPromptRequestSpec formatValidRequest = client.prompt(new Prompt(formatValidPrompt));
 		result = getResultContent(formatValidRequest.call());
 
-		String str = cleanYamlContent(result);
+		String str = llmResponseUtil.cleanYamlContent(result);
 		OpenAPI parse = OpenAPIParser.parse(str);
 
 		return parse;
@@ -73,13 +77,7 @@ public class SpringAICommandForLLM {
 
 	}
 
-	private String cleanYamlContent(String content) {
-		content = content.replace("```", "");
-		content = content.replace("---", "");
-		content = content.replace("yaml", "");
-		content = content.replace("|-", "");
-		return content.trim();
-	}
+
 
 	private void threadSleep(int sleep) {
 		try {
@@ -95,7 +93,7 @@ public class SpringAICommandForLLM {
 		ChatClientPromptRequestSpec requestPath = client.prompt(
 			new Prompt(contents));
 		String content = getResultContent(requestPath.call());
-		return cleanYamlContent(content);
+		return llmResponseUtil.cleanYamlContent(content);
 
 	}
 
