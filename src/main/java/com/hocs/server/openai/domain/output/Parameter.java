@@ -1,10 +1,7 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
-import jakarta.persistence.Access;
-import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;

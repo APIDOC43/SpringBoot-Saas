@@ -1,6 +1,14 @@
 package com.hocs.server.openai.repository;
 
-import com.hocs.server.saas.model.*;
+import com.hocs.server.openai.domain.output.MediaType;
+import com.hocs.server.openai.domain.output.OAS;
+import com.hocs.server.openai.domain.output.OasInfo;
+import com.hocs.server.openai.domain.output.Operation;
+import com.hocs.server.openai.domain.output.Parameter;
+import com.hocs.server.openai.domain.output.PathItem;
+import com.hocs.server.openai.domain.output.RequestBody;
+import com.hocs.server.openai.domain.output.Response;
+import com.hocs.server.openai.domain.output.Schema;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

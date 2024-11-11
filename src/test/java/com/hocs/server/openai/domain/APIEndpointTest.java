@@ -2,7 +2,7 @@ package com.hocs.server.openai.domain;
 
 
 
-import org.junit.jupiter.api.BeforeEach;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.BufferedWriter;

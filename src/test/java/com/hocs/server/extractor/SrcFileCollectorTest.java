@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hocs.server.extractor.core.SrcFileCollector;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.domain.SrcSuffix;
-import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

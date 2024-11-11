@@ -3,7 +3,7 @@ package com.hocs.server.saas.demo.service.impl;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.service.APISourceDependencyService;
-import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import com.hocs.server.saas.demo.controller.exception.GithubCloneException;
 import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
 import com.hocs.server.saas.demo.service.DemoFacadeService;

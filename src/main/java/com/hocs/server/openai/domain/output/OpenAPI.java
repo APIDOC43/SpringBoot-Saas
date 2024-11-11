@@ -1,4 +1,4 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
 import java.util.Map;
 import lombok.Data;

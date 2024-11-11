@@ -1,4 +1,4 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
 import jakarta.persistence.Id;
 import java.util.List;

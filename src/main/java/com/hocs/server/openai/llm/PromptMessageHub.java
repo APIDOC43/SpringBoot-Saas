@@ -1,8 +1,8 @@
 package com.hocs.server.openai.llm;
 
 
-import com.hocs.server.openai.domain.APIEndpoint;
-import com.hocs.server.saas.model.Schema;
+import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.output.Schema;
 import java.util.List;
 
 public class PromptMessageHub {

@@ -1,6 +1,6 @@
 package com.hocs.server.saas.oas.service;
 
-import com.hocs.server.util.cli.CLIManager;
+import com.hocs.server.saas.util.cli.CLIManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

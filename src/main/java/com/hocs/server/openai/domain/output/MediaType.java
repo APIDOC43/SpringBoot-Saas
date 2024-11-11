@@ -1,21 +1,21 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "components")
+@Document(collection = "mediaType")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class Components {
+public class MediaType {
 
-	private Map<String, Schema> schemas;
-	public static Components create(Map<String, Schema> schemas) {
-		return new Components(schemas);
+	private Schema schema;
+	private String description;
+
+	public static MediaType create(Schema schema, String description) {
+		return new MediaType(schema, description);
 	}
 }

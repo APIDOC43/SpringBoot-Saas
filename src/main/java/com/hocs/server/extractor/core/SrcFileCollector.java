@@ -2,7 +2,7 @@ package com.hocs.server.extractor.core;
 
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.domain.SrcSuffix;
-import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -4,13 +4,13 @@ package com.hocs.server.openai.llm;
 import static org.springframework.ai.openai.api.OpenAiApi.ChatModel.GPT_4_O;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.llm.util.LLMResponseUtil;
-import com.hocs.server.saas.model.OpenAPI;
-import com.hocs.server.saas.model.Schema;
-import com.hocs.server.util.OpenAPIParser;
-import com.hocs.server.util.cli.CLIManager;
+import com.hocs.server.openai.domain.output.OpenAPI;
+import com.hocs.server.openai.domain.output.Schema;
+import com.hocs.server.openai.util.OpenAPIParser;
+import com.hocs.server.saas.util.cli.CLIManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

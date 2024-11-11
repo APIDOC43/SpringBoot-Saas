@@ -1,9 +1,8 @@
-package com.hocs.server.saas.model;
+package com.hocs.server.openai.domain.output;
 
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
