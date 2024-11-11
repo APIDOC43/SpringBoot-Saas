@@ -2,7 +2,7 @@ package com.hocs.server.extractor.core;
 
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.domain.SrcSuffix;
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.input.APIEndpoint;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -23,7 +23,7 @@ public class SrcFileCollector {
 	 *
 	 * @return 파일 목록
 	 */
-	public List<File> getNotUesedSrc(List<APIEntry> apiEntries,String PROJECT_ROOT,ClientProjectType clientProjectType){
+	public List<File> getNotUesedSrc(List<APIEndpoint> apiEntries,String PROJECT_ROOT,ClientProjectType clientProjectType){
 
 		String absolutePath = new File(PROJECT_ROOT, clientProjectType.srcRootPath()).getAbsolutePath();
 
@@ -31,8 +31,8 @@ public class SrcFileCollector {
 		Iterator<File> iterator = files.iterator();
 		while (iterator.hasNext()) {
 			File file = iterator.next();
-			for (APIEntry apiEntry : apiEntries) {
-				for (String path : apiEntry.getPaths()) {
+			for (APIEndpoint apiEndpoint : apiEntries) {
+				for (String path : apiEndpoint.getPaths()) {
 					if (file.getPath().equals(path)) {
 						iterator.remove();
 						break;

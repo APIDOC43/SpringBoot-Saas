@@ -1,7 +1,7 @@
 package com.hocs.server.saas.oas.service.impl;
 
 import com.hocs.server.saas.oas.service.ApiDocsUiService;
-import com.hocs.server.util.cli.CLIManager;
+import com.hocs.server.saas.util.cli.CLIManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

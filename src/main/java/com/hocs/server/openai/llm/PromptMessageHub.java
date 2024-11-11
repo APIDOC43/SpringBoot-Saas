@@ -1,37 +1,14 @@
 package com.hocs.server.openai.llm;
 
 
-import com.hocs.server.saas.model.PathItem;
-import com.hocs.server.saas.model.Schema;
-import com.hocs.server.openai.domain.APIEntry;
+import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.output.Schema;
 import java.util.List;
-import java.util.Map;
 
 public class PromptMessageHub {
 
-	public static String createOasInfoSection(String apiEndpoint) {
-		return """
-			목표:
-			```
-			OAS(OpenAPI Specification) 3.0.0 파일의 Info 섹션을 작성하려고 한다.
-			```
-
-			조건:
-			```
-			1. OAS의 Info 섹션만 작성하라.
-			2. 답변은 YAML 코드만 한다.
-			```
-
-			데이터:
-			```
-			아래는 API들의 HTTP Method 및 API endpoint이다.
-			
-			"""
-			+ apiEndpoint+"\n"
-			+ "```";
-	}
-	public static String createOasDescriptionDetail(APIEntry apiEntry, String oas) {
-		return "API: " + apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' 에 대한\n"+"""
+	public static String createOasDescriptionDetail(APIEndpoint apiEndpoint, String oas) {
+		return "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대한\n"+"""
 			OAS(OpenAPI Specification) 3.0.0 파일을 수정하려고 한다.
 			\n"""+oas+"\n"+"""
 						
@@ -68,11 +45,11 @@ public class PromptMessageHub {
 	}
 
 
-	public static String createOasPathSection(APIEntry apiEntry, String srcRelationErrorForamt) {
+	public static String createOasPathSection(APIEndpoint apiEndpoint, String srcRelationErrorForamt) {
 		String promptPath = """
 			목표 :
 			```
-			""" + "API: " + apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' 에 대해서\n" + """
+			""" + "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대해서\n" + """
 			OAS(Open api spec) 3.0.0 파일의 path만을 작성하려고 한다.
 			```
 
@@ -116,91 +93,11 @@ public class PromptMessageHub {
 
 			데이터
 			```
-			아래는 """ + " "+apiEntry.getMethod() + " \'" + apiEntry.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
-			"\n"+apiEntry.getSrc()+"\n "+srcRelationErrorForamt+"```";
+			아래는 """ + " "+ apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
+			"\n"+ apiEndpoint.loadSrcString()+"\n "+srcRelationErrorForamt+"```";
 		return promptPath;
 	}
 
-
-	public static String createOasPathSectionValid(String str,String src) {
-		String promptPath = """
-			목표 :
-			```
-			조건에 맞게 첨부된 OAS를 수정하라.
-			"""
-			+ str +
-   			"""
-			```
-
-			조건:
-			```
-			2. 소스코드 기반으로 작성하고, description같은건 너가 추측해서 한글로 작성가능
-			3. description 작성할때. 첨부된 소스코드 enum을 활용해서 가능한 값들을 나열한다.
-			4. 답변은 yaml코드만 한다.
-			6. 모든 desciprion은 최대한 상세하게 작성한다. 예시,등 참조된 소스코드를 활용한다.
-			7. request/response는 참조형식으로 "components:" 키워드를 이용하여 구성한다.
-			8. ErrorResponse에 경우 key값을 ErrorResponse라고 지칭한다.
-			9. responses 하위 계층은 아래 계층 구조를 반드시 지켜야 한다. '{}'안에는 너가 채워야해
-			          '{Http Status code}':
-			            description: {description}
-			            content:
-			              application/json:
-			                schema:
-			                  $ref: "#/components/schemas/{your schema name}}"
-			10. schema 이름은 첨부된 소스코드의 DTO 클래스명을 활용한다.
-			11.description 값은 String으로 표현한다. "description: "주소" 이런식으로.
-			```
-			
-			
-			```
-
-			데이터
-			```
-			아래는 OAS파일 만들때 사용된 소스코드다."""+
-			"\n"+src+"\n```";
-		return promptPath;
-	}
-
-	public static void main(String[] args) {
-//		APIEntry post = new APIEntry("/re/re", "post", null, "src");
-//		System.out.println(createOasPathSection(post));\
-		System.out.println(createOasBasedSnippet("fdsafa"));
-	}
-
-	public static String createOasBasedSnippet(String totalContent) {
-		return """
-			목표 :
-			```
-			조각난 OAS yaml파일을 조합하여 OAS(open api spec) 3.0.0 파일 전체를 생성한다.
-			```
-
-			조건:
-			```
-			1.데이터를 기반으로 적절하게 재구성하여 OAS 3.0.0 문법에 호환되도록 구성한다.
-			2.생략없이 전체코드를 답변하라.
-			3.답변은 yaml파일만 답변하라.
-			4.단 x_audience 키는 예외로 반드시 유지하라.(특이사항)
-			5.중복되는 요소는 하나로 중복을 제거한다.
-			6.responses 하위 계층은 아래 계층 구조를 반드시 지켜야 한다.
-			               '{Http Status code}':
-			            description: {description}
-			            content:
-			              application/json:
-			                schema:
-			                  $ref: "#/components/schemas/{your schema name}}"
-			7. components.schemas에서 아래와 같이 내부에 또다른 schema를 참조하는 경우 OAS형식을 무시하고 description을 포함한다.(특이사항)
-			         address:
-			           $ref: "#/components/schemas/Address"
-			           description: "주소"
-			8.마지막점검으로 특이사항을 제외하고 OAS문법을 준수했는지 확인한다.
-						
-			```
-
-			데이터
-			```
-			아래 yaml을 기반으로 조합하여 으로 OAS파일 전체를 생성한다. 설명은 한글로 작성
-			"""+"\n"+totalContent+"\n```";
-	}
 
 	public static String integrationSchema(List<Schema> schema) {
 		StringBuffer sb = new StringBuffer();
@@ -228,74 +125,7 @@ public class PromptMessageHub {
 			"""+sb;
 	}
 
-	public static String integrationPath(List<Map<String, PathItem>> schema) {
-		StringBuffer sb = new StringBuffer();
-		for(int i = 0; i < schema.size(); i++){
-			sb.append(i+1).append("번 schema").append("\n")
-				.append(schema.get(i).toString()).append("\n\n");
-		}
-
-		return """
-			   
-						아래는 OAS(open api spec) 3.0.0문법을 가지는 데이터 에서 Paths 일부분이다.
-						
-						1. 첨부되는 데이터는 동일한  endpoint를 가지는 api의 Paths이다.
-						그러므로 여러개의 path를 통합하여 하나의 path로 만들어라.
-						
-						아래 처럼 HTTP method(get,post 등)만 다른경우 통합한다.
-						
-						[통합 전]
-						1번
-							/owners/{ownerId}/pets/{petId}/visits/new:
-								get:
-								summary: "방문 예약 폼 초기화"
-								(...생략)
-						2번
-							/owners/{ownerId}/pets/{petId}/visits/new:
-								post:
-								summary: "방문 예약 폼 초기화"
-								(...생략)
-						
-						[통합 후]
-							
-								get:
-									summary: "방문 예약 폼 초기화"
-									(...생략)
-								post:
-									summary: "방문 예약 폼 초기화"
-									(...생략)
-						
-						4. 답변은 병합된 yaml코드만 한다.
-			"""+sb;
-	}
-
-	public static String complementAPI(String result, String src) {
-		return """
-						
-			아래는 API 하나에 대한 OAS 명세이다.
-			"""+
-   			result+
-			"""			
-			추가로 첨부된 소스코드에서 API OAS명세를 개선하라.
-						
-			소스코드기반을로 활용할만한 정보를 참고하여 개선한다.
-						
-			특히 예외를 담당하는 명세를 소스코드와 일치하도록 수정하라.		
-			소스코드에서 실제 실행시 반환하게 되는 response 형태를 확인하여 일치시킨다..
-			
-			답변은 개선된 yaml파일만 한다.
-			'
-			paths:
-			components:
-			'
-			만 생성한다.
-			
-			
-			소스코드:			
-			"""+"\n"+src;
-	}
-
-	public static String vaildErrorResponseFormat(APIEntry apiEntry, String src, String result) {
+	public static String validErrorResponseFormat(String srcRelatedError, String result) {
 		return """
 						
 			아래는 API 하나에 대한 OAS 명세이다.
@@ -319,7 +149,7 @@ public class PromptMessageHub {
 			
 			
 			소스코드:			
-			"""+"apiEntry.getSrc()"+"\n"+src;
+			"""+"apiEntry.getSrc()"+"\n"+srcRelatedError;
 	}
 
 	public static String findRelationExceptionFormat(String output) {
