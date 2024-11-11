@@ -1,6 +1,7 @@
 package com.hocs.server.extractor.domain;
 
 import jakarta.persistence.Id;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,5 +47,26 @@ public class GlobalSourceDependency {
 		ExceptionHandler exceptionHandler,
 		List<String> configuration, List<String> component) {
 		return new GlobalSourceDependency(id, aop, exceptionHandler, configuration, component);
+	}
+
+	public List<String> getAllSourcePathList(){
+		List<String> srcList = new ArrayList<>();
+
+		for (String src : aop.getPaths()) {
+			srcList.add(src);
+		}
+		for (String src : exceptionHandler.getPaths()) {
+			srcList.add(src);
+		}
+
+		for (String src : configuration) {
+			srcList.add(src);
+		}
+
+		for (String src : component) {
+			srcList.add(src);
+		}
+
+		return srcList;
 	}
 }

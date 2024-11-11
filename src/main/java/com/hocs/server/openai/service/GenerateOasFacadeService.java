@@ -1,10 +1,11 @@
-package com.hocs.server.openai.llm;
+package com.hocs.server.openai.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.hocs.server.openai.domain.APIEndpoint;
+import com.hocs.server.openai.llm.SpringAICommandForLLM;
 import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.openai.util.FileManager;
@@ -15,11 +16,9 @@ import com.hocs.server.saas.model.OasInfo;
 import com.hocs.server.saas.model.OpenAPI;
 import com.hocs.server.saas.model.PathItem;
 import com.hocs.server.saas.model.Schema;
-import com.hocs.server.util.OpenAPIParser;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,39 +29,42 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
 
 @Service
 @RequiredArgsConstructor
-public class GenerateOasUsingLLM {
+public class GenerateOasFacadeService {
 
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
+	private final ExceptionFormatService exceptionFormatService;
+	private final OasIntegrationService oasIntegrationService;
 	private final OasRepository OasRepository;
 
-	public void generate(String userId, List<APIEndpoint> apiEntries, File projectDir) throws IOException {
+	public void generate(String userId, List<APIEndpoint> apiEndpoints, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
 
 		/** output.yaml to APIEndpoint **/
-		if (apiEntries == null || apiEntries.size() == 0) {
+		if (apiEndpoints == null || apiEndpoints.size() == 0) {
 			throw new ApiEntriesNullException("APIEndpoint is empty");
 		}
+
+		String exceptionFormatSrc = exceptionFormatService.findRelatedExceptionSrc(projectRootPath, client);
 
 		Map<String, List<Schema>> schemasMap = new HashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();
 
-		String exceptionFormatSrc = findRelatedExceptionSrc(projectRootPath, client);
-
-		int totalTasks = Math.min(apiEntries.size(), 3); // 작업 개수 제한
+		int totalTasks = Math.min(apiEndpoints.size(), 3); // 작업 개수 제한
 		AtomicInteger completedTasks = new AtomicInteger(0); // 완료된 작업 수
 
 		// CompletableFuture 리스트를 생성하고 병렬 실행
-		List<CompletableFuture<Void>> futures = apiEntries.stream()
+		//현재 apiEndpoint 하나에 대한 소스파일에는 여러개의 endpoint가 담겨있음. extartor에서 하나의 엔드포인트에는 해당하는 소스부분만 잘라서 보내줘야함.
+		//위 과정이 이루어지면. 중복은 발생하지 않고 merge과정은 필요 없어짐.
+		List<CompletableFuture<Void>> futures = apiEndpoints.stream()
 			.limit(totalTasks) // 처음 3개 항목에 대해서만 병렬 처리
-			.map(apiEntry -> CompletableFuture.runAsync(() ->
-				generateOasPathSchemaSnippet(client, apiEntry, schemasMap, pathList, exceptionFormatSrc)
+			.map(apiEndpoint -> CompletableFuture.runAsync(() ->
+				generateOasPathSchemaSnippet(client, apiEndpoint, schemasMap, pathList, exceptionFormatSrc)
 			).thenRun(() -> { // 작업 완료 후 실행
 				int completed = completedTasks.incrementAndGet();
 				MemoryProcessPercentage.save(userId, completed, totalTasks); // 진행 상황 계산
@@ -73,91 +75,28 @@ public class GenerateOasUsingLLM {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
 		//path integeration
-		List<Map<String, PathItem>> integrationPaths = pathIntegration(pathList);
+		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
 		//schema integration
-		removeDuplicates(client, schemasMap);
+		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.shemaIntegration(client, schemasMap);
 
-		OasRepository.save(
-			OAS.create(userId, OasInfo.create(userId, "", "", "", "", "3.0.1"), pathList,
-				schemasMap));
-
+		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
 		String result = merge(schemasMap, integrationPaths);
 
 		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
 
-	}
+		OAS oas = OAS.create(
+			userId,
+			OasInfo.create(userId, "", "", "", "", "3.0.1"),
+			pathList,
+			integrationSchemaMap);
 
-	private String findRelatedExceptionSrc(String projectRootPath, ChatClient chatClient4o)
-		throws IOException {
-		String[] ExceptionSrc = springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(
-			projectRootPath, chatClient4o);
+		OasRepository.save(oas);
 
-		StringBuffer sb = new StringBuffer();
-		for (String src : ExceptionSrc) {
-			sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
-		}
-		return sb.toString();
-	}
 
-	private void removeDuplicates(ChatClient chatClient4o, Map<String, List<Schema>> schemasMap) {
-		for (String key : schemasMap.keySet()) {
-			List<Schema> schemas = schemasMap.get(key);
-			if (schemas.size() >= 2) {
-				removeDuplicatesByLLM(chatClient4o, schemasMap, key, schemas);
-			}
-		}
 
 	}
 
-	private static List<Map<String, PathItem>> pathIntegration(
-		Map<String, List<Map<String, PathItem>>> pathList) {
-		List<Map<String, PathItem>> integrationPaths = new ArrayList<>();
-		for (String key : pathList.keySet()) {
-			List<Map<String, PathItem>> maps = pathList.get(key);
-			if (maps.size() >= 2) {
-				PathItem integrationPathitem = new PathItem();
-				for (Map<String, PathItem> map : maps) {
-					PathItem pathItem = map.get(key);
-					if (pathItem.getX_link() != null) {
-						integrationPathitem.setX_link(pathItem.getX_link());
-					}
-					if (pathItem.getGet() != null) {
-						integrationPathitem.setGet(pathItem.getGet());
-					}
-					if (pathItem.getHead() != null) {
-						integrationPathitem.setHead(pathItem.getHead());
-					}
-					if (pathItem.getPatch() != null) {
-						integrationPathitem.setPatch(pathItem.getPatch());
-					}
-					if (pathItem.getPut() != null) {
-						integrationPathitem.setPut(pathItem.getPut());
-					}
-					if (pathItem.getPost() != null) {
-						integrationPathitem.setPost(pathItem.getPost());
-					}
-					if (pathItem.getOptions() != null) {
-						integrationPathitem.setOptions(pathItem.getOptions());
-					}
-					if (pathItem.getDelete() != null) {
-						integrationPathitem.setDelete(pathItem.getDelete());
-					}
-					if (pathItem.getExtensions() != null) {
-						integrationPathitem.setExtensions(pathItem.getExtensions());
-					}
-					if (pathItem.getTrace() != null) {
-						integrationPathitem.setTrace(pathItem.getTrace());
-					}
-				}
-				Map<String, PathItem> stringPathItemHashMap = new HashMap<>();
-				stringPathItemHashMap.put(key, integrationPathitem);
-				integrationPaths.add(stringPathItemHashMap);
-			} else {
-				integrationPaths.add(maps.get(0));
-			}
-		}
-		return integrationPaths;
-	}
+
 
 	private String merge(Map<String, List<Schema>> schemasMap,
 		List<Map<String, PathItem>> integrationPaths) {
@@ -203,6 +142,8 @@ public class GenerateOasUsingLLM {
 	private void generateOasPathSchemaSnippet(ChatClient client, APIEndpoint apiEndpoint,
 		Map<String, List<Schema>> schemasMap,
 		Map<String, List<Map<String, PathItem>>> pathList, String exceptionFormatSrc) {
+
+
 		OpenAPI openAPI = oasApiSnippet(client, apiEndpoint, exceptionFormatSrc);
 		openAPI.getPaths().values().forEach(f -> f.setX_link(apiEndpoint.getAbsolutePath()));
 
@@ -221,31 +162,6 @@ public class GenerateOasUsingLLM {
 		});
 	}
 
-	private void removeDuplicatesByLLM(ChatClient client, Map<String, List<Schema>> schemasMap,
-		String key,
-		List<Schema> schemas) {
-		try {
-			String integrationSchema = springAiCommandForLLM.integrationSchema(schemas, client);
-			Schema schema = OpenAPIParser.parseToSchema(integrationSchema);
-			ArrayList<Schema> temp = new ArrayList<>();
-			temp.add(schema);
-			schemasMap.put(key, temp);
-		} catch (ResourceAccessException e) {
-			throw new ResourceAccessException(e.getMessage());
-		} catch (Exception e) {
-			if (e.getMessage().equals("TPM")) {
-				throw new RuntimeException("TPM");
-			}
-			e.printStackTrace();
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException ex) {
-				throw new RuntimeException(ex);
-			}
-			removeDuplicatesByLLM(client, schemasMap, key, schemas);
-		}
-
-	}
 
 
 	private OpenAPI oasApiSnippet(ChatClient client, APIEndpoint apiEndpoint, String exceptionFormatSrc) {

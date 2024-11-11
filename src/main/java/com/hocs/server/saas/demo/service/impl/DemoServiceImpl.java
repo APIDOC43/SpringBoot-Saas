@@ -5,12 +5,12 @@ import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.service.APISourceDependencyService;
 import com.hocs.server.openai.domain.APIEndpoint;
 import com.hocs.server.saas.demo.controller.exception.GithubCloneException;
-import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEntryMapper;
+import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
 import com.hocs.server.saas.demo.service.DemoFacadeService;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import com.hocs.server.saas.user.gitapi.service.GitHubFacadeService;
 import com.hocs.server.saas.apidoc.service.impl.StaticApiDocServiceImpl;
-import com.hocs.server.openai.llm.GenerateOasUsingLLM;
+import com.hocs.server.openai.service.GenerateOasFacadeService;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
 import com.hocs.server.saas.user.oauth.dto.FilesData;
@@ -28,7 +28,7 @@ public class DemoServiceImpl implements DemoFacadeService {
 
 
 	private final GitHubFacadeService gitHubFacadeService;
-	private final GenerateOasUsingLLM llmService;
+	private final GenerateOasFacadeService llmService;
 	private final APISourceDependencyService apiSourceDependencyService;
 	private final StaticApiDocServiceImpl staticApiDocServiceImpl;
 
@@ -44,10 +44,10 @@ public class DemoServiceImpl implements DemoFacadeService {
 		APISourceDependencyInfo apiSourceDependencyInfo = apiSourceDependencyService.extractApiSourceDependencyInfo(
 			ClientProjectType.SPRING_JAVA, clonedDir.toFile(), gitRepo, userId);
 
-		List<APIEndpoint> apiEntries = APISourceDependencyInfoToAPIEntryMapper.mapToAPIEntries(
-			apiSourceDependencyInfo);
+		List<APIEndpoint> apiEndpoints = APISourceDependencyInfoToAPIEndpoint
+			.mapToAPIEndpoint(apiSourceDependencyInfo);
 
-		llmService.generate(userId,apiEntries,clonedDir.toFile());
+		llmService.generate(userId,apiEndpoints,clonedDir.toFile());
 		MemoryProcessPercentage.clear(userId);
 
 		HttpClient.toSaas(clonedDir.toFile(), userId);

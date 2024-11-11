@@ -11,6 +11,7 @@ import java.util.List;
 
 public class FileManager {
 
+
 	public static void saveToFile(String content,String name) {
 		try {
 			Files.writeString(Paths.get(name), content);
@@ -18,5 +19,9 @@ public class FileManager {
 			throw new RuntimeException(e);
 		}
 	}
+
+
+
+
 
 }
