@@ -120,7 +120,7 @@ GenerateOas -->> User: OAS 반환
 홍석준 : [@hoding](https://github.com/seokjun7410)
 
 프로젝트 총괄  (기획, 아키텍처 설계, 구현, 마케팅),
-- 코드파서 서버 개발 (java)
+- 코드파서 서버 개발(CustomRAG)
 - LLM 서버 개발 및 AI 모델 통합 (Spring Boot)
  - SaaS 서버 개발 
 - SSG (Static Site Generator) 서버 개발 (Node.js, EJS)
