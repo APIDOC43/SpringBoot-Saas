@@ -14,4 +14,13 @@ public class NodeJs implements NodeJsPort {
 			throw new RuntimeException(e);
 		}
 	}
+
+	@Override
+	public String getExtension() {
+		try {
+			throw new OperationNotSupportedException("Node Js Not Supported");
+		} catch (OperationNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }
