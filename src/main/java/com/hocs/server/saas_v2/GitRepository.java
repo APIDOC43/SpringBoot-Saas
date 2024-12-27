@@ -13,6 +13,7 @@ public class GitRepository {
 	private String id;
 	private String url;
 	private String name;
+	private String ownerName;
 
 	public String getCloneUrl(){
 		return Strings.concat(url,".git");

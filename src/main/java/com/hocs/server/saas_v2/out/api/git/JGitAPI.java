@@ -6,17 +6,21 @@ import com.hocs.server.saas_v2.CustomException;
 import com.hocs.server.saas_v2.GitAPI;
 import com.hocs.server.saas_v2.GitRepository;
 import com.hocs.server.saas_v2.out.api.git.dto.RepositoryResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -55,7 +59,7 @@ public class JGitAPI implements GitAPI {
 		return Arrays.stream(body)
 			.map(
 				m -> new GitRepository(Strings.concat(m.nodeId(), m.name()), m.svnUrl(),
-					m.fullName())
+					m.fullName(), m.owner().login())
 			).collect(Collectors.toList());
 
 	}
@@ -75,6 +79,44 @@ public class JGitAPI implements GitAPI {
 
 	@Override
 	public String getDefaultBranchName(GitRepository repo) {
-		return null;
+		String apiUrl = API_URL + "/repos/" + repo.getOwnerName() + "/" + repo.getName();
+		HttpURLConnection connection = null;
+
+		try {
+			// URL 연결 설정
+			URL url = new URL(apiUrl);
+			connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+
+			// 응답 코드 확인
+			int responseCode = connection.getResponseCode();
+			if (responseCode == HttpURLConnection.HTTP_OK) {
+				// 응답 데이터 읽기
+				try (BufferedReader reader = new BufferedReader(
+					new InputStreamReader(connection.getInputStream()))) {
+					StringBuilder response = new StringBuilder();
+					String line;
+					while ((line = reader.readLine()) != null) {
+						response.append(line);
+					}
+
+					// JSON 파싱 및 기본 브랜치 반환
+					JSONObject json = new JSONObject(response.toString());
+					return json.optString("default_branch", "main");
+				}
+			} else {
+				System.err.println("GET 요청 실패. 응답 코드: " + responseCode);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			log.error("JGitAPI.getDefaultBranchName Exception");
+		} finally {
+			if (connection != null) {
+				connection.disconnect();
+			}
+		}
+
+		return "main"; // 기본값 반환
 	}
 }
