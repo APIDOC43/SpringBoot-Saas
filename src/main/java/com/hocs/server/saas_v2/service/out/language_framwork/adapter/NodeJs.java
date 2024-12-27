@@ -1,6 +1,6 @@
-package com.hocs.server.saas_v2.out.language_framwork.adapter;
+package com.hocs.server.saas_v2.service.out.language_framwork.adapter;
 
-import com.hocs.server.saas_v2.out.language_framwork.port.NodeJsPort;
+import com.hocs.server.saas_v2.service.out.language_framwork.port.NodeJsPort;
 import java.nio.file.Path;
 import javax.naming.OperationNotSupportedException;
 

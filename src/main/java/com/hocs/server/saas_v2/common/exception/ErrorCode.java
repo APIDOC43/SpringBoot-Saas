@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2.exception;
+package com.hocs.server.saas_v2.common.exception;
 
 public enum ErrorCode {
 

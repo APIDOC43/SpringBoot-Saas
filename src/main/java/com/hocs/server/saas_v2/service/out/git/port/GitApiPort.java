@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2.out.git.port;
+package com.hocs.server.saas_v2.service.out.git.port;
 
 import com.hocs.server.saas_v2.domain.GitRepository;
 import java.nio.file.Path;

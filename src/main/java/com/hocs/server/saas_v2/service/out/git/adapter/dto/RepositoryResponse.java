@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2.out.git.adapter.dto;
+package com.hocs.server.saas_v2.service.out.git.adapter.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
