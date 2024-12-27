@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2;
+package com.hocs.server.saas_v2.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

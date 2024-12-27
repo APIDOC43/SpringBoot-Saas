@@ -1,11 +1,11 @@
-package com.hocs.server.saas_v2.out.api.git;
+package com.hocs.server.saas_v2.out.git.adapter;
 
-import static com.hocs.server.saas_v2.ErrorCode.GIT_REPOSITORY_IS_EMPTY;
+import static com.hocs.server.saas_v2.exception.ErrorCode.GIT_REPOSITORY_IS_EMPTY;
 
-import com.hocs.server.saas_v2.CustomException;
-import com.hocs.server.saas_v2.GitAPI;
-import com.hocs.server.saas_v2.GitRepository;
-import com.hocs.server.saas_v2.out.api.git.dto.RepositoryResponse;
+import com.hocs.server.saas_v2.exception.CustomException;
+import com.hocs.server.saas_v2.out.git.adapter.dto.RepositoryResponse;
+import com.hocs.server.saas_v2.domain.GitRepository;
+import com.hocs.server.saas_v2.out.git.port.GitApiPort;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @Slf4j
-public class JGitAPI implements GitAPI {
+public class JGitAPI implements GitApiPort {
 
 	private static final String API_URL = "https://api.github.com";
 
