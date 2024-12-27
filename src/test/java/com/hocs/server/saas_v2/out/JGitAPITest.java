@@ -3,6 +3,7 @@ package com.hocs.server.saas_v2.out;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.hocs.server.saas_v2.GitRepository;
+import com.hocs.server.saas_v2.out.api.git.JGitAPI;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
