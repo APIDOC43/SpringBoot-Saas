@@ -1,10 +1,10 @@
-package com.hocs.server.code_resolver.service.out.language_framwork.adapter;
+package com.hocs.server.code_resolver.collector.domain;
 
-import com.hocs.server.code_resolver.service.out.language_framwork.port.NodeJsPort;
+import com.hocs.server.code_resolver.collector.domain.LanguageFramework;
 import java.nio.file.Path;
 import javax.naming.OperationNotSupportedException;
 
-public class NodeJs implements NodeJsPort {
+public class NodeJs implements LanguageFramework {
 
 	@Override
 	public boolean isApiEntry(Path path) {

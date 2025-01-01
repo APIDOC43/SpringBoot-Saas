@@ -2,17 +2,17 @@ package com.hocs.server.saas_v2.service;
 
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
 import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
+import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
-import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 @Facade
 @RequiredArgsConstructor
-public class DocumentGenerateFacade {
+public class ApiEndpointFacade {
 
 	private final GitCloneService gitCloneService;
 	private final ApiEndpointCollectorPort apiEndpointCollectorPort;

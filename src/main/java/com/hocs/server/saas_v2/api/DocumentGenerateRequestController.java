@@ -3,14 +3,9 @@ package com.hocs.server.saas_v2.api;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
 import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
 import com.hocs.server.saas_v2.common.ApiResponse;
-import com.hocs.server.saas_v2.domain.ApiInfo;
-import com.hocs.server.saas_v2.domain.ClientProjectPath;
-import com.hocs.server.saas_v2.service.DocumentGenerateFacade;
-import com.hocs.server.saas_v2.service.GitCloneService;
+import com.hocs.server.saas_v2.service.ApiEndpointFacade;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -25,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DocumentGenerateRequestController {
 
-	private final DocumentGenerateFacade documentGenerateFacade;
+	private final ApiEndpointFacade documentGenerateFacade;
 
 	@PostMapping("/generation/receipt/v1")
 	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @NotNull Long metadataId) {

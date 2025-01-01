@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter;
 
-import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
+import com.hocs.server.code_resolver.collector.service.ApiEndpointResolveFacade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InternalServiceCallAdapter implements ApiEndpointCollectorPort {
 
-	private final ApiEndpointCollectorService service;
+	private final ApiEndpointResolveFacade service;
 
 	@Override
 	public Map<String, List<ApiInfo>> findApiInfo(CodingLanguage language, ProjectFramework projectFramework,

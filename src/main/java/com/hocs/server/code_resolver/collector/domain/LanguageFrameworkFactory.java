@@ -1,6 +1,5 @@
 package com.hocs.server.code_resolver.collector.domain;
 
-import com.hocs.server.code_resolver.service.out.language_framwork.adapter.SpringBootJava;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
 import com.hocs.server.saas_v2.domain.ProjectFramework;
 

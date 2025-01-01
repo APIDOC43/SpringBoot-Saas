@@ -1,14 +1,13 @@
-package com.hocs.server.code_resolver.service.out.language_framwork.adapter;
+package com.hocs.server.code_resolver.collector.domain;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.hocs.server.code_resolver.service.out.language_framwork.port.SpringBootJavaPort;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class SpringBootJava implements SpringBootJavaPort {
+public class SpringBootJava implements LanguageFramework {
 
 	@Override
 	public boolean isApiEntry(Path path) {
