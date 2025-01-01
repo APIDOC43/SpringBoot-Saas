@@ -1,9 +1,18 @@
 package com.hocs.server.saas_v2.api;
 
-import com.hocs.server.saas_v2.api.request.GenerationRequest;
-import com.hocs.server.saas_v2.service.DocumentGenerateRequestService;
+import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
+import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
+import com.hocs.server.saas_v2.common.ApiResponse;
+import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
+import com.hocs.server.saas_v2.service.DocumentGenerateFacade;
+import com.hocs.server.saas_v2.service.GitCloneService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,13 +25,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DocumentGenerateRequestController {
 
-	private final DocumentGenerateRequestService service;
+	private final DocumentGenerateFacade documentGenerateFacade;
 
 	@PostMapping("/generation/receipt/v1")
-	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @Valid GenerationRequest request) {
+	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @NotNull Long metadataId) {
 
+		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+	}
 
+	@PostMapping("/endpoint/demo/v1")
+	public ResponseEntity<?> findEndpointInfo(
+		@RequestBody @Valid FindApiInfoClientRequest request) {
+		ApiInfoResponse response = documentGenerateFacade.findEndpointInfo(request);
 
-	    return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+		return ResponseEntity.ok(ApiResponse.create(2000, response));
 	}
 }

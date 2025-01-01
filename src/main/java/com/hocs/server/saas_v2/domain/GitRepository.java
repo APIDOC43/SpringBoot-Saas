@@ -1,20 +1,12 @@
 package com.hocs.server.saas_v2.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.ToString;
-import org.apache.logging.log4j.util.Strings;
 
 @Getter
-@AllArgsConstructor
-@ToString
 public class GitRepository {
-	private String id;
-	private String url;
-	private String name;
-	private String ownerName;
+	private final UrlData urlData;
 
-	public String getCloneUrl(){
-		return Strings.concat(url,".git");
+	public GitRepository(String cloneUrl) {
+		this.urlData = UrlData.of(cloneUrl);
 	}
 }

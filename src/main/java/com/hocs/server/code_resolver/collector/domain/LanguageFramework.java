@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2.domain.language_framwork;
+package com.hocs.server.code_resolver.collector.domain;
 
 import java.nio.file.Path;
 

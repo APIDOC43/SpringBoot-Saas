@@ -2,7 +2,13 @@ package com.hocs.server.saas_v2.common.exception;
 
 public enum ErrorCode {
 
-	GIT_REPOSITORY_IS_EMPTY("G00001","조회가능한 GitHub Repository가 없습니다.");
+	//git
+	GIT_REPOSITORY_IS_EMPTY("G00001","조회가능한 GitHub Repository가 없습니다."),
+	GIT_CLONE_FAIL("G00002","Git Clone에 실패하였습니다."),
+
+
+	//IO
+	IO_CREATE_DIR_FAIL("I00001", "폴더 생성에 실패하였습니다.");
 
 	final String code;
 	final String message;

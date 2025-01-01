@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.domain;
 
-import com.hocs.server.saas_v2.domain.language_framwork.LanguageFramework;
+import com.hocs.server.code_resolver.collector.domain.LanguageFramework;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;

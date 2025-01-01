@@ -1,12 +1,17 @@
 package com.hocs.server.saas_v2.service.out.git.adapter;
 
+import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_CLONE_FAIL;
 import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_REPOSITORY_IS_EMPTY;
 
 import com.hocs.server.saas_v2.common.exception.CustomException;
+import com.hocs.server.saas_v2.common.exception.ErrorCode;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.GitRepository;
+import com.hocs.server.saas_v2.domain.UrlData;
 import com.hocs.server.saas_v2.service.out.git.adapter.dto.RepositoryResponse;
 import com.hocs.server.saas_v2.service.out.git.port.GitApiPort;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,8 +19,8 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.json.JSONObject;
@@ -26,11 +31,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-@Component
-@Slf4j
-public class JGitAPI implements GitApiPort {
 
-	private static final String API_URL = "https://api.github.com";
+@Component
+@RequiredArgsConstructor
+@Slf4j
+public class GitApiAdapter implements GitApiPort {
+	String API_URL = "https://api.github.com";
 
 	@Override
 	public List<GitRepository> findRepositories(String accessToken) {
@@ -56,28 +62,14 @@ public class JGitAPI implements GitApiPort {
 
 		return Arrays.stream(body)
 			.map(
-				m -> new GitRepository(Strings.concat(m.nodeId(), m.name()), m.svnUrl(),
-					m.fullName(), m.owner().login())
+				m -> new GitRepository(m.cloneUrl())
 			).collect(Collectors.toList());
-
 	}
 
 	@Override
-	public void gitClone(GitRepository repo, Path path) {
-		try {
-			Git.cloneRepository()
-				.setURI(repo.getUrl())
-				.setDirectory(path.toFile())
-				.call();
-		} catch (GitAPIException gitAPIException) {
-			gitAPIException.printStackTrace();
-			log.error("JGitAPI.gitClone throw GitAPIException");
-		}
-	}
+	public String getDefaultBranchName(UrlData urlData) {
 
-	@Override
-	public String getDefaultBranchName(GitRepository repo) {
-		String apiUrl = API_URL + "/repos/" + repo.getOwnerName() + "/" + repo.getName();
+		String apiUrl = API_URL + "/repos/" + urlData.getOwnerName() + "/" + urlData.getRepoName();
 		HttpURLConnection connection = null;
 
 		try {
@@ -108,7 +100,7 @@ public class JGitAPI implements GitApiPort {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			log.error("JGitAPI.getDefaultBranchName Exception");
+			System.err.println("GitApiAdapter.getDefaultBranchName Exception");
 		} finally {
 			if (connection != null) {
 				connection.disconnect();
@@ -116,5 +108,43 @@ public class JGitAPI implements GitApiPort {
 		}
 
 		return "main"; // 기본값 반환
+	}
+
+	@Override
+	public ClientProjectPath gitClone(UrlData urlData, Path path) {
+		File folder = new File(path.toUri());
+
+		// 폴더 생성
+		if (!folder.exists()) {
+			if (!folder.mkdirs()) {
+				System.err.println("GitApiAdapter.gitClone throw mkdirs exception");
+				throw new CustomException(ErrorCode.IO_CREATE_DIR_FAIL);
+			}
+		}
+
+		File cloneFolder = cloneCommand(urlData, path);
+		return new ClientProjectPath(cloneFolder.toPath());
+	}
+
+	//default Jgit, extends and override this method if you want other
+	protected File cloneCommand(UrlData urlData, Path path) {
+		try {
+
+			File cloneFolder = cloneDirNamingStrategy(urlData, path).toFile();
+			Git.cloneRepository()
+				.setURI(urlData.getCloneUrl())
+				.setDirectory(cloneFolder)
+				.call();
+
+			return cloneFolder;
+		} catch (GitAPIException gitAPIException) {
+			gitAPIException.printStackTrace();
+			log.error("GitApiAdapter.gitClone throw GitAPIException");
+			throw new CustomException(GIT_CLONE_FAIL);
+		}
+	}
+
+	private Path cloneDirNamingStrategy(UrlData urlData, Path path) {
+		return path.resolve(urlData.getRepoName() + System.currentTimeMillis());
 	}
 }
