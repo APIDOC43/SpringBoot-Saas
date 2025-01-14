@@ -1,6 +1,7 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter;
 
 import com.hocs.server.code_resolver.collector.service.ApiEndpointResolveFacade;
+import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
@@ -12,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 
-@Component
+@Adapter
 @RequiredArgsConstructor
 public class InternalServiceCallAdapter implements ApiEndpointCollectorPort {
 

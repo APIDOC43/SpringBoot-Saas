@@ -3,6 +3,7 @@ package com.hocs.server.saas_v2.service.out.git.adapter;
 import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_CLONE_FAIL;
 import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_REPOSITORY_IS_EMPTY;
 
+import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.saas_v2.common.exception.CustomException;
 import com.hocs.server.saas_v2.common.exception.ErrorCode;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
@@ -28,11 +29,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+
 import org.springframework.web.client.RestTemplate;
 
 
-@Component
+@Adapter
 @RequiredArgsConstructor
 @Slf4j
 public class GitApiAdapter implements GitApiPort {
