@@ -8,7 +8,8 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class GenerateReceiptRequest {
+public class GenerationRequest {
+	private String userId;
 	private ProjectMetaData metaData;
 	private List<ApiInfo> excludeApiInfo;
 }

@@ -1,17 +1,18 @@
 package com.hocs.server.saas_v2.domain;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 import org.apache.logging.log4j.util.Strings;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 public class UrlData {
 	private String cloneUrl;
-	private String repoName;
 	private String ownerName;
+	private String repoName;
 
 	public String getCloneUrl(){
 		return cloneUrl.endsWith(".git") ? cloneUrl : Strings.concat(cloneUrl,".git");

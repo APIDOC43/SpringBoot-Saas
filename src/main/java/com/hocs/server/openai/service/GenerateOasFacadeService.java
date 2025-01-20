@@ -16,8 +16,10 @@ import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.openai.util.FileManager;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +51,7 @@ public class GenerateOasFacadeService {
 			throw new ApiEntriesNullException("APIEndpoint is empty");
 		}
 
-		String exceptionFormatSrc = exceptionFormatService.findRelatedExceptionSrc(projectRootPath, client);
+		String exceptionFormatSrc = exceptionFormatService.findRelatedExceptionSrc(new ClientProjectPath(Path.of(projectRootPath)), client);
 
 		Map<String, List<Schema>> schemasMap = new HashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();

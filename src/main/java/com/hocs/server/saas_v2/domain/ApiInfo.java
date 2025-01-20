@@ -1,14 +1,16 @@
 package com.hocs.server.saas_v2.domain;
 
+import com.hocs.server.code_resolver.extractor.MethodInformation;
 import lombok.Getter;
 
 @Getter
 public class ApiInfo {
-	private final String method;
+	private final String httpMethod; //GET, POST ...
 	private final String endpoint;
-
-	public ApiInfo(String method, String endpoint) {
-		this.method = method;
+	private final MethodInformation methodSignature; //methodName+param
+	public ApiInfo(String httpMethod, String endpoint, MethodInformation methodSignature) {
+		this.httpMethod = httpMethod;
 		this.endpoint = endpoint;
+		this.methodSignature = methodSignature;
 	}
 }

@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ApiInfoExtractorService {
 
-	public Map<String, List<ApiInfo>> extractApiInfo(List<File> controllers) {
-		Map<String, List<ApiInfo>> apiInfos = new HashMap<>();
+	public Map<ControllerFile, List<ApiInfo>> extractApiInfo(List<File> controllers) {
+		Map<ControllerFile, List<ApiInfo>> apiInfos = new HashMap<>();
 
 		for (File controller : controllers) {
 			String srcContent = null;
@@ -39,10 +39,11 @@ public class ApiInfoExtractorService {
 			for (MethodDeclaration method : classDeclaration.getMethods()) {
 				ApiEndpoint apiEndpoint = EndpointPathUtil.generateApiEndpoint(baseUrl, method);
 
-				List<ApiInfo> orDefault = apiInfos.getOrDefault(controller.getPath(),
+				List<ApiInfo> orDefault = apiInfos.getOrDefault(new ControllerFile(controller.getPath()),
 					new ArrayList<>());
-				orDefault.add(new ApiInfo(apiEndpoint.getMethod(), apiEndpoint.getApi()));
-				apiInfos.put(controller.getPath(),orDefault);
+
+				orDefault.add(new ApiInfo(apiEndpoint.getMethod(), apiEndpoint.getApi(),new MethodInformation(method)));
+				apiInfos.put(new ControllerFile(controller.getPath()),orDefault);
 			}
 		}
 

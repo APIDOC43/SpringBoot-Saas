@@ -7,6 +7,7 @@ import com.hocs.server.saas_v2.common.ApiResponse;
 import com.hocs.server.saas_v2.service.ApiEndpointFacade;
 import com.hocs.server.saas_v2.service.DocumentGenerateFacade;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -24,10 +25,10 @@ public class DocumentGenerateRequestController {
 	private final ApiEndpointFacade apiEndpointFacade;
 	private final DocumentGenerateFacade documentGenerateService;
 
-	@PostMapping("/generation/receipt/v1")
+	@PostMapping("/generation/reception/v1")
 	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @Valid GenerateReceiptClientRequest request) {
-		documentGenerateService.generationReceipt(request.getMetadataId(),request.getExcludeApiInfo());
-
+		String userId = UUID.randomUUID().toString();
+		documentGenerateService.generationReceipt(userId,request.getMetadataId(),request.getExcludeApiInfo());
 
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();
 	}

@@ -3,7 +3,7 @@ package com.hocs.server.saas_v2.service;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ProjectMetaData;
-import com.hocs.server.saas_v2.service.out.pipline.adapter.GenerateReceiptRequest;
+import com.hocs.server.saas_v2.service.out.pipline.adapter.GenerationRequest;
 import com.hocs.server.saas_v2.service.out.pipline.port.PiplineExecutorPort;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -14,9 +14,15 @@ public class DocumentGenerateFacade {
 	private final ProjectMetaDataService projectMetaDataService;
 	private final PiplineExecutorPort piplineExecutorPort;
 
-	public boolean generationReceipt(long metadataId, List<ApiInfo> excludeApiInfo) {
+	/**
+	 * 메타데이터 조회 후
+	 * @param metadataId
+	 * @param excludeApiInfo
+	 * @return
+	 */
+	public boolean generationReceipt(String userId, long metadataId, List<ApiInfo> excludeApiInfo) {
 		ProjectMetaData metaData = projectMetaDataService.findMetadataById(metadataId);
-		piplineExecutorPort.execute(new GenerateReceiptRequest(metaData,excludeApiInfo));
+		piplineExecutorPort.send(new GenerationRequest(userId,metaData,excludeApiInfo));
 
 		return true;
 	}

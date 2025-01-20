@@ -2,6 +2,7 @@ package com.hocs.server.saas_v2.service;
 
 import com.hocs.server.saas_v2.common.exception.CustomException;
 import com.hocs.server.saas_v2.common.exception.ErrorCode;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
 import com.hocs.server.saas_v2.domain.ProjectFramework;
 import com.hocs.server.saas_v2.domain.ProjectMetaData;
@@ -18,12 +19,14 @@ public class ProjectMetaDataService {
 
 	private final ClientProjectMetadataRepository clientProjectMetadataRepository;
 	@Transactional
-	public Long saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, String gitCloneUrl) {
+	public Long saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, String gitCloneUrl,
+		ClientProjectPath path) {
 		ProjectMetaData projectMetaData = new ProjectMetaData(
 			language,
 			projectFramework,
 			coreSrcRootPath,
-			gitCloneUrl
+			gitCloneUrl,
+			path
 		);
 
 		//metadata save

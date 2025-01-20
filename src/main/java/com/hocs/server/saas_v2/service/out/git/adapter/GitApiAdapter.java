@@ -97,11 +97,11 @@ public class GitApiAdapter implements GitApiPort {
 					return json.optString("default_branch", "main");
 				}
 			} else {
-				System.err.println("GET 요청 실패. 응답 코드: " + responseCode);
+				log.error("GET 요청 실패. 응답 코드: " + responseCode);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("GitApiAdapter.getDefaultBranchName Exception");
+			log.error("GitApiAdapter.getDefaultBranchName Exception");
 		} finally {
 			if (connection != null) {
 				connection.disconnect();

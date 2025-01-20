@@ -1,6 +1,7 @@
 package com.hocs.server.openai.service;
 
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -14,7 +15,7 @@ public class ExceptionFormatService {
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
 
-	public String findRelatedExceptionSrc(String projectRootPath, ChatClient chatClient4o)
+	public String findRelatedExceptionSrc(ClientProjectPath projectRootPath, ChatClient chatClient4o)
 		throws IOException {
 		String[] ExceptionSrc = springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(
 			projectRootPath, chatClient4o);

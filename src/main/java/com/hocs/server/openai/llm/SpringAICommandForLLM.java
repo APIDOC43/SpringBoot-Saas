@@ -11,6 +11,7 @@ import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.llm.util.LLMResponseUtil;
 import com.hocs.server.openai.util.OpenAPIParser;
 import com.hocs.server.saas.util.cli.CLIManager;
+import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -108,17 +109,14 @@ public class SpringAICommandForLLM {
 		return client;
 	}
 
-	public String[] findFilePathRelatedExceptionFormatSrc(String TEMP_DIR,ChatClient client) {
+	public String[] findFilePathRelatedExceptionFormatSrc(ClientProjectPath projectPath,ChatClient client) {
 		CLIManager cliManager = new CLIManager();
-		String output = cliManager.executeCommand(new String[]{"tree", TEMP_DIR + "/src/main/java"});
-
-		System.out.println("tree output = " + output);
-
+		String output = cliManager.executeCommand(new String[]{"tree", projectPath + "/src/main/java"});
 
 		String validPrompt = PromptMessageHub.findRelationExceptionFormat(output);
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
-		String result = getResultContent(validRequest.call());
-
+//		String result = getResultContent(validRequest.call());
+		String result = "";
 		System.out.println("result = " + result);
 		String[] split = result.split(",");
 

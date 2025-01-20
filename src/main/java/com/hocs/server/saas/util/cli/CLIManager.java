@@ -27,7 +27,7 @@ public class CLIManager {
 
 			// 표준 출력 출력
 			while ((line = reader.readLine()) != null) {
-				System.out.println("Output: " + line);
+//				System.out.println("Output: " + line);
 				sb.append(line).append("\n");
 			}
 

@@ -5,7 +5,6 @@ import com.hocs.server.code_resolver.collector.domain.LanguageFrameworkFactory;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
 import com.hocs.server.saas_v2.domain.ProjectFramework;
-import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class ApiEndpointCollectorService {
 		framework, ClientProjectPath path) {
 		LanguageFramework languageFramework = LanguageFrameworkFactory.create(language, framework);
 
-		List<File> files = collectFiles(path.getUrl().toFile(), languageFramework.getExtension());
+		List<File> files = collectFiles(path.getPath().toFile(), languageFramework.getExtension());
 
 		return files.stream()
 			.filter(f -> languageFramework.isApiEntry(f.toPath()))

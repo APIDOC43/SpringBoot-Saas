@@ -1,5 +1,6 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port;
 
+import com.hocs.server.code_resolver.extractor.ControllerFile;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.CodingLanguage;
@@ -9,6 +10,6 @@ import java.util.Map;
 
 public interface ApiEndpointCollectorPort {
 
-	Map<String, List<ApiInfo>> findApiInfo(CodingLanguage language, ProjectFramework framework,
+	Map<ControllerFile, List<ApiInfo>> findApiInfo(CodingLanguage language, ProjectFramework framework,
 		ClientProjectPath path, int firstPageSize);
 }
