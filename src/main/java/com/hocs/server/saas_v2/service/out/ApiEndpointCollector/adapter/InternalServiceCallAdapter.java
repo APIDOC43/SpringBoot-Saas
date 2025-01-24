@@ -1,7 +1,7 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter;
 
-import com.hocs.server.code_resolver.collector.service.ApiEndpointResolveFacade;
-import com.hocs.server.code_resolver.extractor.ControllerFile;
+import com.hocs.server.code_resolver.service.ApiEndpointResolveFacade;
+import com.hocs.server.code_resolver.domain.ControllerFile;
 import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;

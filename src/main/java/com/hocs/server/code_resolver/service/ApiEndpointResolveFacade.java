@@ -1,7 +1,7 @@
-package com.hocs.server.code_resolver.collector.service;
+package com.hocs.server.code_resolver.service;
 
-import com.hocs.server.code_resolver.extractor.ApiInfoExtractorService;
-import com.hocs.server.code_resolver.extractor.ControllerFile;
+import com.hocs.server.code_resolver.domain.APIEntries;
+import com.hocs.server.code_resolver.domain.ControllerFile;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
@@ -19,9 +19,11 @@ public class ApiEndpointResolveFacade {
 	private final ApiEndpointCollectorService apiEndpointCollectorService;
 
 	public Map<ControllerFile, List<ApiInfo>> findApiInfo(FindApiInfoApiRequest request) {
-		List<File> controllers = apiEndpointCollectorService.findControllerFiles(
+		APIEntries apiEntries = apiEndpointCollectorService.findControllerFiles(
 			request.getLanguage(), request.getProjectFramework(), request.getPath());
 
-		return ApiInfoExtractorService.extractApiInfo(controllers);
+		List<File> controllerFiles = apiEntries.getControllerFiles();
+
+		return ApiInfoExtractorService.extractApiInfo(controllerFiles);
 	}
 }

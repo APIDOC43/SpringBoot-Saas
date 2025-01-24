@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.extractor;
+package com.hocs.server.code_resolver.domain;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.google.common.base.Objects;
 import lombok.Getter;

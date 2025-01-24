@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.service;
 
-import com.hocs.server.code_resolver.extractor.ControllerFile;
+import com.hocs.server.code_resolver.domain.ControllerFile;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
 import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;

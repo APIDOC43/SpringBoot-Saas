@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.domain;
 
-import com.hocs.server.code_resolver.extractor.MethodInformation;
+import com.hocs.server.code_resolver.domain.MethodInformation;
 import lombok.Getter;
 
 @Getter

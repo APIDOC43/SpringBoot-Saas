@@ -3,6 +3,7 @@ package com.hocs.server.code_resolver.extractor.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.hocs.server.code_resolver.domain.DependencyExtractorByMethod;
 import com.hocs.server.extractor.core.SrcFileCollector;
 import com.hocs.server.extractor.core.config.ExtractorConfig;
 import com.hocs.server.extractor.core.data.JavaClassifiedDataGenerator;
@@ -16,7 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.hocs.server.code_resolver.extractor.MethodInformation;
+import com.hocs.server.code_resolver.domain.MethodInformation;
 import com.hocs.server.extractor.core.data.JavaClassifiedDataContainer;
 
 import java.nio.file.Files;

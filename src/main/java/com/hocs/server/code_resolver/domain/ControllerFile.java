@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.extractor;
+package com.hocs.server.code_resolver.domain;
 
 import java.util.Objects;
 import lombok.Getter;

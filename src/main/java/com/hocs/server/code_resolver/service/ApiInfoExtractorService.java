@@ -1,10 +1,12 @@
-package com.hocs.server.code_resolver.extractor;
+package com.hocs.server.code_resolver.service;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.hocs.server.code_resolver.EndpointPathUtil;
+import com.hocs.server.code_resolver.common.EndpointPathUtil;
+import com.hocs.server.code_resolver.domain.ControllerFile;
+import com.hocs.server.code_resolver.domain.MethodInformation;
 import com.hocs.server.extractor.domain.ApiEndpoint;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import java.io.File;
@@ -22,10 +24,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ApiInfoExtractorService {
 
-	public Map<ControllerFile, List<ApiInfo>> extractApiInfo(List<File> controllers) {
+	public Map<ControllerFile, List<ApiInfo>> extractApiInfo(List<File> controllerFiles) {
 		Map<ControllerFile, List<ApiInfo>> apiInfos = new HashMap<>();
 
-		for (File controller : controllers) {
+
+		for (File controller : controllerFiles) {
 			String srcContent = null;
 			try {
 				srcContent = new String(Files.readAllBytes(Paths.get(controller.toURI())));

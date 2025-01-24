@@ -1,6 +1,5 @@
-package com.hocs.server.code_resolver.collector.domain;
+package com.hocs.server.code_resolver.domain;
 
-import com.hocs.server.code_resolver.collector.domain.LanguageFramework;
 import java.nio.file.Path;
 import javax.naming.OperationNotSupportedException;
 

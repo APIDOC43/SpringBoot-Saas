@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.extractor.domain;
+package com.hocs.server.code_resolver.domain;
 
 import static com.hocs.server.extractor.core.util.ParameterSupportAnnotations.supportedAnnotations;
 
@@ -8,7 +8,6 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.hocs.server.code_resolver.extractor.MethodInformation;
 import com.hocs.server.extractor.core.DependencyExplorer;
 import com.hocs.server.extractor.core.data.JavaClassifiedDataContainer;
 import java.nio.file.Files;

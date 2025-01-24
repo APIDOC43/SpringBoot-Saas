@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.collector.domain;
+package com.hocs.server.code_resolver.domain;
 
 import com.hocs.server.saas_v2.domain.CodingLanguage;
 import com.hocs.server.saas_v2.domain.ProjectFramework;

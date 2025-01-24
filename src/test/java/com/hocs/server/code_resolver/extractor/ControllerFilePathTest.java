@@ -2,6 +2,7 @@ package com.hocs.server.code_resolver.extractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.hocs.server.code_resolver.domain.ControllerFile;
 import org.junit.jupiter.api.Test;
 
 class ControllerFilePathTest {
