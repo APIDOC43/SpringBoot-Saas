@@ -1,7 +1,9 @@
-package com.hocs.server.code_resolver.service;
+package com.hocs.server.code_resolver.facade;
 
 import com.hocs.server.code_resolver.domain.APIEntries;
 import com.hocs.server.code_resolver.domain.ControllerFile;
+import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
+import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
@@ -15,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ApiEndpointResolveFacade {
 
-	private final ApiInfoExtractorService ApiInfoExtractorService;
+	private final com.hocs.server.code_resolver.service.ApiInfoExtractorService ApiInfoExtractorService;
 	private final ApiEndpointCollectorService apiEndpointCollectorService;
 
 	public Map<ControllerFile, List<ApiInfo>> findApiInfo(FindApiInfoApiRequest request) {
