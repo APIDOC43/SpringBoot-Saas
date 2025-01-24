@@ -1,15 +1,13 @@
 package com.hocs.server.saas_v2.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hocs.server.saas_v2.domain.CodingLanguage;
+import com.hocs.server.common.CodingLanguage;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
-import com.hocs.server.saas_v2.domain.ProjectFramework;
-import com.hocs.server.saas_v2.service.GitCloneService;
+import com.hocs.server.common.ProjectFramework;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;

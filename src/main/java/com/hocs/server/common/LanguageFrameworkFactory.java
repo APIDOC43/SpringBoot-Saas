@@ -1,7 +1,4 @@
-package com.hocs.server.code_resolver.domain;
-
-import com.hocs.server.saas_v2.domain.CodingLanguage;
-import com.hocs.server.saas_v2.domain.ProjectFramework;
+package com.hocs.server.common;
 
 public class LanguageFrameworkFactory {
 	public static LanguageFramework create(CodingLanguage language, ProjectFramework framework) {

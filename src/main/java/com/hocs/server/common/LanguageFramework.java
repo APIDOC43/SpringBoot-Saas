@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.domain;
+package com.hocs.server.common;
 
 import java.nio.file.Path;
 

@@ -4,10 +4,10 @@ import java.nio.file.Path;
 import lombok.Getter;
 
 @Getter
-public class SourceCode {
-	private final Path path;
+public class SourceFile {
+	protected final Path path;
 
-	public SourceCode(Path path) {
+	public SourceFile(Path path) {
 		this.path = path;
 	}
 }

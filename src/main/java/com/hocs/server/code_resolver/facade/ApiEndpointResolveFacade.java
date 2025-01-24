@@ -3,7 +3,6 @@ package com.hocs.server.code_resolver.facade;
 import com.hocs.server.code_resolver.domain.APIEntries;
 import com.hocs.server.code_resolver.domain.ControllerFile;
 import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
-import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
@@ -24,7 +23,7 @@ public class ApiEndpointResolveFacade {
 		APIEntries apiEntries = apiEndpointCollectorService.findControllerFiles(
 			request.getLanguage(), request.getProjectFramework(), request.getPath());
 
-		List<File> controllerFiles = apiEntries.getControllerFiles();
+		List<File> controllerFiles = apiEntries.getFiles();
 
 		return ApiInfoExtractorService.extractApiInfo(controllerFiles);
 	}

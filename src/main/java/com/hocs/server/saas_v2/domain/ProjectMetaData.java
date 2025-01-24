@@ -1,4 +1,6 @@
 package com.hocs.server.saas_v2.domain;
+import com.hocs.server.common.CodingLanguage;
+import com.hocs.server.common.ProjectFramework;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,8 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class ProjectMetaData {
-
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;

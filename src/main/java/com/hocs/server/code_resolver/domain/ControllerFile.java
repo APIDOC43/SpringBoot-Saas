@@ -1,15 +1,15 @@
 package com.hocs.server.code_resolver.domain;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import lombok.Getter;
 
 @Getter
-public class ControllerFile {
-	private String path;
-	private String className;
+public class ControllerFile extends SourceFile {
+	private final String className;
 
 	public ControllerFile(String path) {
-		this.path = path;
+		super(Path.of(path));
 		this.className = path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'));
 	}
 

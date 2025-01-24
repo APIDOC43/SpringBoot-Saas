@@ -1,4 +1,4 @@
-package com.hocs.server.saas_v2.domain;
+package com.hocs.server.common;
 
 public enum ProjectFramework {
 	SPRINGBOOT

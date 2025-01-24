@@ -1,5 +1,6 @@
 package com.hocs.server.code_resolver.domain;
 
+import com.hocs.server.common.LanguageFramework;
 import com.hocs.server.saas_v2.domain.ClientProjectPath;
 import java.io.File;
 import java.nio.file.Path;
@@ -10,23 +11,23 @@ import java.util.stream.Collectors;
 
 public class APIEntries {
 
-	private List<SourceCode> sourceCodeList;
+	private final List<SourceFile> sourceFileList;
 
-	private APIEntries(List<SourceCode> sourceCodeList) {
-		this.sourceCodeList = sourceCodeList;
+	private APIEntries(List<SourceFile> sourceFileList) {
+		this.sourceFileList = sourceFileList;
 	}
 
 	public static APIEntries create(ClientProjectPath rootPath, LanguageFramework languageFramework) {
 		List<Path> srcPath = read(rootPath.getPath().toFile(),languageFramework);
-		List<SourceCode> sourceCodeList = new ArrayList<>();
+		List<SourceFile> sourceFileList = new ArrayList<>();
 
 		for (Path path : srcPath) {
 			if(languageFramework.isApiEntry(path)){
-				sourceCodeList.add(new SourceCode(path));
+				sourceFileList.add(new SourceFile(path));
 			}
 		}
 
-		return new APIEntries(sourceCodeList);
+		return new APIEntries(sourceFileList);
 	}
 
 	private static List<Path> read(File rootDir, LanguageFramework languageFramework) {
@@ -45,8 +46,8 @@ public class APIEntries {
 		return files;
 	}
 
-	public List<File> getControllerFiles(){
-		return this.sourceCodeList
+	public List<File> getFiles(){
+		return this.sourceFileList
 			.stream()
 			.map(m->m.getPath().toFile())
 			.collect(Collectors.toList());
