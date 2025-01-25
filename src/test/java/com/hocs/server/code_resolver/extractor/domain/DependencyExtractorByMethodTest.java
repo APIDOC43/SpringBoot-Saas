@@ -4,10 +4,10 @@ package com.hocs.server.code_resolver.extractor.domain;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.hocs.server.code_resolver.domain.DependencyExtractorByMethod;
-import com.hocs.server.extractor.core.SrcFileCollector;
-import com.hocs.server.extractor.core.config.ExtractorConfig;
-import com.hocs.server.extractor.core.data.JavaClassifiedDataGenerator;
-import com.hocs.server.extractor.domain.ClientProjectType;
+import com.hocs.server.code_resolver.legacy.extractor.core.SrcFileCollector;
+import com.hocs.server.code_resolver.legacy.extractor.core.config.ExtractorConfig;
+import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataGenerator;
+import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.hocs.server.code_resolver.domain.MethodInformation;
-import com.hocs.server.extractor.core.data.JavaClassifiedDataContainer;
+import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainer;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;

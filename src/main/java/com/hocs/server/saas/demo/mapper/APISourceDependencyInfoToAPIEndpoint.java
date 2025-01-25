@@ -1,9 +1,9 @@
 package com.hocs.server.saas.demo.mapper;
 
-import com.hocs.server.extractor.domain.API;
-import com.hocs.server.extractor.domain.APISourceDependencyInfo;
-import com.hocs.server.extractor.domain.ApiEndpoint;
-import com.hocs.server.extractor.domain.GlobalSourceDependency;
+import com.hocs.server.code_resolver.legacy.extractor.domain.API;
+import com.hocs.server.code_resolver.legacy.extractor.domain.APISourceDependencyInfo;
+import com.hocs.server.code_resolver.legacy.extractor.domain.ApiEndpoint;
+import com.hocs.server.code_resolver.legacy.extractor.domain.GlobalSourceDependency;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import java.util.ArrayList;
 import java.util.List;

@@ -7,7 +7,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.hocs.server.code_resolver.common.EndpointPathUtil;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.code_resolver.domain.MethodInformation;
-import com.hocs.server.extractor.domain.ApiEndpoint;
+import com.hocs.server.code_resolver.legacy.extractor.domain.ApiEndpoint;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import java.io.File;
 import java.io.IOException;

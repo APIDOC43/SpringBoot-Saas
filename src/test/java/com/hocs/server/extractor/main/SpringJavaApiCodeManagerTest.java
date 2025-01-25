@@ -2,9 +2,9 @@ package com.hocs.server.extractor.main;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hocs.server.extractor.core.client.SpringJavaApiCodeClient;
-import com.hocs.server.extractor.domain.APISourceDependencyInfo;
-import com.hocs.server.extractor.domain.ClientProjectType;
+import com.hocs.server.code_resolver.legacy.extractor.core.client.SpringJavaApiCodeClient;
+import com.hocs.server.code_resolver.legacy.extractor.domain.APISourceDependencyInfo;
+import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
 import com.hocs.server.saas.user.gitapi.domin.GitRepo;
 import java.io.File;
 import java.nio.file.Path;

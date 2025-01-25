@@ -1,8 +1,8 @@
 package com.hocs.server.saas.demo.service.impl;
 
-import com.hocs.server.extractor.domain.APISourceDependencyInfo;
-import com.hocs.server.extractor.domain.ClientProjectType;
-import com.hocs.server.extractor.service.APISourceDependencyService;
+import com.hocs.server.code_resolver.legacy.extractor.domain.APISourceDependencyInfo;
+import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
+import com.hocs.server.code_resolver.legacy.extractor.service.APISourceDependencyService;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.openai.service.GenerateOasFacadeService;
 import com.hocs.server.openai.util.HttpClient;

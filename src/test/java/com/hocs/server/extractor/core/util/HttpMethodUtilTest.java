@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.*;
+import com.hocs.server.code_resolver.legacy.extractor.core.util.HttpMethodUtil;
 import org.junit.jupiter.api.Test;
 
 public class HttpMethodUtilTest {

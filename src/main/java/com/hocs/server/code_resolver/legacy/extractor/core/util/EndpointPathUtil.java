@@ -1,4 +1,4 @@
-package com.hocs.server.code_resolver.common;
+package com.hocs.server.code_resolver.legacy.extractor.core.util;
 
 import static com.hocs.server.code_resolver.legacy.extractor.core.util.HttpMethodUtil.extractHttpMethod;
 
