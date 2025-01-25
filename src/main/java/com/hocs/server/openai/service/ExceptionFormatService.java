@@ -1,7 +1,7 @@
 package com.hocs.server.openai.service;
 
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
-import com.hocs.server.saas_v2.domain.ClientProjectPath;
+import com.hocs.server.common.ClientProjectPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,7 +22,8 @@ public class ExceptionFormatService {
 
 		StringBuilder sb = new StringBuilder();
 		for (String src : ExceptionSrc) {
-			sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
+			if(!src.equals(""))
+				sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
 		}
 		return sb.toString();
 	}

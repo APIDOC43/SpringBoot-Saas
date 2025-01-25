@@ -1,8 +1,9 @@
-package com.hocs.server.saas_v2.domain;
+package com.hocs.server.common;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Converter;
+import java.io.File;
 import java.nio.file.Path;
 import jakarta.persistence.Embeddable;
 import java.nio.file.Paths;
@@ -20,6 +21,9 @@ public class ClientProjectPath {
 	@Convert(converter = PathConverter.class)
 	private Path path;
 
+	public File getToFile(){
+		return path.toFile();
+	}
 }
 @Converter(autoApply = true)
 class PathConverter implements AttributeConverter<Path, String> {

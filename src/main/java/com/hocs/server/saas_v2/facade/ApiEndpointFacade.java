@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.facade;
 
-import com.hocs.server.code_resolver.domain.ControllerFile;
+import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
 import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
 import com.hocs.server.saas_v2.service.GitCloneService;
@@ -8,7 +8,7 @@ import com.hocs.server.saas_v2.service.ProjectMetaDataService;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
-import com.hocs.server.saas_v2.domain.ClientProjectPath;
+import com.hocs.server.common.ClientProjectPath;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class ApiEndpointFacade {
 		//io -3
 		//이 api자체가 code paser에 있어야 하는거 아닐까..? api gateway이용해서..
 		////현재는 전부 주지만. enddpoint갯수는 300개이상임. 페이징하는게 좋은데, DB에 저장하고 첫 50개 보내주고 pagenagion api 만들어야 할듯
-		//		//<ApiInfo:path,endpoint,className>
+		//		//<ApiInfoInPipline:path,endpoint,className>
 		//캐싱 생각
 		Map<ControllerFile, List<ApiInfo>> apiEndpointInfo = apiEndpointCollectorPort.findApiInfo(
 			request.getLanguage(),

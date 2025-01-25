@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/apis/document")
 @RequiredArgsConstructor
+@Slf4j
 public class DocumentGenerateRequestController {
 
 	private final ApiEndpointFacade apiEndpointFacade;
@@ -28,6 +30,7 @@ public class DocumentGenerateRequestController {
 	@PostMapping("/generation/reception/v1")
 	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @Valid GenerateReceiptClientRequest request) {
 		String userId = UUID.randomUUID().toString();
+		log.info("userId = " + userId);
 		documentGenerateService.generationReceipt(userId,request.getMetadataId(),request.getExcludeApiInfo());
 
 		return ResponseEntity.status(HttpStatus.ACCEPTED).build();

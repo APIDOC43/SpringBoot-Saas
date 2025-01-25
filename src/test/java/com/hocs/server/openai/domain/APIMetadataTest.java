@@ -2,7 +2,7 @@ package com.hocs.server.openai.domain;
 
 
 
-import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIMetadata;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.BufferedWriter;
@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class APIEndpointTest {
+class APIMetadataTest {
 
 	private static final String TEST_API = "TestAPI";
 	private static final String TEST_METHOD = "GET";
@@ -22,7 +22,7 @@ class APIEndpointTest {
 	private static final List<String> TEST_GLOBAL_SRC = Arrays.asList("globalSrc1", "globalSrc2");
 	private static final String TEST_ABSOLUTE_PATH = "path/to/absolute";
 
-	private APIEndpoint apiEndpoint;
+	private APIMetadata apiMetadata;
 
 	@TempDir
 	Path tempDir;
@@ -30,7 +30,7 @@ class APIEndpointTest {
 
 	@Test
 	void testCreate() {
-		APIEndpoint endpoint = APIEndpoint.create(TEST_API, TEST_METHOD, TEST_PATHS, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
+		APIMetadata endpoint = APIMetadata.create(TEST_API, TEST_METHOD, TEST_PATHS, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
 
 		assertNotNull(endpoint);
 		assertEquals(TEST_API, endpoint.getAPI());
@@ -55,8 +55,8 @@ class APIEndpointTest {
 		}
 
 		List<String> paths = Arrays.asList(tempFile1.toString(), tempFile2.toString());
-		apiEndpoint = APIEndpoint.create(TEST_API, TEST_METHOD, paths, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
-		String result = apiEndpoint.loadSrcString();
+		apiMetadata = APIMetadata.create(TEST_API, TEST_METHOD, paths, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
+		String result = apiMetadata.loadSrcString();
 
 		// 예상 결과 검증
 		String expected ="""
@@ -78,8 +78,8 @@ class APIEndpointTest {
 	void testLoadSrcWithInvalidPath() {
 		// 존재하지 않는 파일 경로
 		List<String> paths = Arrays.asList("invalid/path/file1.java");
-		apiEndpoint = APIEndpoint.create(TEST_API, TEST_METHOD, paths, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
-		String result = apiEndpoint.loadSrcString();
+		apiMetadata = APIMetadata.create(TEST_API, TEST_METHOD, paths, TEST_GLOBAL_SRC, TEST_ABSOLUTE_PATH);
+		String result = apiMetadata.loadSrcString();
 
 		// 결과가 빈 문자열인지 확인 (예외 상황 처리)
 		assertEquals("", result);

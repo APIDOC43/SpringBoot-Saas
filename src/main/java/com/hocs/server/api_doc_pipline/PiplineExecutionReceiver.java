@@ -2,10 +2,12 @@ package com.hocs.server.api_doc_pipline;
 
 import com.hocs.server.api_doc_pipline.service.ApiDocPiplineService;
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
-import com.hocs.server.saas_v2.domain.ProjectMetaData;
+import com.hocs.server.common.ProjectMetaData;
+import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.domain.UrlData;
 import com.hocs.server.saas_v2.service.out.git.port.GitApiPort;
 import com.hocs.server.saas_v2.service.out.pipline.adapter.GenerationRequest;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
@@ -31,12 +33,13 @@ public class PiplineExecutionReceiver {
 		String defaultBranchName = gitApiPort.getDefaultBranchName(UrlData.of(gitCloneUrl));
 
 		try {
+			List<ApiInfo> excludeApiInfo = request.getExcludeApiInfo();
 			apiDocPiplineService.execute(
 				request.getUserId(),
 				metaData,
 				filenamesRelatedException,
 				defaultBranchName,
-				request.getExcludeApiInfo()
+				excludeApiInfo
 			);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

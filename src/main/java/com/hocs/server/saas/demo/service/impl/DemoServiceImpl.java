@@ -3,7 +3,7 @@ package com.hocs.server.saas.demo.service.impl;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.service.APISourceDependencyService;
-import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.openai.service.GenerateOasFacadeService;
 import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
@@ -44,10 +44,10 @@ public class DemoServiceImpl implements DemoFacadeService {
 		APISourceDependencyInfo apiSourceDependencyInfo = apiSourceDependencyService.extractApiSourceDependencyInfo(
 			ClientProjectType.SPRING_JAVA, clonedDir.toFile(), gitRepo, userId);
 
-		List<APIEndpoint> apiEndpoints = APISourceDependencyInfoToAPIEndpoint
+		List<APIMetadata> apiMetadata = APISourceDependencyInfoToAPIEndpoint
 			.mapToAPIEndpoint(apiSourceDependencyInfo);
 
-		llmService.generate(userId,apiEndpoints,clonedDir.toFile());
+		llmService.generate(userId, apiMetadata,clonedDir.toFile());
 		MemoryProcessPercentage.clear(userId);
 
 		HttpClient.toSaas(clonedDir.toFile(), userId);

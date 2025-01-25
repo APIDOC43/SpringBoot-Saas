@@ -12,12 +12,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-// APIEndpoint 클래스 정의
+// APIMetadata 클래스 정의
 @Getter
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class APIEndpoint {
+public class APIMetadata {
 
 	private final static String IMPORT_PARSE_REGEX = "(?m)^\\s*import\\s+.*?;\\s*";
 
@@ -27,9 +27,9 @@ public class APIEndpoint {
 	private List<String> globalSrc;
 	private String absolutePath;
 
-	public static APIEndpoint create(String API, String method, List<String> paths, List<String> globalSrc,
+	public static APIMetadata create(String API, String method, List<String> paths, List<String> globalSrc,
 		String absolutePath) {
-		return new APIEndpoint(API, method, paths, globalSrc, absolutePath);
+		return new APIMetadata(API, method, paths, globalSrc, absolutePath);
 	}
 
 

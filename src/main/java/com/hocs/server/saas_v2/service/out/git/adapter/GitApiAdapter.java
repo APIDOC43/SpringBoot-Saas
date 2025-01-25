@@ -6,7 +6,7 @@ import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_REPOSITORY_
 import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.saas_v2.common.exception.CustomException;
 import com.hocs.server.saas_v2.common.exception.ErrorCode;
-import com.hocs.server.saas_v2.domain.ClientProjectPath;
+import com.hocs.server.common.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.GitRepository;
 import com.hocs.server.saas_v2.domain.UrlData;
 import com.hocs.server.saas_v2.service.out.git.adapter.dto.RepositoryResponse;

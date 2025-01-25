@@ -2,7 +2,7 @@ package com.hocs.server.saas_v2.facade;
 
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
-import com.hocs.server.saas_v2.domain.ProjectMetaData;
+import com.hocs.server.common.ProjectMetaData;
 import com.hocs.server.saas_v2.service.ProjectMetaDataService;
 import com.hocs.server.saas_v2.service.out.pipline.adapter.GenerationRequest;
 import com.hocs.server.saas_v2.service.out.pipline.port.PiplineExecutorPort;

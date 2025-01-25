@@ -1,14 +1,14 @@
 package com.hocs.server.openai.llm;
 
 
-import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.openai.domain.output.Schema;
 import java.util.List;
 
 public class PromptMessageHub {
 
-	public static String createOasDescriptionDetail(APIEndpoint apiEndpoint, String oas) {
-		return "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대한\n"+"""
+	public static String createOasDescriptionDetail(APIMetadata apiMetadata, String oas) {
+		return "API: " + apiMetadata.getMethod() + " \'" + apiMetadata.getAPI()+"\' 에 대한\n"+"""
 			OAS(OpenAPI Specification) 3.0.0 파일을 수정하려고 한다.
 			\n"""+oas+"\n"+"""
 						
@@ -45,11 +45,11 @@ public class PromptMessageHub {
 	}
 
 
-	public static String createOasPathSection(APIEndpoint apiEndpoint, String srcRelationErrorForamt) {
+	public static String createOasPathSection(APIMetadata apiMetadata, String srcRelationErrorForamt) {
 		String promptPath = """
 			목표 :
 			```
-			""" + "API: " + apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' 에 대해서\n" + """
+			""" + "API: " + apiMetadata.getMethod() + " \'" + apiMetadata.getAPI()+"\' 에 대해서\n" + """
 			OAS(Open api spec) 3.0.0 파일의 path만을 작성하려고 한다.
 			```
 
@@ -93,8 +93,8 @@ public class PromptMessageHub {
 
 			데이터
 			```
-			아래는 """ + " "+ apiEndpoint.getMethod() + " \'" + apiEndpoint.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
-			"\n"+ apiEndpoint.loadSrcString()+"\n "+srcRelationErrorForamt+"```";
+			아래는 """ + " "+ apiMetadata.getMethod() + " \'" + apiMetadata.getAPI()+"\' API가 실행될때 필요한 소스코드들이다."+
+			"\n"+ apiMetadata.loadSrcString()+"\n "+srcRelationErrorForamt+"```";
 		return promptPath;
 	}
 

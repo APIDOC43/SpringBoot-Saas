@@ -1,5 +1,6 @@
-package com.hocs.server.code_resolver.domain;
+package com.hocs.server.api_doc_pipline.domain;
 
+import com.hocs.server.code_resolver.domain.SourceFile;
 import java.nio.file.Path;
 import java.util.Objects;
 import lombok.Getter;

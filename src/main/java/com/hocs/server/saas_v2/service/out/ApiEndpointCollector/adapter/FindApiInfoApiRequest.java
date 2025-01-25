@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter;
 
-import com.hocs.server.saas_v2.domain.ClientProjectPath;
+import com.hocs.server.common.ClientProjectPath;
 import com.hocs.server.common.CodingLanguage;
 import com.hocs.server.common.ProjectFramework;
 import lombok.Data;

@@ -1,4 +1,5 @@
-package com.hocs.server.saas_v2.domain;
+package com.hocs.server.common;
+import com.hocs.server.common.ClientProjectPath;
 import com.hocs.server.common.CodingLanguage;
 import com.hocs.server.common.ProjectFramework;
 import jakarta.persistence.Embedded;
@@ -8,6 +9,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.nio.file.Path;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class ProjectMetaData {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -39,4 +41,7 @@ public class ProjectMetaData {
 		this.gitCloneUrl = gitCloneUrl;
 		this.projectRootPath = path;
 	}
+
+
+
 }

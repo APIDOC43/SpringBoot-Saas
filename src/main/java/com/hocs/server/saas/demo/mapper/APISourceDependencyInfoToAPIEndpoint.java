@@ -4,14 +4,14 @@ import com.hocs.server.extractor.domain.API;
 import com.hocs.server.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.extractor.domain.ApiEndpoint;
 import com.hocs.server.extractor.domain.GlobalSourceDependency;
-import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIMetadata;
 import java.util.ArrayList;
 import java.util.List;
 
 public class APISourceDependencyInfoToAPIEndpoint {
 
-	public static List<APIEndpoint> mapToAPIEndpoint(APISourceDependencyInfo sourceDependencyInfo) {
-		List<APIEndpoint> apiEntries = new ArrayList<>();
+	public static List<APIMetadata> mapToAPIEndpoint(APISourceDependencyInfo sourceDependencyInfo) {
+		List<APIMetadata> apiEntries = new ArrayList<>();
 
 		GlobalSourceDependency global = sourceDependencyInfo.getGlobal();
 
@@ -23,8 +23,8 @@ public class APISourceDependencyInfoToAPIEndpoint {
 
 				List<String> paths = api.getPaths();
 				String absolutePath = api.getLink() != null ? api.getLink() : "unknown";
-				// Map fields to APIEndpoint
-				APIEndpoint apiEntry = APIEndpoint.create(apiPath, method, paths, global.getAllSourcePathList(),absolutePath);
+				// Map fields to APIMetadata
+				APIMetadata apiEntry = APIMetadata.create(apiPath, method, paths, global.getAllSourcePathList(),absolutePath);
 				apiEntries.add(apiEntry);
 			}
 		}

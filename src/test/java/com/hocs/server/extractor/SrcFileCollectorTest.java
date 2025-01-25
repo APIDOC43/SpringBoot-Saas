@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.hocs.server.extractor.core.SrcFileCollector;
 import com.hocs.server.extractor.domain.ClientProjectType;
 import com.hocs.server.extractor.domain.SrcSuffix;
-import com.hocs.server.openai.domain.input.APIEndpoint;
+import com.hocs.server.openai.domain.input.APIMetadata;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +34,7 @@ public class SrcFileCollectorTest {
 	private Path file3;
 
 
-	private List<APIEndpoint> apiEntries;
+	private List<APIMetadata> apiEntries;
 
 	@BeforeEach
 	public void setUp() throws IOException {
@@ -47,7 +47,7 @@ public class SrcFileCollectorTest {
 		file3 = Files.createFile(java.resolve("Test3.java"));
 
 		apiEntries = new ArrayList<>();
-		APIEndpoint entry = APIEndpoint.create("test", "test", new ArrayList<>(), new ArrayList<>(), "test");
+		APIMetadata entry = APIMetadata.create("test", "test", new ArrayList<>(), new ArrayList<>(), "test");
 		apiEntries.add(entry);
 
 	}
