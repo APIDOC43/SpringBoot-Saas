@@ -1,6 +1,6 @@
 package com.hocs.server.code_resolver.legacy.extractor.service;
 
-import com.hocs.server.saas.user.gitapi.domin.GitRepo;
+import com.hocs.server.saas_v2.legacy.saas.user.gitapi.domin.GitRepo;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;

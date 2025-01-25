@@ -6,7 +6,7 @@ import com.hocs.server.api_doc_pipline.service.out.port.ApiEndpointCollectorPort
 import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.openai.service.GenerateOasFacadeService;
 import com.hocs.server.openai.util.HttpClient;
-import com.hocs.server.saas.apidoc.service.impl.StaticApiDocServiceImpl;
+import com.hocs.server.saas_v2.legacy.saas.apidoc.service.impl.StaticApiDocServiceImpl;
 
 import com.hocs.server.common.ProjectMetaData;
 import com.hocs.server.saas_v2.domain.ApiInfo;

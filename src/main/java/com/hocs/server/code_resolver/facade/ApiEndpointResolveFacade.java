@@ -15,7 +15,7 @@ import com.hocs.server.code_resolver.legacy.extractor.domain.APISourceDependency
 import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
 import com.hocs.server.code_resolver.legacy.extractor.domain.GlobalSourceDependency;
 import com.hocs.server.openai.domain.input.APIMetadata;
-import com.hocs.server.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
+import com.hocs.server.saas_v2.legacy.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
 import com.hocs.server.saas_v2.common.annotation.Facade;
 import com.hocs.server.saas_v2.domain.ApiInfo;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;

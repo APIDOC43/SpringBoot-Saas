@@ -11,7 +11,7 @@ import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
 import com.hocs.server.code_resolver.legacy.extractor.domain.GlobalSourceDependency;
 import com.hocs.server.code_resolver.legacy.extractor.service.GitApiService;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
-import com.hocs.server.saas.user.gitapi.domin.GitRepo;
+import com.hocs.server.saas_v2.legacy.saas.user.gitapi.domin.GitRepo;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;

@@ -4,7 +4,7 @@ import com.hocs.server.code_resolver.legacy.extractor.respository.mongo.APISourc
 import com.hocs.server.code_resolver.legacy.extractor.core.client.SpringJavaApiCodeClient;
 import com.hocs.server.code_resolver.legacy.extractor.domain.APISourceDependencyInfo;
 import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
-import com.hocs.server.saas.user.gitapi.domin.GitRepo;
+import com.hocs.server.saas_v2.legacy.saas.user.gitapi.domin.GitRepo;
 import java.io.File;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
