@@ -65,7 +65,7 @@ public class ApiInfoInPiplineExtractorServiceTest {
 		assertEquals(2, result.get(new ControllerFile(sampleControllerFile.getPath())).size());
 
 		ControllerFile controllerFile = result.keySet().iterator().next();
-		assertEquals(sampleControllerFile.getPath(), controllerFile.getPath());
+		assertEquals(sampleControllerFile.getPath(), controllerFile.getPath().toString());
 		assertEquals(sampleControllerFile.getName(), controllerFile.getClassName()+".java");
 
 		List<ApiInfo> apiInfos = result.get(controllerFile);

@@ -46,7 +46,7 @@ class DocumentGenerateRequestControllerTest {
 		request.setLanguage(null);
 		request.setProjectFramework(null);
 
-		mockMvc.perform(post("/apis/document/generation/receipt/v1")
+		mockMvc.perform(post("/apis/document/endpoint/demo/v1")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
 			.andExpect(status().isBadRequest());
