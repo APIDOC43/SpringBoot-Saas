@@ -1,5 +1,6 @@
 package com.hocs.server.saas_v2.domain;
 
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.common.ProjectMetaData;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -7,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.DigestUtils;
@@ -23,7 +25,7 @@ public class DocGeneratePiplineTask extends BaseEntity{
 	private String userId;
 	private String requestId;
 	private String gitUrl;
-
+	private List<ApiInfo> excludeApiInfo;
 
 	@OneToOne
 	@JoinColumn(name = "project_metadata_id")

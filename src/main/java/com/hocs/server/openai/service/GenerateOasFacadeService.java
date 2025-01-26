@@ -28,11 +28,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GenerateOasFacadeService {
 
 
@@ -94,7 +96,7 @@ public class GenerateOasFacadeService {
 
 		OasRepository.save(oas);
 
-		System.out.println("oas-Result = " + oas);
+		log.info("oas-Result = " + oas);
 
 
 	}

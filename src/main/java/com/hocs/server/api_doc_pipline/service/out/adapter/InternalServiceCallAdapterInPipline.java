@@ -9,7 +9,7 @@ import com.hocs.server.common.ProjectFramework;
 import com.hocs.server.common.ProjectMetaData;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.saas_v2.common.annotation.Adapter;
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.common.ClientProjectPath;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
 import java.util.HashMap;

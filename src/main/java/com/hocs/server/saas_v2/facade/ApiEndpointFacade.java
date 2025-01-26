@@ -7,7 +7,7 @@ import com.hocs.server.saas_v2.service.GitCloneService;
 import com.hocs.server.saas_v2.service.ProjectMetaDataService;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
 import com.hocs.server.saas_v2.common.annotation.Facade;
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.common.ClientProjectPath;
 import java.util.List;
 import java.util.Map;

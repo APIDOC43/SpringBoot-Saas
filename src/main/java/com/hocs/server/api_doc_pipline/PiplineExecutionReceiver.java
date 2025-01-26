@@ -3,7 +3,7 @@ package com.hocs.server.api_doc_pipline;
 import com.hocs.server.api_doc_pipline.service.ApiDocPiplineService;
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
 import com.hocs.server.common.ProjectMetaData;
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.saas_v2.domain.UrlData;
 import com.hocs.server.saas_v2.service.out.git.port.GitApiPort;
 import com.hocs.server.saas_v2.service.out.pipline.adapter.GenerationRequest;

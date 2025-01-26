@@ -5,6 +5,7 @@ import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
 import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
 import com.hocs.server.code_resolver.service.ApiSourceDependencyService;
+import com.hocs.server.common.ProjectFramework;
 import com.hocs.server.common.ProjectMetaData;
 import com.hocs.server.code_resolver.legacy.extractor.core.DependencyAnalyzer;
 import com.hocs.server.code_resolver.legacy.extractor.core.SrcFileCollector;
@@ -18,7 +19,7 @@ import com.hocs.server.code_resolver.legacy.extractor.domain.GlobalSourceDepende
 import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.saas_v2.legacy.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
 import com.hocs.server.saas_v2.common.annotation.Facade;
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
 import java.io.File;
 import java.io.IOException;
@@ -56,6 +57,9 @@ public class ApiEndpointResolveFacade {
 			metaData.getProjectRootPath().getPath());
 		List<API> apis = null;
 		try {
+
+			//사용자 프로젝트 언어 및 프레임워크에 따라 달라집니다.
+			//if(metaData.getProjectFramework().equals(ProjectFramework.SPRINGBOOT))
 			apis = dependencyAnalyzer.findDependency(controllerFile.getClassName());
 
 

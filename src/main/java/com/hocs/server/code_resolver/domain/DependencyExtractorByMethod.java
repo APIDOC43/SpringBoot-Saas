@@ -10,6 +10,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.hocs.server.code_resolver.legacy.extractor.core.DependencyExplorer;
 import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainer;
+import com.hocs.server.common.MethodInformation;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;

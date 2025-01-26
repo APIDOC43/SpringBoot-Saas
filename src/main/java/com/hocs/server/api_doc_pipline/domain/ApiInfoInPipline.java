@@ -1,6 +1,6 @@
 package com.hocs.server.api_doc_pipline.domain;
 
-import com.hocs.server.code_resolver.domain.MethodInformation;
+import com.hocs.server.common.MethodInformation;
 import lombok.Getter;
 
 @Getter

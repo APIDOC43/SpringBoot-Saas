@@ -9,7 +9,7 @@ import com.hocs.server.openai.util.HttpClient;
 import com.hocs.server.saas_v2.legacy.saas.apidoc.service.impl.StaticApiDocServiceImpl;
 
 import com.hocs.server.common.ProjectMetaData;
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import java.io.File;
 import java.util.List;
 import java.util.Map;

@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.service.out.pipline.adapter;
 
-import com.hocs.server.saas_v2.domain.ApiInfo;
+import com.hocs.server.common.ApiInfo;
 import com.hocs.server.common.ProjectMetaData;
 import java.util.List;
 import lombok.AllArgsConstructor;

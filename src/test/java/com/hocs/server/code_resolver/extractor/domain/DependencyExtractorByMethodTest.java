@@ -17,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.hocs.server.code_resolver.domain.MethodInformation;
 import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainer;
 
 import java.nio.file.Files;
@@ -90,17 +89,17 @@ public class DependencyExtractorByMethodTest {
 		dataContainer.getClassToFilePath().put(SERVICE_CLASS_NAME, SERVICE_FILE_PATH);
 
 		// Act
-		Map<MethodInformation, List<String>> result = dependencyExtractorByMethod.findDependency(
+		Map<MethodInformationInCodeResolver, List<String>> result = dependencyExtractorByMethod.findDependency(
 			CONTROLLER_CLASS_NAME,
 			dataContainer);
 
 		// Assert
 		assertNotNull(result, "Result should not be null");
 		assertEquals(1, result.size(), "There should be exactly one dependency");
-		assertEquals(2, result.get(new MethodInformation("sayHello()")).size(), "There should be exactly two dependency");
+		assertEquals(2, result.get(new MethodInformationInCodeResolver("sayHello()")).size(), "There should be exactly two dependency");
 
 
-		MethodInformation methodSignature = result.keySet().iterator().next();
+		MethodInformationInCodeResolver methodSignature = result.keySet().iterator().next();
 		List<String> dependencies = result.get(methodSignature);
 
 		assertTrue(dependencies.contains(SERVICE_FILE_PATH), "Dependencies should contain the service file path");
