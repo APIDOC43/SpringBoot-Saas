@@ -4,6 +4,7 @@ import com.hocs.server.code_resolver.domain.APIEntries;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
 import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
+import com.hocs.server.code_resolver.service.ApiSourceDependencyService;
 import com.hocs.server.common.ProjectMetaData;
 import com.hocs.server.code_resolver.legacy.extractor.core.DependencyAnalyzer;
 import com.hocs.server.code_resolver.legacy.extractor.core.SrcFileCollector;
@@ -37,6 +38,7 @@ public class ApiEndpointResolveFacade {
 	private final DependencyAnalyzer dependencyAnalyzer;
 	private final SrcFileCollector srcFileCollector;
 	private final JavaClassifiedDataGenerator javaCodeCategorizer;
+	private final ApiSourceDependencyService apiSourceDependencyService;
 
 	public Map<ControllerFile, List<ApiInfo>> findApiInfo(FindApiInfoApiRequest request) {
 		APIEntries apiEntries = apiEndpointCollectorService.findControllerFiles(
@@ -70,11 +72,10 @@ public class ApiEndpointResolveFacade {
 		GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
 		APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
 			.create(UUID.randomUUID().toString(), userId, apis, globalSourceDependency);
-		//repository.save(apiSourceDependencyInfo);
-		List<APIMetadata> apiMetadata = APISourceDependencyInfoToAPIEndpoint
-			.mapToAPIEndpoint(apiSourceDependencyInfo);
 
-		return apiMetadata;
+		apiSourceDependencyService.save(apiSourceDependencyInfo);
+
+		return APISourceDependencyInfoToAPIEndpoint.mapToAPIEndpoint(apiSourceDependencyInfo);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

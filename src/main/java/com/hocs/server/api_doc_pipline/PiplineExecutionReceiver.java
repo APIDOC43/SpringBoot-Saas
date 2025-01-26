@@ -20,7 +20,7 @@ public class PiplineExecutionReceiver {
 	private final ApiDocPiplineService apiDocPiplineService;
 	private final GitApiPort gitApiPort;
 
-	public void send(GenerationRequest request)  {
+	public void receive(GenerationRequest request)  {
 		//pipline start. 파이프라인 진입점.
 
 		ProjectMetaData metaData = request.getMetaData();

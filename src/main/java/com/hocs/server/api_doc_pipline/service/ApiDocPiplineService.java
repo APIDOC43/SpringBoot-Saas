@@ -40,7 +40,6 @@ public class ApiDocPiplineService {
 
 		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
 			//task 1
-//			List<API> apis = dependencyAnalyzer.findDependency(controllerFile.getClassName())
 			//CustomRAG 하나의 컨트롤러 파일에서 Endpoint별 API 정보를 추출합니다.
 			List<APIMetadata> apiMetadata = apiEndpointCollectorPortInPipline.getApiEndpoints(
 				userId, metaData, defaultBranchName, controllerFile);

@@ -12,6 +12,6 @@ public class PiplineExecutorSender implements PiplineExecutorPort {
 	private final PiplineExecutionReceiver piplineExecutionReceiver;
 	@Override
 	public void send(GenerationRequest request) {
-		piplineExecutionReceiver.send(request);
+		piplineExecutionReceiver.receive(request);
 	}
 }

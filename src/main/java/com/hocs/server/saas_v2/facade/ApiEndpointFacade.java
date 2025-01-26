@@ -35,10 +35,7 @@ public class ApiEndpointFacade {
 		);
 
 		//io -3
-		//이 api자체가 code paser에 있어야 하는거 아닐까..? api gateway이용해서..
-		////현재는 전부 주지만. enddpoint갯수는 300개이상임. 페이징하는게 좋은데, DB에 저장하고 첫 50개 보내주고 pagenagion api 만들어야 할듯
-		//		//<ApiInfoInPipline:path,endpoint,className>
-		//캐싱 생각
+		//TODO pagenation 구현
 		Map<ControllerFile, List<ApiInfo>> apiEndpointInfo = apiEndpointCollectorPort.findApiInfo(
 			request.getLanguage(),
 			request.getProjectFramework(),
