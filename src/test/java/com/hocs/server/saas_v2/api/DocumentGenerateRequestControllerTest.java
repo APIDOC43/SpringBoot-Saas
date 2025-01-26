@@ -1,9 +1,9 @@
 package com.hocs.server.saas_v2.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hocs.server.common.CodingLanguage;
+import com.hocs.server.common.domain.CodingLanguage;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
-import com.hocs.server.common.ProjectFramework;
+import com.hocs.server.common.domain.ProjectFramework;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

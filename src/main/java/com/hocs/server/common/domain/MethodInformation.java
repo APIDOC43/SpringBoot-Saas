@@ -1,4 +1,4 @@
-package com.hocs.server.common;
+package com.hocs.server.common.domain;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.google.common.base.Objects;
 import lombok.Getter;

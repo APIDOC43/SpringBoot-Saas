@@ -1,8 +1,11 @@
 package com.hocs.server.saas_v2.service.out.pipline.adapter;
 
 import com.hocs.server.api_doc_pipline.PiplineExecutionReceiver;
+import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.saas_v2.common.annotation.Adapter;
+import com.hocs.server.common.domain.DocGeneratePiplineTask;
 import com.hocs.server.saas_v2.service.out.pipline.port.PiplineExecutorPort;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @Adapter
@@ -10,8 +13,9 @@ import lombok.RequiredArgsConstructor;
 public class PiplineExecutorSender implements PiplineExecutorPort {
 
 	private final PiplineExecutionReceiver piplineExecutionReceiver;
+
 	@Override
-	public void send(GenerationRequest request) {
-		piplineExecutionReceiver.receive(request);
+	public void send(DocGeneratePiplineTask docGeneratePiplineTask, List<ApiInfo> excludeApiInfo) {
+		piplineExecutionReceiver.receive(docGeneratePiplineTask, excludeApiInfo);
 	}
 }

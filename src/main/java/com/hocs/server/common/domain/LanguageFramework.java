@@ -1,4 +1,4 @@
-package com.hocs.server.common;
+package com.hocs.server.common.domain;
 
 import java.nio.file.Path;
 

@@ -2,10 +2,11 @@ package com.hocs.server.saas_v2.service;
 
 import com.hocs.server.saas_v2.common.exception.CustomException;
 import com.hocs.server.saas_v2.common.exception.ErrorCode;
-import com.hocs.server.common.ClientProjectPath;
-import com.hocs.server.common.CodingLanguage;
-import com.hocs.server.common.ProjectFramework;
-import com.hocs.server.common.ProjectMetaData;
+import com.hocs.server.common.domain.ClientProjectPath;
+import com.hocs.server.common.domain.CodingLanguage;
+import com.hocs.server.common.domain.ProjectFramework;
+import com.hocs.server.common.domain.ProjectMetaData;
+import com.hocs.server.saas_v2.domain.GitRepoData;
 import com.hocs.server.saas_v2.repository.ClientProjectMetadataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +20,13 @@ public class ProjectMetaDataService {
 
 	private final ClientProjectMetadataRepository clientProjectMetadataRepository;
 	@Transactional
-	public Long saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, String gitCloneUrl,
+	public Long saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, GitRepoData gitRepoData,
 		ClientProjectPath path) {
 		ProjectMetaData projectMetaData = new ProjectMetaData(
 			language,
 			projectFramework,
 			coreSrcRootPath,
-			gitCloneUrl,
+			gitRepoData,
 			path
 		);
 

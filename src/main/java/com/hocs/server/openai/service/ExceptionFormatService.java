@@ -1,7 +1,7 @@
 package com.hocs.server.openai.service;
 
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;

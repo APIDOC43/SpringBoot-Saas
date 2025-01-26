@@ -3,12 +3,13 @@ package com.hocs.server.saas_v2.facade;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.saas_v2.api.request.FindApiInfoClientRequest;
 import com.hocs.server.saas_v2.api.response.ApiInfoResponse;
+import com.hocs.server.saas_v2.domain.GitRepoData;
 import com.hocs.server.saas_v2.service.GitCloneService;
 import com.hocs.server.saas_v2.service.ProjectMetaDataService;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
 import com.hocs.server.saas_v2.common.annotation.Facade;
-import com.hocs.server.common.ApiInfo;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ApiInfo;
+import com.hocs.server.common.domain.ClientProjectPath;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class ApiEndpointFacade {
 			request.getLanguage(),
 			request.getProjectFramework(),
 			request.getCoreSrcRootPath(),
-			request.getGitCloneUrl(),
+			GitRepoData.of(request.getGitCloneUrl()),
 			clientProjectPath
 		);
 

@@ -1,4 +1,4 @@
-package com.hocs.server.common;
+package com.hocs.server.common.domain;
 
 public class LanguageFrameworkFactory {
 	public static LanguageFramework create(CodingLanguage language, ProjectFramework framework) {

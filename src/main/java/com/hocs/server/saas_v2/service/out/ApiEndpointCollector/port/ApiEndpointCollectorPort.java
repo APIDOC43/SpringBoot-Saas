@@ -1,10 +1,10 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port;
 
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
-import com.hocs.server.common.ApiInfo;
-import com.hocs.server.common.ClientProjectPath;
-import com.hocs.server.common.CodingLanguage;
-import com.hocs.server.common.ProjectFramework;
+import com.hocs.server.common.domain.ApiInfo;
+import com.hocs.server.common.domain.ClientProjectPath;
+import com.hocs.server.common.domain.CodingLanguage;
+import com.hocs.server.common.domain.ProjectFramework;
 import java.util.List;
 import java.util.Map;
 

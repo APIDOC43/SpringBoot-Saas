@@ -1,45 +1,42 @@
-package com.hocs.server.saas_v2.domain;
+package com.hocs.server.common.domain;
 
-import com.hocs.server.common.ApiInfo;
-import com.hocs.server.common.ProjectMetaData;
+import com.hocs.server.saas_v2.domain.BaseEntity;
+import com.hocs.server.saas_v2.domain.GitRepoData;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import java.util.List;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.DigestUtils;
 
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 /** Not Yet **/
-public class DocGeneratePiplineTask extends BaseEntity{
+public class DocGeneratePiplineTask extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	private String userId;
 	private String requestId;
-	private String gitUrl;
-	private List<ApiInfo> excludeApiInfo;
 
 	@OneToOne
 	@JoinColumn(name = "project_metadata_id")
 	private ProjectMetaData projectMetaData;
 
-	public DocGeneratePiplineTask(String userId, ProjectMetaData projectMetaData, UrlData urlData) {
+	public DocGeneratePiplineTask(String userId, ProjectMetaData projectMetaData) {
 		this.userId = userId;
-		this.requestId = generateIdempotencyKey(urlData);
-		this.gitUrl = urlData.getCloneUrl();
+		this.requestId = generateIdempotencyKey(projectMetaData.getGitRepoData());
 		this.projectMetaData = projectMetaData;
 	}
 
-	private String generateIdempotencyKey(UrlData urlData) {
-		String data = String.join("|", urlData.getCloneUrl(), urlData.getRepoName(), urlData.getOwnerName());
+	private String generateIdempotencyKey(GitRepoData gitRepoData) {
+		String data = String.join("|", gitRepoData.getCloneUrl(), gitRepoData.getRepoName(), gitRepoData.getOwnerName());
 		return DigestUtils.md5DigestAsHex(data.getBytes());
 	}
 }

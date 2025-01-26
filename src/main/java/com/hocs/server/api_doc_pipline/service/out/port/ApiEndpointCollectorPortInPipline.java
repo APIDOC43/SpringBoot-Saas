@@ -2,10 +2,10 @@ package com.hocs.server.api_doc_pipline.service.out.port;
 
 import com.hocs.server.api_doc_pipline.domain.ApiInfoInPipline;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
-import com.hocs.server.common.CodingLanguage;
-import com.hocs.server.common.ProjectFramework;
-import com.hocs.server.common.ClientProjectPath;
-import com.hocs.server.common.ProjectMetaData;
+import com.hocs.server.common.domain.CodingLanguage;
+import com.hocs.server.common.domain.ProjectFramework;
+import com.hocs.server.common.domain.ClientProjectPath;
+import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import java.util.List;
 import java.util.Map;

@@ -1,10 +1,10 @@
 package com.hocs.server.saas_v2.repository;
 
-import com.hocs.server.common.domain.ProjectMetaData;
+import com.hocs.server.common.domain.DocGeneratePiplineTask;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ClientProjectMetadataRepository extends JpaRepository<ProjectMetaData,Long> {
+public interface DocGeneratePiplineTaskRepository extends JpaRepository<DocGeneratePiplineTask,Long> {
 
 }

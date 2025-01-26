@@ -4,9 +4,9 @@ import lombok.Getter;
 
 @Getter
 public class GitRepository {
-	private final UrlData urlData;
+	private final GitRepoData gitRepoData;
 
 	public GitRepository(String cloneUrl) {
-		this.urlData = UrlData.of(cloneUrl);
+		this.gitRepoData = GitRepoData.of(cloneUrl);
 	}
 }

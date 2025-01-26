@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.api.request;
 
-import com.hocs.server.common.ApiInfo;
+import com.hocs.server.common.domain.ApiInfo;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;

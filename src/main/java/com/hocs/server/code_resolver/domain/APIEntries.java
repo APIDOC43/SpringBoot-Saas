@@ -1,7 +1,7 @@
 package com.hocs.server.code_resolver.domain;
 
-import com.hocs.server.common.LanguageFramework;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.LanguageFramework;
+import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;

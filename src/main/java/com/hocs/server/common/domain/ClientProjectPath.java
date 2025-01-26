@@ -1,4 +1,4 @@
-package com.hocs.server.common;
+package com.hocs.server.common.domain;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Convert;

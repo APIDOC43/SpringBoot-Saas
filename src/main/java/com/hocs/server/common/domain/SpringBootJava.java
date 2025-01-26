@@ -1,9 +1,8 @@
-package com.hocs.server.common;
+package com.hocs.server.common.domain;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.hocs.server.common.LanguageFramework;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

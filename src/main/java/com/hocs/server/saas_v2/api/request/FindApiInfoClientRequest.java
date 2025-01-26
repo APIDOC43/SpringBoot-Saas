@@ -1,7 +1,7 @@
 package com.hocs.server.saas_v2.api.request;
 
-import com.hocs.server.common.CodingLanguage;
-import com.hocs.server.common.ProjectFramework;
+import com.hocs.server.common.domain.CodingLanguage;
+import com.hocs.server.common.domain.ProjectFramework;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

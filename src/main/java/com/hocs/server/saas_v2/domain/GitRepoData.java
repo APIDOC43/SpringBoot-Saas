@@ -1,15 +1,18 @@
 package com.hocs.server.saas_v2.domain;
 
+import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.logging.log4j.util.Strings;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 @ToString
-public class UrlData {
+public class GitRepoData {
+
 	private String cloneUrl;
 	private String ownerName;
 	private String repoName;
@@ -18,13 +21,19 @@ public class UrlData {
 		return cloneUrl.endsWith(".git") ? cloneUrl : Strings.concat(cloneUrl,".git");
 	}
 
-	public static UrlData of(String cloneUrl) {
+	private GitRepoData(String cloneUrl, String ownerName, String repoName) {
+		this.cloneUrl = cloneUrl;
+		this.ownerName = ownerName;
+		this.repoName = repoName;
+	}
+
+	public static GitRepoData of(String cloneUrl) {
 		if (cloneUrl.endsWith(".git")) {
 			cloneUrl = cloneUrl.substring(0, cloneUrl.indexOf(".git"));
 		}
 
 		String[] urlParts = cloneUrl.split("/");
-		return new UrlData(cloneUrl,urlParts[3],urlParts[4]);
+		return new GitRepoData(cloneUrl,urlParts[3],urlParts[4]);
 	}
 
 }

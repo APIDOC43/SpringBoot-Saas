@@ -11,7 +11,7 @@ import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.llm.util.LLMResponseUtil;
 import com.hocs.server.openai.util.OpenAPIParser;
 import com.hocs.server.saas_v2.legacy.saas.util.cli.CLIManager;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ClientProjectPath;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

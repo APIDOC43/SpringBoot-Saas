@@ -1,7 +1,7 @@
 package com.hocs.server.saas_v2.service;
 
 import com.hocs.server.saas_v2.domain.GitRepository;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.service.out.git.port.GitApiPort;
 import java.nio.file.Path;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +19,6 @@ public class GitCloneService {
 
 	public ClientProjectPath gitClone(String gitCloneUrl) {
 		GitRepository gitRepository = new GitRepository(gitCloneUrl);
-		return gitApiPort.gitClone(gitRepository.getUrlData(), Path.of(cloneDir));
+		return gitApiPort.gitClone(gitRepository.getGitRepoData(), Path.of(cloneDir));
 	}
 }

@@ -16,7 +16,7 @@ import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.openai.util.FileManager;
 import com.hocs.server.openai.util.MemoryProcessPercentage;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;

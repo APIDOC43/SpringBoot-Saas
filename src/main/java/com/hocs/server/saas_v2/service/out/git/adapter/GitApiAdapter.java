@@ -6,9 +6,9 @@ import static com.hocs.server.saas_v2.common.exception.ErrorCode.GIT_REPOSITORY_
 import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.saas_v2.common.exception.CustomException;
 import com.hocs.server.saas_v2.common.exception.ErrorCode;
-import com.hocs.server.common.ClientProjectPath;
+import com.hocs.server.common.domain.ClientProjectPath;
 import com.hocs.server.saas_v2.domain.GitRepository;
-import com.hocs.server.saas_v2.domain.UrlData;
+import com.hocs.server.saas_v2.domain.GitRepoData;
 import com.hocs.server.saas_v2.service.out.git.adapter.dto.RepositoryResponse;
 import com.hocs.server.saas_v2.service.out.git.port.GitApiPort;
 import java.io.BufferedReader;
@@ -68,9 +68,9 @@ public class GitApiAdapter implements GitApiPort {
 	}
 
 	@Override
-	public String getDefaultBranchName(UrlData urlData) {
+	public String getDefaultBranchName(GitRepoData gitRepoData) {
 
-		String apiUrl = API_URL + "/repos/" + urlData.getOwnerName() + "/" + urlData.getRepoName();
+		String apiUrl = API_URL + "/repos/" + gitRepoData.getOwnerName() + "/" + gitRepoData.getRepoName();
 		HttpURLConnection connection = null;
 
 		try {
@@ -112,7 +112,7 @@ public class GitApiAdapter implements GitApiPort {
 	}
 
 	@Override
-	public ClientProjectPath gitClone(UrlData urlData, Path path) {
+	public ClientProjectPath gitClone(GitRepoData gitRepoData, Path path) {
 		File folder = new File(path.toUri());
 
 		// 폴더 생성
@@ -123,17 +123,17 @@ public class GitApiAdapter implements GitApiPort {
 			}
 		}
 
-		File cloneFolder = cloneCommand(urlData, path);
+		File cloneFolder = cloneCommand(gitRepoData, path);
 		return new ClientProjectPath(cloneFolder.toPath());
 	}
 
 	//default Jgit, extends and override this method if you want other
-	protected File cloneCommand(UrlData urlData, Path path) {
+	protected File cloneCommand(GitRepoData gitRepoData, Path path) {
 		try {
 
-			File cloneFolder = cloneDirNamingStrategy(urlData, path).toFile();
+			File cloneFolder = cloneDirNamingStrategy(gitRepoData, path).toFile();
 			Git.cloneRepository()
-				.setURI(urlData.getCloneUrl())
+				.setURI(gitRepoData.getCloneUrl())
 				.setDirectory(cloneFolder)
 				.call();
 
@@ -145,7 +145,7 @@ public class GitApiAdapter implements GitApiPort {
 		}
 	}
 
-	private Path cloneDirNamingStrategy(UrlData urlData, Path path) {
-		return path.resolve(urlData.getRepoName() + System.currentTimeMillis());
+	private Path cloneDirNamingStrategy(GitRepoData gitRepoData, Path path) {
+		return path.resolve(gitRepoData.getRepoName() + System.currentTimeMillis());
 	}
 }
