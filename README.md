@@ -2,7 +2,9 @@
 [자세히보기](https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f63869f)
 ---
 # 리팩토링 진행중
-[자세히 보기](https://steadfast-sofa-4b2.notion.site/30-18beeae70b8581109d36c11ed2adf303)
+
+[자세히 보기](https://steadfast-sofa-4b2.notion.site/2-1-API-16eeeae70b8580f1854df55109b87bb6)
+
 
 # APIDOC43: 완전 자동화된 API 문서 솔루션
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
