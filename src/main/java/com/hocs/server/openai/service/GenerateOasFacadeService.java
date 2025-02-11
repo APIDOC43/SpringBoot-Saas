@@ -58,7 +58,7 @@ public class GenerateOasFacadeService {
 		Map<String, List<Schema>> schemasMap = new HashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();
 
-		int totalTasks = Math.min(apiMetadata.size(), 3); // 작업 개수 제한
+		int totalTasks = apiMetadata.size(); // 작업 개수 제한
 		AtomicInteger completedTasks = new AtomicInteger(0); // 완료된 작업 수
 
 		// CompletableFuture 리스트를 생성하고 병렬 실행
@@ -155,15 +155,13 @@ public class GenerateOasFacadeService {
 		Components components = pathAndComponents.getComponents();
 		if (components != null && components.getSchemas() != null) {
 			components.getSchemas().forEach((key, schema) -> {
-				schemasMap.putIfAbsent(key, new ArrayList<>());
-				schemasMap.get(key).add(schema);
+				schemasMap.getOrDefault(key, new ArrayList<>()).add(schema);
 			});
 		}
 
 		Map<String, PathItem> paths = pathAndComponents.getPaths();
 		paths.forEach((key, pathItem) -> {
-			pathList.putIfAbsent(key, new ArrayList<>());
-			pathList.get(key).add(paths);
+			pathList.getOrDefault(key, new ArrayList<>()).add(paths);
 		});
 	}
 
