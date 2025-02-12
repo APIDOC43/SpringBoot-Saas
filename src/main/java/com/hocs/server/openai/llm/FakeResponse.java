@@ -11,7 +11,7 @@ public class FakeResponse {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		return """
+		String original = """
 			```yaml
 			paths:
 			  /api/s3/:
@@ -73,6 +73,7 @@ public class FakeResponse {
 			              example: "https://bucket-name.s3.amazonaws.com/uuid.png"
 			```
 			""";
+		return new String(original.toCharArray());
 	}
 
 	public static String fomatValid() {
@@ -83,7 +84,7 @@ public class FakeResponse {
 			throw new RuntimeException(e);
 		}
 
-		return """
+		String original = """
 			yaml
 			paths:
 			  /api/s3/:
@@ -148,6 +149,7 @@ public class FakeResponse {
 			              example: "https://bucket-name.s3.amazonaws.com/uuid.png"
 			```
 			""";
+		return new String(original.toCharArray());
 	}
 
 	public static String createDescrionion() {
@@ -158,7 +160,7 @@ public class FakeResponse {
 			throw new RuntimeException(e);
 		}
 
-		return """
+		String original = """
 			```yaml
 			paths:
 			  /api/s3/:
@@ -222,6 +224,7 @@ public class FakeResponse {
 			              description: "업로드된 파일의 URL (예: https://bucket-name.s3.amazonaws.com/uuid.png)"
 			              example: "https://bucket-name.s3.amazonaws.com/uuid.png"
 			""";
+		return new String(original.toCharArray());
 	}
 }
 
