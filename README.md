@@ -1,12 +1,12 @@
-# 회고페이지
-[자세히보기](https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f63869f)
+## 프로젝트 소개 및 동기 
+https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f63869f
+
 ---
-# 리팩토링 진행중
+## 리팩토링 진행중
+https://steadfast-sofa-4b2.notion.site/2-1-API-16eeeae70b8580f1854df55109b87bb
 
-[자세히 보기](https://steadfast-sofa-4b2.notion.site/2-1-API-16eeeae70b8580f1854df55109b87bb6)
 
-
-# APIDOC43: 완전 자동화된 API 문서 솔루션
+## APIDOC43: 완전 자동화된 API 문서 솔루션
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
 
 **APIDOC43**은 개발자의 생산성을 극대화하고 비즈니스 성장에 기여하는 API 문서 자동화 서비스입니다.
