@@ -3,7 +3,7 @@ https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f6
 
 ---
 ## 리팩토링 진행중
-https://steadfast-sofa-4b2.notion.site/2-1-API-16eeeae70b8580f1854df55109b87bb
+https://steadfast-sofa-4b2.notion.site/195eeae70b8580e2913bf8c43565d435?pvs=74
 
 
 ## APIDOC43: 완전 자동화된 API 문서 솔루션
