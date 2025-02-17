@@ -40,11 +40,9 @@ https://steadfast-sofa-4b2.notion.site/195eeae70b8580e2913bf8c43565d435?pvs=74
 
 ---
 ## 파이프라인
-![스크린샷 2024-11-28 오후 4 33 59](https://github.com/user-attachments/assets/8a1cd9f9-c01d-4516-a2bc-172914323905)
+<img width="1116" alt="스크린샷 2025-02-17 오후 10 18 06" src="https://github.com/user-attachments/assets/b5a75c44-810a-46f3-a167-efe5fd022495" />
 
----
-## 프로젝트 관리
-[GitHub Project 이용](https://github.com/orgs/APIDOC43/projects/1)
+
 ---
 ## Developer
 홍석준 : [@hoding](https://github.com/seokjun7410)
