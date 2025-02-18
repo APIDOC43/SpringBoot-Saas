@@ -30,6 +30,7 @@ public class JavaClassifiedDataContainer {
 	private final Set<String> controllerClasses = new HashSet<>();
 	private final Map<String, Set<String>> globalDependencies = new LinkedHashMap<>();
 	private final Map<String, Set<String>> simpleClassNameToQualifiedNames = new HashMap<>();
+	private JavaClassifiedDataContainerStatus status = JavaClassifiedDataContainerStatus.NOT_INIT;
 
 	public JavaClassifiedDataContainer() {
 		// Global Dependencies 초기화
@@ -86,4 +87,9 @@ public class JavaClassifiedDataContainer {
 
 		return GlobalSourceDependency.create(id, aop, exceptionHandler, configuration, component);
 	}
+
+	public void setStatusToInit() {
+		this.status = JavaClassifiedDataContainerStatus.INIT;
+	}
+
 }

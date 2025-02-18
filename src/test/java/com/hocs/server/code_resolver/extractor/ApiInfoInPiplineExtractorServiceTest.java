@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.common.domain.ApiInfo;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.io.File;
@@ -57,7 +58,7 @@ public class ApiInfoInPiplineExtractorServiceTest {
 		List<File> controllers = List.of(sampleControllerFile);
 
 		// When
-		Map<ControllerFile, List<ApiInfo>> result = apiInfoExtractorService.extractApiInfo(controllers);
+		Map<ControllerFile, List<ApiInfo>> result = apiInfoExtractorService.extractApiInfo(controllers,new ArrayList<>());
 
 		// Then
 		assertNotNull(result);

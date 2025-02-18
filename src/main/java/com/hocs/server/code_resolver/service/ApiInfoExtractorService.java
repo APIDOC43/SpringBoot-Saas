@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ApiInfoExtractorService {
 
-	public Map<ControllerFile, List<ApiInfo>> extractApiInfo(List<File> controllerFiles) {
+	public Map<ControllerFile, List<ApiInfo>> extractApiInfo(List<File> controllerFiles, List<ApiInfo> excludeFile) {
 		Map<ControllerFile, List<ApiInfo>> apiInfos = new HashMap<>();
 
+		HashSet<ApiInfo> excludeFileSet;
+		if(excludeFile == null)
+			excludeFileSet = new HashSet<>();
+		else
+			excludeFileSet = new HashSet<>(excludeFile);
 
 		for (File controller : controllerFiles) {
-			String srcContent = null;
+			String srcContent;
 			try {
 				srcContent = new String(Files.readAllBytes(Paths.get(controller.toURI())));
 			} catch (IOException e) {
@@ -44,12 +50,15 @@ public class ApiInfoExtractorService {
 
 				List<ApiInfo> orDefault = apiInfos.getOrDefault(new ControllerFile(controller.getPath()),
 					new ArrayList<>());
+				ApiInfo apiinfo = new ApiInfo(apiEndpoint.getMethod(), apiEndpoint.getApi(),
+					new MethodInformation(method));
 
-				orDefault.add(new ApiInfo(apiEndpoint.getMethod(), apiEndpoint.getApi(),new MethodInformation(method)));
-				apiInfos.put(new ControllerFile(controller.getPath()),orDefault);
+				if(!excludeFileSet.contains(apiinfo)) {
+					orDefault.add(apiinfo);
+					apiInfos.put(new ControllerFile(controller.getPath()), orDefault);
+				}
 			}
 		}
-
 		return apiInfos;
 	}
 }

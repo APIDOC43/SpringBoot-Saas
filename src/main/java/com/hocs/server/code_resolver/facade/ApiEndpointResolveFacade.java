@@ -2,6 +2,7 @@ package com.hocs.server.code_resolver.facade;
 
 import com.hocs.server.code_resolver.domain.APIEntries;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainerStatus;
 import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
 import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
 import com.hocs.server.code_resolver.service.ApiSourceDependencyService;
@@ -26,11 +27,14 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Facade
 @RequiredArgsConstructor
+@Slf4j
 public class ApiEndpointResolveFacade {
 
 	private final ApiInfoExtractorService ApiInfoExtractorService;
@@ -40,20 +44,23 @@ public class ApiEndpointResolveFacade {
 	private final JavaClassifiedDataGenerator javaCodeCategorizer;
 	private final ApiSourceDependencyService apiSourceDependencyService;
 
+	private final JavaClassifiedDataContainer container;
+	private final ReentrantLock lock = new ReentrantLock();
+
 	public Map<ControllerFile, List<ApiInfo>> findApiInfo(FindApiInfoApiRequest request) {
 		APIEntries apiEntries = apiEndpointCollectorService.findControllerFiles(
 			request.getLanguage(), request.getProjectFramework(), request.getPath());
 
 		List<File> controllerFiles = apiEntries.getFiles();
 
-		return ApiInfoExtractorService.extractApiInfo(controllerFiles);
+		return ApiInfoExtractorService.extractApiInfo(controllerFiles,request.getExcludeFile());
 	}
 
 	public List<APIMetadata> findAPIMetadata(String userId, ProjectMetaData metaData,
 		String defaultBranchName, ControllerFile controllerFile) {
 
-		JavaClassifiedDataContainer container = initJavaClassifiedDataContainer(
-			metaData.getProjectRootPath().getPath());
+		JavaClassifiedDataContainer container = getContainerNoLock(metaData);
+
 		List<API> apis = null;
 		try {
 
@@ -83,7 +90,47 @@ public class ApiEndpointResolveFacade {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+	}
 
+	private JavaClassifiedDataContainer getContainerNoLock(ProjectMetaData metaData) {
+		return initJavaClassifiedDataContainer(
+			metaData.getProjectRootPath().getPath());
+	}
+
+	private JavaClassifiedDataContainer getContainerDoubleCheckLock(ProjectMetaData metaData) {
+		if (container.getStatus() == JavaClassifiedDataContainerStatus.INIT) {
+			return container;
+		}
+
+		lock.lock();
+		try {
+			// 락 내부에서 다시 한 번 확인 (double-check)
+			if (container.getStatus() == JavaClassifiedDataContainerStatus.NOT_INIT) {
+				initJavaClassifiedDataContainer(
+					metaData.getProjectRootPath().getPath());
+			}
+
+		} finally {
+			lock.unlock();
+		}
+
+		return container;
+	}
+
+	private JavaClassifiedDataContainer getContainerLock(ProjectMetaData metaData) {
+		lock.lock();
+		try {
+			// 락 내부에서 다시 한 번 확인 (double-check)
+			if (container.getStatus() == JavaClassifiedDataContainerStatus.NOT_INIT) {
+				initJavaClassifiedDataContainer(
+					metaData.getProjectRootPath().getPath());
+			}
+
+		} finally {
+			lock.unlock();
+		}
+
+		return container;
 	}
 
 	private JavaClassifiedDataContainer initJavaClassifiedDataContainer(Path clonedDir) {

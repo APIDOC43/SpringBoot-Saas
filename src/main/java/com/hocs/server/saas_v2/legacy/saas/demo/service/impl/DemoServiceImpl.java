@@ -26,7 +26,6 @@ import org.springframework.ui.Model;
 @Slf4j
 public class DemoServiceImpl implements DemoFacadeService {
 
-
 	private final GitHubFacadeService gitHubFacadeService;
 	private final GenerateOasFacadeService llmService;
 	private final APISourceDependencyService apiSourceDependencyService;
@@ -58,7 +57,4 @@ public class DemoServiceImpl implements DemoFacadeService {
 		String response = HttpClient.findHtmlRequest(htmlFiles.get(0).getFilePath());
 		model.addAttribute("content", response);
 	}
-
-
-
 }

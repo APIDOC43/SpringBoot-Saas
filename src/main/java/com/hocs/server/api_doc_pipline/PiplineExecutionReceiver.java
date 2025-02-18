@@ -33,7 +33,7 @@ public class PiplineExecutionReceiver {
 		String defaultBranchName = gitApiPort.getDefaultBranchName(gitRepoData);
 
 		try {
-			apiDocPiplineService.execute(
+			apiDocPiplineService.executeAsync(
 				request.getUserId(),
 				metaData,
 				filenamesRelatedException,

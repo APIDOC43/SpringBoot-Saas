@@ -20,6 +20,10 @@ public class ExceptionFormatService {
 		String[] ExceptionSrc = springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(
 			projectRootPath, chatClient4o);
 
+		return read(ExceptionSrc);
+	}
+
+	public String read(String[] ExceptionSrc) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		for (String src : ExceptionSrc) {
 			if(!src.equals(""))

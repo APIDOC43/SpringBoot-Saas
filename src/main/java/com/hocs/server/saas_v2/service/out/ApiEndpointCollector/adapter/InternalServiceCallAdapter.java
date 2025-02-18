@@ -8,6 +8,7 @@ import com.hocs.server.common.domain.ClientProjectPath;
 import com.hocs.server.common.domain.CodingLanguage;
 import com.hocs.server.common.domain.ProjectFramework;
 import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.port.ApiEndpointCollectorPort;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class InternalServiceCallAdapter implements ApiEndpointCollectorPort {
 		ClientProjectPath path, int firstPageSize) {
 
 		FindApiInfoApiRequest request = new FindApiInfoApiRequest(language,
-			projectFramework, path, firstPageSize);
+			projectFramework, path, firstPageSize, new ArrayList<>());
 
 		return service.findApiInfo(request);
 	}

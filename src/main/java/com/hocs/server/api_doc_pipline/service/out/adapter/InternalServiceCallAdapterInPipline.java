@@ -28,10 +28,10 @@ public class InternalServiceCallAdapterInPipline implements ApiEndpointCollector
 	@Override
 	public Map<ControllerFile, List<ApiInfoInPipline>> findApiInfo(CodingLanguage language,
 		ProjectFramework projectFramework,
-		ClientProjectPath path, int firstPageSize) {
+		ClientProjectPath path, List<ApiInfo> excludeApiInfo, int firstPageSize) {
 
 		FindApiInfoApiRequest request = new FindApiInfoApiRequest(language,
-			projectFramework, path, firstPageSize);
+			projectFramework, path, firstPageSize,excludeApiInfo);
 
 		Map<ControllerFile, List<ApiInfo>> apiInfo = service.findApiInfo(request);
 
@@ -44,7 +44,6 @@ public class InternalServiceCallAdapterInPipline implements ApiEndpointCollector
 
 		return service.findAPIMetadata(userId,metaData,defaultBranchName,controllerFile);
 	}
-
 
 	private static HashMap<ControllerFile, List<ApiInfoInPipline>> mapping(
 		Map<ControllerFile, List<ApiInfo>> apiInfo) {

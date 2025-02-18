@@ -27,7 +27,6 @@ public class JavaClassifiedDataGenerator {
 
 	public JavaClassifiedDataContainer init(List<File> files) throws IOException {
 
-		int i = 0;
 		for (File file : files) {
 			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
 			try {
@@ -40,6 +39,7 @@ public class JavaClassifiedDataGenerator {
 				e.printStackTrace();
 			}
 		}
+		javaClassifiedDataContainer.setStatusToInit();
 		return javaClassifiedDataContainer;
 	}
 
