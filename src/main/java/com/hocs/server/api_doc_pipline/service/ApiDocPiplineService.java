@@ -84,7 +84,7 @@ public class ApiDocPiplineService {
 
 
 		File cloneDir = metaData.getProjectRootPath().getToFile();
-		try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+		try (ExecutorService executorService = Executors.newFixedThreadPool(5)) {
 			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 			List<CompletableFuture<Void>> futures = new ArrayList<>();
 
