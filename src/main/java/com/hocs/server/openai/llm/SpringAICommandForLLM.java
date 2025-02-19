@@ -122,7 +122,6 @@ public class SpringAICommandForLLM {
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
 //		String result = getResultContent(validRequest.call());
 		String result = "";
-		System.out.println("result = " + result);
 		String[] split = result.split(",");
 
 

@@ -54,7 +54,7 @@ public class APIMetadata {
 					.append(leanedContent)
 					.append("```\n\n");
 			} catch (IOException e) {
-				System.out.println("Error reading file " + path + ": " + e.getMessage());
+				System.err.println("Error reading file " + path + ": " + e.getMessage());
 			}
 		}
 

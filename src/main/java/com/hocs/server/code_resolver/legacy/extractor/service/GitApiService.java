@@ -43,10 +43,9 @@ public class GitApiService {
 				// JSON 파싱
 				JSONObject json = new JSONObject(response.toString());
 				String defaultBranch = json.getString("default_branch");
-				System.out.println("기본 브랜치는: " + defaultBranch);
 				return defaultBranch;
 			} else {
-				System.out.println("GET 요청 실패. 응답 코드: " + responseCode);
+				System.err.println("GET 요청 실패. 응답 코드: " + responseCode);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class ProgressController {
 	@GetMapping("/demo/progress")
 	public String progress(@RequestParam(name = "repoUrl") String param, Model model) {
-		System.out.println("HomeController.progress");
 		model.addAttribute("param", param);
 
 		return "progress";

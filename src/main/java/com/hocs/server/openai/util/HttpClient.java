@@ -1,6 +1,7 @@
 package com.hocs.server.openai.util;
 
 import java.io.File;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +11,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 public class HttpClient {
 	private final static String BASE_URL = "http://localhost:8080";
 	public static String findHtmlRequest(String filename) {
@@ -28,7 +30,7 @@ public class HttpClient {
 			ResponseEntity<String> response = restTemplate.postForEntity(url, requestEntity, String.class);
 			return response.getBody();
 		} catch (Exception e) {
-			System.out.println("Error while making API request: " + e.getMessage());
+			System.err.println("Error while making API request: " + e.getMessage());
 			return null;
 		}
 	}
@@ -73,7 +75,7 @@ public class HttpClient {
 			String.class);
 
 		// 응답 출력
-		System.out.println("Response: " + response.getBody());
+		log.info("Response: {}",response.getBody());
 	}
 
 	public static void main(String[] args) {
