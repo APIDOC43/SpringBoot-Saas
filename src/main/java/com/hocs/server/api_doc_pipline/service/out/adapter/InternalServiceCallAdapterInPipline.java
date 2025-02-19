@@ -40,9 +40,9 @@ public class InternalServiceCallAdapterInPipline implements ApiEndpointCollector
 
 	@Override
 	public List<APIMetadata> getApiEndpoints(String userId, ProjectMetaData metaData,
-		String defaultBranchName, ControllerFile controllerFile) {
+		String defaultBranchName, ControllerFile controllerFile, String requestId) {
 
-		return service.findAPIMetadata(userId,metaData,defaultBranchName,controllerFile);
+		return service.findAPIMetadata(userId,metaData,defaultBranchName,controllerFile,requestId);
 	}
 
 	private static HashMap<ControllerFile, List<ApiInfoInPipline>> mapping(

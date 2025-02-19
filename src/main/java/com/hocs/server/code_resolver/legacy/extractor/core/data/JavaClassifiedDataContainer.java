@@ -5,12 +5,12 @@ import com.hocs.server.code_resolver.legacy.extractor.domain.ExceptionHandler;
 import com.hocs.server.code_resolver.legacy.extractor.domain.GlobalSourceDependency;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 import lombok.Getter;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -24,20 +24,20 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class JavaClassifiedDataContainer {
 
-	private final Map<String, String> specialAnnotations = new HashMap<>();
-	private final Map<String, String> classToFilePath = new HashMap<>();
-	private final Map<String, Set<String>> interfaceImplementations = new HashMap<>();
-	private final Set<String> controllerClasses = new HashSet<>();
+	private final Map<String, String> specialAnnotations = new ConcurrentHashMap<>();
+	private final Map<String, String> classToFilePath = new ConcurrentHashMap<>();
+	private final Map<String, Set<String>> interfaceImplementations = new ConcurrentHashMap<>();
+	private final Set<String> controllerClasses = new ConcurrentSkipListSet<>();
 	private final Map<String, Set<String>> globalDependencies = new LinkedHashMap<>();
-	private final Map<String, Set<String>> simpleClassNameToQualifiedNames = new HashMap<>();
+	private final Map<String, Set<String>> simpleClassNameToQualifiedNames = new ConcurrentHashMap<>();
 	private JavaClassifiedDataContainerStatus status = JavaClassifiedDataContainerStatus.NOT_INIT;
 
 	public JavaClassifiedDataContainer() {
 		// Global Dependencies 초기화
-		globalDependencies.put("AOP", new HashSet<>());
-		globalDependencies.put("Filter", new HashSet<>());
-		globalDependencies.put("Interceptor", new HashSet<>());
-		globalDependencies.put("ExceptionHandler", new HashSet<>());
+		globalDependencies.put("AOP", new ConcurrentSkipListSet<>());
+		globalDependencies.put("Filter", new ConcurrentSkipListSet<>());
+		globalDependencies.put("Interceptor", new ConcurrentSkipListSet<>());
+		globalDependencies.put("ExceptionHandler", new ConcurrentSkipListSet<>());
 
 		specialAnnotations.put("ControllerAdvice", "ExceptionHandler");
 		specialAnnotations.put("RestControllerAdvice", "ExceptionHandler");
@@ -47,7 +47,7 @@ public class JavaClassifiedDataContainer {
 
 		// specialAnnotations에 있는 카테고리를 globalDependencies에 추가
 		for (String category : specialAnnotations.values()) {
-			globalDependencies.putIfAbsent(category, new HashSet<>());
+			globalDependencies.putIfAbsent(category, new ConcurrentSkipListSet<>());
 		}
 	}
 

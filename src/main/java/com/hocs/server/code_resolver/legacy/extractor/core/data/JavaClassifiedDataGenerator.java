@@ -11,8 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -79,7 +79,7 @@ public class JavaClassifiedDataGenerator {
 				if (!cid.isInterface()) {
 					cid.getImplementedTypes().forEach(implType -> {
 						String interfaceName = implType.getNameAsString();
-						javaClassifiedDataContainer.getInterfaceImplementations().computeIfAbsent(interfaceName, k -> new HashSet<>()).add(typeName);
+						javaClassifiedDataContainer.getInterfaceImplementations().computeIfAbsent(interfaceName, k -> new ConcurrentSkipListSet<>()).add(typeName);
 
 						// Filter 인터페이스 구현 여부 확인
 						if (interfaceName.equals("Filter")) {

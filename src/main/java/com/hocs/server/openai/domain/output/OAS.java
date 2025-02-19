@@ -1,5 +1,6 @@
 package com.hocs.server.openai.domain.output;
 
+import com.hocs.server.saas_v2.domain.MongoBaseEntity;
 import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class OAS {
+public class OAS extends MongoBaseEntity {
 
 	@Id
 	private String id;

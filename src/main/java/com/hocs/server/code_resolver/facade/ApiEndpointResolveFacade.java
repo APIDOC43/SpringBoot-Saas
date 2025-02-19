@@ -5,6 +5,7 @@ import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainerStatus;
 import com.hocs.server.code_resolver.service.ApiEndpointCollectorService;
 import com.hocs.server.code_resolver.service.ApiInfoExtractorService;
+import com.hocs.server.code_resolver.service.ApiSourceDependencyBatchSaveService;
 import com.hocs.server.code_resolver.service.ApiSourceDependencyService;
 import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.code_resolver.legacy.extractor.core.DependencyAnalyzer;
@@ -26,7 +27,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class ApiEndpointResolveFacade {
 	private final SrcFileCollector srcFileCollector;
 	private final JavaClassifiedDataGenerator javaCodeCategorizer;
 	private final ApiSourceDependencyService apiSourceDependencyService;
-
+	private final ApiSourceDependencyBatchSaveService apiSourceDependencyBatchSaveService;
 	private final JavaClassifiedDataContainer container;
 	private final ReentrantLock lock = new ReentrantLock();
 
@@ -53,12 +53,11 @@ public class ApiEndpointResolveFacade {
 
 		List<File> controllerFiles = apiEntries.getFiles();
 
-		return ApiInfoExtractorService.extractApiInfo(controllerFiles,request.getExcludeFile());
+		return ApiInfoExtractorService.extractApiInfo(controllerFiles, request.getExcludeFile());
 	}
 
 	public List<APIMetadata> findAPIMetadata(String userId, ProjectMetaData metaData,
-		String defaultBranchName, ControllerFile controllerFile) {
-
+		String defaultBranchName, ControllerFile controllerFile, String requestId) {
 		JavaClassifiedDataContainer container = getContainerNoLock(metaData);
 
 		List<API> apis = null;
@@ -68,24 +67,23 @@ public class ApiEndpointResolveFacade {
 			//if(metaData.getProjectFramework().equals(ProjectFramework.SPRINGBOOT))
 			apis = dependencyAnalyzer.findDependency(controllerFile.getClassName());
 
+			for (API api : apis) {
+				String gitCloneUrl = metaData.getGitRepoData().getCloneUrl();
+				if (gitCloneUrl.endsWith(".git")) {
+					gitCloneUrl = gitCloneUrl.split("\\.")[0];
+				}
 
-		for (API api : apis) {
-			String gitCloneUrl = metaData.getGitRepoData().getCloneUrl();
-			if (gitCloneUrl.endsWith(".git")) {
-				gitCloneUrl = gitCloneUrl.split("\\.")[0];
+				api.setLink(
+					gitCloneUrl + "/blob/" + defaultBranchName + "/" + controllerFile.getPath());
 			}
 
-			api.setLink(
-				gitCloneUrl + "/blob/" + defaultBranchName + "/" + controllerFile.getPath());
-		}
+			GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
+			APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
+				.create(requestId, userId, apis, globalSourceDependency);
 
-		GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
-		APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
-			.create(UUID.randomUUID().toString(), userId, apis, globalSourceDependency);
+			apiSourceDependencyBatchSaveService.addEntity(apiSourceDependencyInfo);
 
-		apiSourceDependencyService.save(apiSourceDependencyInfo);
-
-		return APISourceDependencyInfoToAPIEndpoint.mapToAPIEndpoint(apiSourceDependencyInfo);
+			return APISourceDependencyInfoToAPIEndpoint.mapToAPIEndpoint(apiSourceDependencyInfo);
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

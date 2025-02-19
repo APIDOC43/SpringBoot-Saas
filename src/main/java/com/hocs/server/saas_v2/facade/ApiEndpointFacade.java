@@ -43,6 +43,7 @@ public class ApiEndpointFacade {
 			clientProjectPath,
 			100);
 
-		return new ApiInfoResponse(metadataId, apiEndpointInfo);
+		int apiCount = apiEndpointInfo.values().stream().mapToInt(List::size).sum();
+		return new ApiInfoResponse(apiEndpointInfo.size(), apiCount,metadataId, apiEndpointInfo);
 	}
 }

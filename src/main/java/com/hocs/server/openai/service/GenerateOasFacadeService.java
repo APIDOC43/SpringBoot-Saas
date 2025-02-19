@@ -15,12 +15,10 @@ import com.hocs.server.openai.llm.SpringAICommandForLLM;
 import com.hocs.server.openai.llm.exception.ApiEntriesNullException;
 import com.hocs.server.openai.repository.OasRepository;
 import com.hocs.server.openai.util.FileManager;
-import com.hocs.server.openai.util.MemoryProcessPercentage;
 import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -28,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +41,7 @@ public class GenerateOasFacadeService {
 	private final SpringAICommandForLLM springAiCommandForLLM;
 	private final ExceptionFormatService exceptionFormatService;
 	private final OasIntegrationService oasIntegrationService;
-	private final OasRepository OasRepository;
+	private final OasBatchSaverService oasBatchSaverService;
 
 	public void generate(String userId, List<APIMetadata> apiMetadata, File projectDir) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
@@ -58,8 +55,8 @@ public class GenerateOasFacadeService {
 
 		String exceptionFormatSrc = exceptionFormatService.findRelatedExceptionSrc(new ClientProjectPath(Path.of(projectRootPath)), client);
 
-		Map<String, List<Schema>> schemasMap = new HashMap<>();
-		Map<String, List<Map<String, PathItem>>> pathList = new HashMap<>();
+		Map<String, List<Schema>> schemasMap = new ConcurrentHashMap<>();
+		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
 
 		int totalTasks = apiMetadata.size(); // 작업 개수 제한
 
@@ -89,14 +86,14 @@ public class GenerateOasFacadeService {
 			pathList,
 			integrationSchemaMap);
 
-		OasRepository.save(oas);
+		oasBatchSaverService.addEntity(oas);
 
 		log.info("oas-Result = " + oas);
 
 	}
 
 	public void generateV1(String userId, List<APIMetadata> apiMetadata, File projectDir,
-		String[] exceptionFiles) throws IOException {
+		String[] exceptionFiles,String requestId) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
@@ -113,14 +110,13 @@ public class GenerateOasFacadeService {
 
 		int totalTasks = apiMetadata.size(); // 작업 개수 제한
 
-		int numThreads = 4;
-		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
 
 		List<CompletableFuture<Void>> futures = apiMetadata.stream()
 			.limit(totalTasks)
 			.map(apiEndpoint -> CompletableFuture.runAsync(() ->
 					generateOasPathSchemaSnippet(client, apiEndpoint, schemasMap, pathList, exceptionFormatSrc)
-				,executor))
+			,executor))
 			.collect(Collectors.toList());
 
 		// 모든 CompletableFuture 완료 대기
@@ -140,12 +136,12 @@ public class GenerateOasFacadeService {
 		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
 
 		OAS oas = OAS.create(
-			userId,
+			requestId,
 			OasInfo.create(userId, "", "", "", "", "3.0.1"),
 			pathList,
 			integrationSchemaMap);
 
-		OasRepository.save(oas);
+			oasBatchSaverService.addEntity(oas);
 	}
 
 	private String merge(Map<String, List<Schema>> schemasMap,

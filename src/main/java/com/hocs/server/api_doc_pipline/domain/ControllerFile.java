@@ -29,5 +29,4 @@ public class ControllerFile extends SourceFile {
 		ControllerFile other = (ControllerFile) obj; // 필드 비교
 		return Objects.equals(path, other.path) && Objects.equals(className, other.className);
 	}
-
 }

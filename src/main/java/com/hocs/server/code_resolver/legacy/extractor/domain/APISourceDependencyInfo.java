@@ -1,5 +1,6 @@
 package com.hocs.server.code_resolver.legacy.extractor.domain;
 
+import com.hocs.server.saas_v2.domain.MongoBaseEntity;
 import jakarta.persistence.Id;
 import java.util.List;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class APISourceDependencyInfo {
+public class APISourceDependencyInfo extends MongoBaseEntity {
 
 	@Id
 	private String id;

@@ -4,6 +4,7 @@ package com.hocs.server.code_resolver.legacy.extractor.domain;
 import jakarta.persistence.Embedded;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,5 +36,22 @@ public class API {
 
 	public void setLink(String link) {
 		this.link = link;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		API api = (API) o;
+		return Objects.equals(apiEndpoint, api.apiEndpoint);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(apiEndpoint, paths, link);
 	}
 }

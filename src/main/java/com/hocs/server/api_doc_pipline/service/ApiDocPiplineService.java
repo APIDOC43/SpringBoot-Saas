@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
@@ -38,6 +39,8 @@ public class ApiDocPiplineService {
 		String defaultBranchName,
 		List<ApiInfo> excludeApiInfoInPipline) throws Exception
 	{
+		String requestId = UUID.randomUUID().toString();
+
 		//task 0;
 		Map<ControllerFile, List<ApiInfoInPipline>> apiEndpointInfo = apiEndpointCollectorPortInPipline.findApiInfo(
 			metaData.getCodingLanguage(),
@@ -50,12 +53,12 @@ public class ApiDocPiplineService {
 			//task 1
 			//CustomRAG 하나의 컨트롤러 파일에서 Endpoint별 API 정보를 추출합니다.
 			List<APIMetadata> apiMetadata = apiEndpointCollectorPortInPipline.getApiEndpoints(
-				userId, metaData, defaultBranchName, controllerFile);
+				userId, metaData, defaultBranchName, controllerFile, requestId);
 
 			//task 2
 			//LLM을 이용하여 OAS 데이터를 생성합니다.
 			File cloneDir = metaData.getProjectRootPath().getToFile();
-			llmService.generateV1(userId, apiMetadata, cloneDir,filenamesRelatedException);
+			llmService.generate(userId, apiMetadata, cloneDir);
 
 			//task 3
 			//OAS데이터를 렌더링합니다.
@@ -69,6 +72,9 @@ public class ApiDocPiplineService {
 		String defaultBranchName,
 		List<ApiInfo> excludeApiInfoInPipline)
 	{
+		//레포정보기반으로 requestID전달 받도록 수정해야됨. 임시적을로 여기서 생성
+		String requestId = UUID.randomUUID().toString();
+
 		//task 0;
 		Map<ControllerFile, List<ApiInfoInPipline>> apiEndpointInfo = apiEndpointCollectorPortInPipline.findApiInfo(
 			metaData.getCodingLanguage(),
@@ -76,45 +82,38 @@ public class ApiDocPiplineService {
 			metaData.getProjectRootPath(),
 			excludeApiInfoInPipline, 100);
 
-		int numThreads = 5;
-		System.out.println("numThreads = " + numThreads);
-		ExecutorService executorService = Executors.newFixedThreadPool(numThreads);
+		ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
+		File cloneDir = metaData.getProjectRootPath().getToFile();
 		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
 			CompletableFuture<Void> future = CompletableFuture
 				// Task 1: 각 컨트롤러 파일에서 Endpoint별 API 정보를 추출합니다.
 				.supplyAsync(() -> {
 					RequestContextHolder.setRequestAttributes(requestAttributes);
-					return apiEndpointCollectorPortInPipline.getApiEndpoints(userId, metaData, defaultBranchName, controllerFile);
+					return apiEndpointCollectorPortInPipline.getApiEndpoints(
+						userId, metaData, defaultBranchName, controllerFile, requestId
+					);
 				}, executorService)
 				// Task 2: LLM을 이용하여 OAS 데이터를 생성합니다.
-				.thenCompose(apiMetadata -> {
-					File cloneDir = metaData.getProjectRootPath().getToFile();
-					return CompletableFuture.runAsync(() -> {
-							try {
-								llmService.generateV1(userId, apiMetadata, cloneDir, filenamesRelatedException);
-							} catch (IOException e) {
-								throw new CompletionException(e);
-							}
-						}, executorService)
-						// Task 2 실행 후 cloneDir를 다음 체이닝으로 전달합니다.
-						.thenApply(voidResult -> cloneDir);
-				})
-				// Task 3: OAS 데이터를 렌더링합니다.
-				.thenAccept(cloneDir -> {
-					HttpClient.toSaas(cloneDir, userId);
-				})
-				// 체이닝 작업 완료 후 RequestContext 정리
-				.whenComplete((result, throwable) -> {
-					RequestContextHolder.resetRequestAttributes();
-				});
+				.thenAccept(apiMetadata -> {
+					try {
+						llmService.generateV1(userId, apiMetadata, cloneDir, filenamesRelatedException, requestId);
+					} catch (IOException e) {
+						throw new CompletionException(e);
+					}
+				})// 체이닝 작업 완료 후 RequestContext 정리
+				.whenComplete((result, throwable) -> RequestContextHolder.resetRequestAttributes());
+
 			futures.add(future);
 		}
 		// 모든 비동기 작업이 완료될 때까지 대기합니다.
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 		// 작업 완료 후 스레드풀을 종료합니다.
 		executorService.shutdown();
+
+		// Task 3: OAS 데이터를 렌더링합니다.
+		HttpClient.toSaas(cloneDir, userId);
 	}
 }

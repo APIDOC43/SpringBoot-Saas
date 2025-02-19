@@ -2,14 +2,27 @@ package com.hocs.server.saas_v2.api.response;
 
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.common.domain.ApiInfo;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 public class ApiInfoResponse {
+	private int controllerCount = 0;
+	private int apiCount = 0;
 	private Long metadataId;
-	private Map<ControllerFile, List<ApiInfo>> apiInfos;
+	private List<ControllerResponse> controllerResponses = new ArrayList<>();
+
+	public ApiInfoResponse(int controllerCount, int apiCount, Long metadataId,
+		Map<ControllerFile,List<ApiInfo>>  apiEndpointInfo) {
+		this.controllerCount = controllerCount;
+		this.apiCount = apiCount;
+		this.metadataId = metadataId;
+
+		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
+			List<ApiInfo> apiInfos = apiEndpointInfo.get(controllerFile);
+			this.controllerResponses.add(new ControllerResponse(controllerFile,apiInfos));
+		}
+	}
 }
