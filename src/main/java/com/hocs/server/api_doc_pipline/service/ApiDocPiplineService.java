@@ -82,38 +82,43 @@ public class ApiDocPiplineService {
 			metaData.getProjectRootPath(),
 			excludeApiInfoInPipline, 100);
 
-		ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
-		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
 		File cloneDir = metaData.getProjectRootPath().getToFile();
-		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
-			CompletableFuture<Void> future = CompletableFuture
-				// Task 1: 각 컨트롤러 파일에서 Endpoint별 API 정보를 추출합니다.
-				.supplyAsync(() -> {
-					RequestContextHolder.setRequestAttributes(requestAttributes);
-					return apiEndpointCollectorPortInPipline.getApiEndpoints(
-						userId, metaData, defaultBranchName, controllerFile, requestId
-					);
-				}, executorService)
-				// Task 2: LLM을 이용하여 OAS 데이터를 생성합니다.
-				.thenAccept(apiMetadata -> {
-					try {
-						llmService.generateV1(userId, apiMetadata, cloneDir, filenamesRelatedException, requestId);
-					} catch (IOException e) {
-						throw new CompletionException(e);
-					}
-				})// 체이닝 작업 완료 후 RequestContext 정리
-				.whenComplete((result, throwable) -> RequestContextHolder.resetRequestAttributes());
+		try (ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor()) {
+			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+			List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-			futures.add(future);
+			for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
+				CompletableFuture<Void> future = CompletableFuture
+					.supplyAsync(() -> {
+						try{
+						RequestContextHolder.setRequestAttributes(requestAttributes);
+						return apiEndpointCollectorPortInPipline.getApiEndpoints(
+							userId, metaData, defaultBranchName, controllerFile, requestId);
+						}finally {
+							RequestContextHolder.resetRequestAttributes();
+						}
+					}, executorService)
+					.thenAccept(apiMetadata -> {
+						try {
+							llmService.generateV1(userId, apiMetadata, cloneDir, filenamesRelatedException, requestId);
+						} catch (IOException e) {
+							throw new CompletionException(e);
+						}
+					})
+					.whenComplete((result, throwable) -> {
+						if (throwable != null) {
+							log.error("Error occurred in async task", throwable);
+						}
+					});
+				futures.add(future);
+			}
+			// 모든 비동기 작업이 완료될 때까지 대기합니다.
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+			executorService.shutdownNow();
 		}
-		// 모든 비동기 작업이 완료될 때까지 대기합니다.
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-		// 작업 완료 후 스레드풀을 종료합니다.
-		executorService.shutdown();
-
 		// Task 3: OAS 데이터를 렌더링합니다.
 		HttpClient.toSaas(cloneDir, userId);
+
 	}
 }

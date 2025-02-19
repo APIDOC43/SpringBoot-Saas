@@ -19,6 +19,7 @@ import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -107,22 +108,18 @@ public class GenerateOasFacadeService {
 
 		Map<String, List<Schema>> schemasMap = new ConcurrentHashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
+		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-		int totalTasks = apiMetadata.size(); // 작업 개수 제한
+		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+			for (APIMetadata metadata : apiMetadata) {
+				futures.add(CompletableFuture.runAsync(() ->
+						generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList, exceptionFormatSrc)
+					, executor));
+			}
 
-		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-
-		List<CompletableFuture<Void>> futures = apiMetadata.stream()
-			.limit(totalTasks)
-			.map(apiEndpoint -> CompletableFuture.runAsync(() ->
-					generateOasPathSchemaSnippet(client, apiEndpoint, schemasMap, pathList, exceptionFormatSrc)
-			,executor))
-			.collect(Collectors.toList());
-
-		// 모든 CompletableFuture 완료 대기
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-		executor.shutdown();
-
+			CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+			executor.shutdownNow();
+		}
 
 		//path integeration
 		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
