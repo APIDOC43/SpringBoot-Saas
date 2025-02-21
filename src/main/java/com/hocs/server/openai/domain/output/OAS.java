@@ -1,6 +1,6 @@
 package com.hocs.server.openai.domain.output;
 
-import com.hocs.server.saas_v2.domain.MongoBaseEntity;
+import com.hocs.server.front_server.domain.MongoBaseEntity;
 import jakarta.persistence.Id;
 import java.util.List;
 import java.util.Map;

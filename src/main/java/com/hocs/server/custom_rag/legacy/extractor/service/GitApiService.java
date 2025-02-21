@@ -1,6 +1,6 @@
 package com.hocs.server.custom_rag.legacy.extractor.service;
 
-import com.hocs.server.saas_v2.legacy.saas.user.gitapi.domin.GitRepo;
+import com.hocs.server.front_server.legacy.saas.user.gitapi.domin.GitRepo;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;

@@ -10,7 +10,7 @@ import com.hocs.server.openai.domain.output.Schema;
 import com.hocs.server.openai.llm.exception.LLMException;
 import com.hocs.server.openai.llm.util.LLMResponseUtil;
 import com.hocs.server.openai.util.OpenAPIParser;
-import com.hocs.server.saas_v2.legacy.saas.util.cli.CLIManager;
+import com.hocs.server.front_server.legacy.saas.util.cli.CLIManager;
 import com.hocs.server.common.domain.ClientProjectPath;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

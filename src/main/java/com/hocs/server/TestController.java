@@ -1,6 +1,6 @@
 package com.hocs.server;
 
-import com.hocs.server.saas_v2.legacy.saas.user.gitapi.service.GitHubFacadeService;
+import com.hocs.server.front_server.legacy.saas.user.gitapi.service.GitHubFacadeService;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

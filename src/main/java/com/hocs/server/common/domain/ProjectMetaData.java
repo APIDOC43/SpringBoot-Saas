@@ -1,5 +1,5 @@
 package com.hocs.server.common.domain;
-import com.hocs.server.saas_v2.domain.GitRepoData;
+import com.hocs.server.front_server.domain.GitRepoData;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

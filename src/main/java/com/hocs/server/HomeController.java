@@ -1,7 +1,7 @@
 package com.hocs.server;
 
 
-import com.hocs.server.saas_v2.legacy.saas.user.gitapi.service.GitHubFacadeService;
+import com.hocs.server.front_server.legacy.saas.user.gitapi.service.GitHubFacadeService;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;

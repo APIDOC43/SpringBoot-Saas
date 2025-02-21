@@ -1,7 +1,7 @@
 package com.hocs.server.extractor.service;
 
 import com.hocs.server.custom_rag.legacy.extractor.service.GitApiService;
-import com.hocs.server.saas_v2.legacy.saas.user.gitapi.domin.GitRepo;
+import com.hocs.server.front_server.legacy.saas.user.gitapi.domin.GitRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

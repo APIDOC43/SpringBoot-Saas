@@ -18,10 +18,10 @@ import com.hocs.server.custom_rag.legacy.extractor.domain.APISourceDependencyInf
 import com.hocs.server.custom_rag.legacy.extractor.domain.ClientProjectType;
 import com.hocs.server.custom_rag.legacy.extractor.domain.GlobalSourceDependency;
 import com.hocs.server.openai.domain.input.APIMetadata;
-import com.hocs.server.saas_v2.legacy.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
-import com.hocs.server.saas_v2.common.annotation.Facade;
+import com.hocs.server.front_server.legacy.saas.demo.mapper.APISourceDependencyInfoToAPIEndpoint;
+import com.hocs.server.front_server.common.annotation.Facade;
 import com.hocs.server.common.domain.ApiInfo;
-import com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
+import com.hocs.server.front_server.service.out.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
