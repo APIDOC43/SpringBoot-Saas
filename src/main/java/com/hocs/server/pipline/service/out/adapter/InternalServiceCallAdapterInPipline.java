@@ -1,8 +1,8 @@
-package com.hocs.server.api_doc_pipline.service.out.adapter;
+package com.hocs.server.pipline.service.out.adapter;
 
-import com.hocs.server.api_doc_pipline.domain.ApiInfoInPipline;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
-import com.hocs.server.api_doc_pipline.service.out.port.ApiEndpointCollectorPortInPipline;
+import com.hocs.server.pipline.domain.ApiInfoInPipline;
+import com.hocs.server.pipline.domain.ControllerFile;
+import com.hocs.server.pipline.service.out.port.ApiEndpointCollectorPortInPipline;
 import com.hocs.server.custom_rag.facade.ApiEndpointResolveFacade;
 import com.hocs.server.common.domain.CodingLanguage;
 import com.hocs.server.common.domain.ProjectFramework;

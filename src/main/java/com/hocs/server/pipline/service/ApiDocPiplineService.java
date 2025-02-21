@@ -1,8 +1,8 @@
-package com.hocs.server.api_doc_pipline.service;
+package com.hocs.server.pipline.service;
 
-import com.hocs.server.api_doc_pipline.domain.ApiInfoInPipline;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
-import com.hocs.server.api_doc_pipline.service.out.port.ApiEndpointCollectorPortInPipline;
+import com.hocs.server.pipline.domain.ApiInfoInPipline;
+import com.hocs.server.pipline.domain.ControllerFile;
+import com.hocs.server.pipline.service.out.port.ApiEndpointCollectorPortInPipline;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import com.hocs.server.openai.service.GenerateOasFacadeService;
 import com.hocs.server.openai.util.HttpClient;

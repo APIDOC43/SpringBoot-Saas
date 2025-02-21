@@ -1,7 +1,7 @@
 package com.hocs.server.custom_rag.facade;
 
 import com.hocs.server.custom_rag.domain.APIEntries;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.custom_rag.legacy.extractor.core.data.JavaClassifiedDataContainerStatus;
 import com.hocs.server.custom_rag.service.ApiEndpointCollectorService;
 import com.hocs.server.custom_rag.service.ApiInfoExtractorService;

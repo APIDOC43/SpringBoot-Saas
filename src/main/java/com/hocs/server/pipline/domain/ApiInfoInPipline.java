@@ -1,4 +1,4 @@
-package com.hocs.server.api_doc_pipline.domain;
+package com.hocs.server.pipline.domain;
 
 import com.hocs.server.common.domain.MethodInformation;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.hocs.server.custom_rag.common.EndpointPathUtil;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.custom_rag.legacy.extractor.domain.ApiEndpoint;
 import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.common.domain.MethodInformation;

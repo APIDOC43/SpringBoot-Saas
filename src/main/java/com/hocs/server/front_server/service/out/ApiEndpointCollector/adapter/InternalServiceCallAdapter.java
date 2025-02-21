@@ -1,7 +1,7 @@
 package com.hocs.server.front_server.service.out.ApiEndpointCollector.adapter;
 
 import com.hocs.server.custom_rag.facade.ApiEndpointResolveFacade;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.front_server.common.annotation.Adapter;
 import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.common.domain.ClientProjectPath;

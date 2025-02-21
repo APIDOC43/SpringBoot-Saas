@@ -2,7 +2,7 @@ package com.hocs.server.custom_rag.extractor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import org.junit.jupiter.api.Test;
 
 class ControllerFilePathTest {

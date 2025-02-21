@@ -1,6 +1,6 @@
 package com.hocs.server.front_server.service.out.ApiEndpointCollector.port;
 
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.common.domain.ClientProjectPath;
 import com.hocs.server.common.domain.CodingLanguage;

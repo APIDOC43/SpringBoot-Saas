@@ -1,6 +1,6 @@
 package com.hocs.server.front_server.facade;
 
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.front_server.api.request.FindApiInfoClientRequest;
 import com.hocs.server.front_server.api.response.ApiInfoResponse;
 import com.hocs.server.front_server.domain.GitRepoData;

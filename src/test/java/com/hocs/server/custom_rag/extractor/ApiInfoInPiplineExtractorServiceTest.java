@@ -3,7 +3,7 @@ package com.hocs.server.custom_rag.extractor;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.hocs.server.custom_rag.service.ApiInfoExtractorService;
-import com.hocs.server.api_doc_pipline.domain.ControllerFile;
+import com.hocs.server.pipline.domain.ControllerFile;
 import com.hocs.server.common.domain.ApiInfo;
 import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;

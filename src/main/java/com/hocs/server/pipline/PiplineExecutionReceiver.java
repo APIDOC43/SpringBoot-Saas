@@ -1,6 +1,6 @@
-package com.hocs.server.api_doc_pipline;
+package com.hocs.server.pipline;
 
-import com.hocs.server.api_doc_pipline.service.ApiDocPiplineService;
+import com.hocs.server.pipline.service.ApiDocPiplineService;
 import com.hocs.server.openai.llm.SpringAICommandForLLM;
 import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.common.domain.ApiInfo;

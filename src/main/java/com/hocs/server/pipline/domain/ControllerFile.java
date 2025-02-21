@@ -1,4 +1,4 @@
-package com.hocs.server.api_doc_pipline.domain;
+package com.hocs.server.pipline.domain;
 
 import com.hocs.server.custom_rag.domain.SourceFile;
 import java.nio.file.Path;
