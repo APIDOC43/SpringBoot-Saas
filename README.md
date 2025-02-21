@@ -40,7 +40,7 @@ https://steadfast-sofa-4b2.notion.site/195eeae70b8580e2913bf8c43565d435?pvs=74
 
 ---
 ## 파이프라인
-<img width="1116" alt="스크린샷 2025-02-17 오후 10 18 06" src="https://github.com/user-attachments/assets/b5a75c44-810a-46f3-a167-efe5fd022495" />
+<img width="1364" alt="스크린샷 2025-02-21 오후 1 08 02" src="https://github.com/user-attachments/assets/ac88fc87-63fd-40b5-b960-e30e3a30be2d" />
 
 
 ---
