@@ -1,6 +1,6 @@
 package com.hocs.server.saas_v2.service.out.ApiEndpointCollector.adapter;
 
-import com.hocs.server.code_resolver.facade.ApiEndpointResolveFacade;
+import com.hocs.server.custom_rag.facade.ApiEndpointResolveFacade;
 import com.hocs.server.api_doc_pipline.domain.ControllerFile;
 import com.hocs.server.saas_v2.common.annotation.Adapter;
 import com.hocs.server.common.domain.ApiInfo;

@@ -2,9 +2,9 @@ package com.hocs.server.extractor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.hocs.server.code_resolver.legacy.extractor.core.SrcFileCollector;
-import com.hocs.server.code_resolver.legacy.extractor.domain.ClientProjectType;
-import com.hocs.server.code_resolver.legacy.extractor.domain.SrcSuffix;
+import com.hocs.server.custom_rag.legacy.extractor.core.SrcFileCollector;
+import com.hocs.server.custom_rag.legacy.extractor.domain.ClientProjectType;
+import com.hocs.server.custom_rag.legacy.extractor.domain.SrcSuffix;
 import com.hocs.server.openai.domain.input.APIMetadata;
 import java.io.File;
 import java.io.IOException;

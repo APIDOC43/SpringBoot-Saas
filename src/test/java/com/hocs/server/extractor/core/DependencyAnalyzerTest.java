@@ -4,11 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.hocs.server.code_resolver.legacy.extractor.core.DependencyAnalyzer;
-import com.hocs.server.code_resolver.legacy.extractor.core.DependencyExplorer;
-import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainer;
-import com.hocs.server.code_resolver.legacy.extractor.domain.API;
-import com.hocs.server.code_resolver.legacy.extractor.domain.ApiEndpoint;
+import com.hocs.server.custom_rag.legacy.extractor.core.DependencyAnalyzer;
+import com.hocs.server.custom_rag.legacy.extractor.core.DependencyExplorer;
+import com.hocs.server.custom_rag.legacy.extractor.core.data.JavaClassifiedDataContainer;
+import com.hocs.server.custom_rag.legacy.extractor.domain.API;
+import com.hocs.server.custom_rag.legacy.extractor.domain.ApiEndpoint;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

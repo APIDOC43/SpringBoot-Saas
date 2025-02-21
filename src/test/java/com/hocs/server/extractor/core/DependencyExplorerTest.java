@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.hocs.server.code_resolver.legacy.extractor.core.DependencyExplorer;
-import com.hocs.server.code_resolver.legacy.extractor.core.ExpressionResolver;
-import com.hocs.server.code_resolver.legacy.extractor.core.data.JavaClassifiedDataContainer;
-import com.hocs.server.code_resolver.legacy.extractor.core.util.GenericTypeResolver;
+import com.hocs.server.custom_rag.legacy.extractor.core.DependencyExplorer;
+import com.hocs.server.custom_rag.legacy.extractor.core.ExpressionResolver;
+import com.hocs.server.custom_rag.legacy.extractor.core.data.JavaClassifiedDataContainer;
+import com.hocs.server.custom_rag.legacy.extractor.core.util.GenericTypeResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
