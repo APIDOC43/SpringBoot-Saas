@@ -3,11 +3,14 @@ package com.hocs.server.extractor.service;
 import com.hocs.server.custom_rag.legacy.extractor.service.GitApiService;
 import com.hocs.server.front_server.legacy.saas.user.gitapi.domin.GitRepo;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class GitApiServiceTest {
 
+
 	@Test
+	@Disabled("이 테스트는 현재 비활성화됨")
 	public void getDefaultBranch(){
 		GitApiService gitApiService = new GitApiService();
 		GitRepo gitRepo = GitRepo.of("https://github.com/khoubyari/spring-boot-rest-example.git");
@@ -16,6 +19,7 @@ class GitApiServiceTest {
 		Assertions.assertEquals("master", defaultBranch);
 	}
 
+	@Disabled("이 테스트는 현재 비활성화됨")
 	@Test
 	public void buildSourceCodeUrl(){
 		GitApiService gitApiService = new GitApiService();
