@@ -66,7 +66,7 @@ public class SpringJavaApiCodeClient {
 
 			MemoryProcessPercentage.save(userId,limit++,3);
 
-			List<API> api = dependencyAnalyzer.findDependency(controllerClassName);
+			List<API> api = dependencyAnalyzer.findDependency(controllerClassName,dataContainer);
 
 			// Controller 클래스의 소스 코드 github 링크를 생성합니다.
 			addGithubLink(gitRepo, dataContainer, controllerClassName, api);
