@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 public class DependencyAnalyzerTest {
 
-	private JavaClassifiedDataContainer javaClassifiedDataContainer;
 	private DependencyExplorer dependencyExplorer;
 	private DependencyAnalyzer dependencyAnalyzer;
 
@@ -28,9 +27,8 @@ public class DependencyAnalyzerTest {
 	@BeforeEach
 	public void setUp() throws IOException {
 		// Mock 객체 생성
-		javaClassifiedDataContainer = mock(JavaClassifiedDataContainer.class);
 		dependencyExplorer = mock(DependencyExplorer.class);
-		dependencyAnalyzer = new DependencyAnalyzer(javaClassifiedDataContainer, dependencyExplorer);
+		dependencyAnalyzer = new DependencyAnalyzer(dependencyExplorer);
 
 		// 임시 디렉토리 생성
 		tempDir = Files.createTempDirectory("test");
@@ -58,10 +56,9 @@ public class DependencyAnalyzerTest {
 		String fileName = "MyController.java";
 		String filePath = tempDir.resolve(fileName).toString();
 
-		// Mock 데이터 설정
-		Map<String, String> classToFilePathMap = new HashMap<>();
-		classToFilePathMap.put(className, filePath);
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(classToFilePathMap);
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
+		container.getClassToFilePath().put(className,filePath);
+
 
 		String srcContent =
 			"package com.example;\n"
@@ -92,10 +89,10 @@ public class DependencyAnalyzerTest {
 				return null;
 			})
 			.when(dependencyExplorer)
-			.findClassDependencies(anyString(), anySet(), anySet());
+			.findClassDependencies(anyString(), anySet(), anySet(), any());
 
 		// 실행
-		List<API> apis = dependencyAnalyzer.findDependency(className);
+		List<API> apis = dependencyAnalyzer.findDependency(className,container);
 
 		// 검증
 		assertNotNull(apis);
@@ -112,8 +109,8 @@ public class DependencyAnalyzerTest {
 		assertTrue(requiredFiles.contains("/path/to/String.java"));
 
 		// dependencyExplorer.findClassDependencies가 예상된 클래스 이름으로 호출되었는지 확인
-		verify(dependencyExplorer).findClassDependencies(eq("MyController"), anySet(), anySet());
-		verify(dependencyExplorer).findClassDependencies(eq("String"), anySet(), anySet());
+		verify(dependencyExplorer).findClassDependencies(eq("MyController"), anySet(), anySet(), any());
+		verify(dependencyExplorer).findClassDependencies(eq("String"), anySet(), anySet(), any());
 	}
 
 	@Test
@@ -123,10 +120,8 @@ public class DependencyAnalyzerTest {
 		String fileName = "MyControllerWithParams.java";
 		String filePath = tempDir.resolve(fileName).toString();
 
-		// Mock 데이터 설정
-		Map<String, String> classToFilePathMap = new HashMap<>();
-		classToFilePathMap.put(className, filePath);
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(classToFilePathMap);
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
+		container.getClassToFilePath().put(className,filePath);
 
 		String srcContent =
 			"package com.example;\n"
@@ -168,10 +163,10 @@ public class DependencyAnalyzerTest {
 				return null;
 			})
 			.when(dependencyExplorer)
-			.findClassDependencies(anyString(), anySet(), anySet());
+			.findClassDependencies(anyString(), anySet(), anySet(), any());
 
 		// 실행
-		List<API> apis = dependencyAnalyzer.findDependency(className);
+		List<API> apis = dependencyAnalyzer.findDependency(className, container);
 
 		// 검증
 		assertNotNull(apis);
@@ -191,9 +186,9 @@ public class DependencyAnalyzerTest {
 		assertTrue(requiredFiles.contains("/path/to/MyResponseDto.java"));
 
 		// dependencyExplorer.findClassDependencies가 예상된 클래스 이름으로 호출되었는지 확인
-		verify(dependencyExplorer).findClassDependencies(eq("MyControllerWithParams"), anySet(), anySet());
-		verify(dependencyExplorer).findClassDependencies(eq("MyRequestDto"), anySet(), anySet());
-		verify(dependencyExplorer).findClassDependencies(eq("MyResponseDto"), anySet(), anySet());
+		verify(dependencyExplorer).findClassDependencies(eq("MyControllerWithParams"), anySet(), anySet(), any());
+		verify(dependencyExplorer).findClassDependencies(eq("MyRequestDto"), anySet(), anySet(), any());
+		verify(dependencyExplorer).findClassDependencies(eq("MyResponseDto"), anySet(), anySet(), any());
 	}
 
 	@Test
@@ -203,9 +198,8 @@ public class DependencyAnalyzerTest {
 		String fileName = "EmptyController.java";
 		String filePath = tempDir.resolve(fileName).toString();
 
-		Map<String, String> classToFilePathMap = new HashMap<>();
-		classToFilePathMap.put(className, filePath);
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(classToFilePathMap);
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
+		container.getClassToFilePath().put(className,filePath);
 
 		String srcContent =
 			"package com.example;\n"
@@ -218,7 +212,7 @@ public class DependencyAnalyzerTest {
 		Files.writeString(tempDir.resolve(fileName), srcContent);
 
 		// 실행
-		List<API> apis = dependencyAnalyzer.findDependency(className);
+		List<API> apis = dependencyAnalyzer.findDependency(className, container);
 
 		// 검증
 		assertNotNull(apis);
@@ -229,10 +223,9 @@ public class DependencyAnalyzerTest {
 	public void testFindDependency_nullFilePath() throws Exception {
 		// 준비
 		String className = "com.example.UnknownController";
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(new HashMap<>());
 
 		// 실행
-		List<API> apis = dependencyAnalyzer.findDependency(className);
+		List<API> apis = dependencyAnalyzer.findDependency(className, new JavaClassifiedDataContainer());
 
 		// 검증
 		assertNull(apis);

@@ -25,9 +25,6 @@ class DependencyExplorerTest {
 	private DependencyExplorer dependencyExplorer;
 
 	@Mock
-	private JavaClassifiedDataContainer javaClassifiedDataContainer;
-
-	@Mock
 	private ExpressionResolver expressionResolver;
 
 	@Mock
@@ -36,7 +33,7 @@ class DependencyExplorerTest {
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.openMocks(this);
-		dependencyExplorer = new DependencyExplorer(javaClassifiedDataContainer, expressionResolver,genericTypeResolver);
+		dependencyExplorer = new DependencyExplorer(expressionResolver,genericTypeResolver);
 	}
 
 	@Test
@@ -53,16 +50,15 @@ class DependencyExplorerTest {
 		Files.writeString(classBPath, classBContent);
 
 		// JavaClassifiedDataContainer 설정
-		Map<String, String> classToFilePath = new HashMap<>();
-		classToFilePath.put("A", classAPath.toString());
-		classToFilePath.put("B", classBPath.toString());
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(classToFilePath);
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
+		container.getClassToFilePath().put("A", classAPath.toString());
+		container.getClassToFilePath().put("B", classBPath.toString());
 		when(genericTypeResolver.extractClassNamesFromType(any())).thenAnswer(invocation -> List.of((String)invocation.getArgument(0)));
 
 		// 테스트 실행
 		Set<String> requiredFiles = new HashSet<>();
 		Set<String> visitedClasses = new HashSet<>();
-		dependencyExplorer.findClassDependencies("A", requiredFiles, visitedClasses);
+		dependencyExplorer.findClassDependencies("A", requiredFiles, visitedClasses, container);
 
 		assertTrue(requiredFiles.contains(classAPath.toString()));
 		assertTrue(requiredFiles.contains(classBPath.toString()));
@@ -105,19 +101,18 @@ class DependencyExplorerTest {
 		Files.writeString(classFPath, classFContent);
 
 		// JavaClassifiedDataContainer 설정
-		Map<String, String> classToFilePath = new HashMap<>();
-		classToFilePath.put("E", classEPath.toString());
-		classToFilePath.put("F", classFPath.toString());
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(classToFilePath);
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
+		container.getClassToFilePath().put("E", classEPath.toString());
+		container.getClassToFilePath().put("F", classFPath.toString());
 
 		// ExpressionResolver 모의 객체 설정
-		when(expressionResolver.resolveExpressionType(any(), eq("E")))
+		when(expressionResolver.resolveExpressionType(any(), eq("E"), any()))
 			.thenReturn(Optional.of("F"));
 
 		// 테스트 실행
 		Set<String> requiredFiles = new HashSet<>();
 		Set<String> visitedMethods = new HashSet<>();
-		dependencyExplorer.findMethodCallDependencies("E", "methodE", requiredFiles, visitedMethods);
+		dependencyExplorer.findMethodCallDependencies("E", "methodE", requiredFiles, visitedMethods, container);
 
 		// 검증
 		assertTrue(requiredFiles.contains(classFPath.toString()));

@@ -3,7 +3,6 @@ package com.hocs.server.extractor.core;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -17,14 +16,12 @@ import com.github.javaparser.ast.expr.SuperExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.hocs.server.custom_rag.legacy.extractor.core.ExpressionResolver;
 import com.hocs.server.custom_rag.legacy.extractor.core.data.JavaClassifiedDataContainer;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 
 /**
@@ -33,16 +30,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class ExpressionResolverTest {
 
-	@Mock
-	private JavaClassifiedDataContainer javaClassifiedDataContainer;
-
 	@InjectMocks
 	private ExpressionResolver expressionResolver;
 
 	@Test
 	public void testResolveExpressionType_NullExpression_ReturnsCurrentClassName() {
 		String currentClassName = "TestClass";
-		Optional<String> result = expressionResolver.resolveExpressionType(null, currentClassName);
+		Optional<String> result = expressionResolver.resolveExpressionType(null, currentClassName, new JavaClassifiedDataContainer());
 		assertTrue(result.isPresent());
 		assertEquals(currentClassName, result.get());
 	}
@@ -51,10 +45,11 @@ public class ExpressionResolverTest {
 	public void testResolveExpressionType_NameExpr_ClassName() {
 		String className = "TestClass";
 		NameExpr nameExpr = new NameExpr(className);
-		when(javaClassifiedDataContainer.getClassToFilePath())
-			.thenReturn(Collections.singletonMap(className, "path/to/TestClass.java"));
+		JavaClassifiedDataContainer dataContainer = new JavaClassifiedDataContainer();
+		dataContainer.getClassToFilePath().put(className, "path/to/TestClass.java");
 
-		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass",
+			dataContainer);
 
 		assertTrue(result.isPresent());
 		assertEquals(className, result.get());
@@ -64,11 +59,10 @@ public class ExpressionResolverTest {
 	public void testResolveExpressionType_NameExpr_InterfaceName() {
 		String interfaceName = "TestInterface";
 		NameExpr nameExpr = new NameExpr(interfaceName);
-		when(javaClassifiedDataContainer.getClassToFilePath()).thenReturn(Collections.emptyMap());
-		when(javaClassifiedDataContainer.getInterfaceImplementations())
-			.thenReturn(Map.of(interfaceName, Set.of("Impl1", "Impl2")));
+		JavaClassifiedDataContainer dataContainer = new JavaClassifiedDataContainer();
+		dataContainer.getInterfaceImplementations().put(interfaceName,Set.of("Impl1", "Impl2"));
 
-		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass", dataContainer);
 
 		assertTrue(result.isPresent());
 		assertEquals(interfaceName, result.get());
@@ -85,7 +79,7 @@ public class ExpressionResolverTest {
 
 		nameExpr.setParentNode(methodDeclaration.getBody().orElse(null));
 
-		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(nameExpr, "CurrentClass",new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals("String", result.get());
@@ -96,7 +90,7 @@ public class ExpressionResolverTest {
 		FieldAccessExpr fieldAccessExpr = new FieldAccessExpr(new ThisExpr(), "fieldName");
 
 		String currentClassName = "CurrentClass";
-		Optional<String> result = expressionResolver.resolveExpressionType(fieldAccessExpr, currentClassName);
+		Optional<String> result = expressionResolver.resolveExpressionType(fieldAccessExpr, currentClassName, new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals(currentClassName, result.get());
@@ -107,7 +101,7 @@ public class ExpressionResolverTest {
 		ThisExpr thisExpr = new ThisExpr();
 		String currentClassName = "CurrentClass";
 
-		Optional<String> result = expressionResolver.resolveExpressionType(thisExpr, currentClassName);
+		Optional<String> result = expressionResolver.resolveExpressionType(thisExpr, currentClassName, new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals(currentClassName, result.get());
@@ -118,7 +112,7 @@ public class ExpressionResolverTest {
 		SuperExpr superExpr = new SuperExpr();
 		String currentClassName = "CurrentClass";
 
-		Optional<String> result = expressionResolver.resolveExpressionType(superExpr, currentClassName);
+		Optional<String> result = expressionResolver.resolveExpressionType(superExpr, currentClassName, new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals(currentClassName, result.get());
@@ -129,7 +123,7 @@ public class ExpressionResolverTest {
 		ObjectCreationExpr objectCreationExpr = new ObjectCreationExpr();
 		objectCreationExpr.setType(StaticJavaParser.parseClassOrInterfaceType("ArrayList<String>"));
 
-		Optional<String> result = expressionResolver.resolveExpressionType(objectCreationExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(objectCreationExpr, "CurrentClass", new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals("ArrayList<String>", result.get());
@@ -148,7 +142,7 @@ public class ExpressionResolverTest {
 			.findFirst(MethodCallExpr.class, mce -> mce.getNameAsString().equals("performAction"))
 			.get();
 
-		Optional<String> result = expressionResolver.resolveExpressionType(methodCallExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(methodCallExpr, "CurrentClass", new JavaClassifiedDataContainer());
 
 		assertTrue(result.isPresent());
 		assertEquals("HelperClass", result.get());
@@ -158,7 +152,7 @@ public class ExpressionResolverTest {
 	public void testResolveExpressionType_UnrecognizedExpression() {
 		BooleanLiteralExpr booleanLiteralExpr = new BooleanLiteralExpr(true);
 
-		Optional<String> result = expressionResolver.resolveExpressionType(booleanLiteralExpr, "CurrentClass");
+		Optional<String> result = expressionResolver.resolveExpressionType(booleanLiteralExpr, "CurrentClass", new JavaClassifiedDataContainer());
 
 		assertFalse(result.isPresent());
 	}
