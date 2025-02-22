@@ -42,9 +42,7 @@ public class ApiEndpointResolveFacade {
 	private final DependencyAnalyzer dependencyAnalyzer;
 	private final SrcFileCollector srcFileCollector;
 	private final JavaClassifiedDataGenerator javaCodeCategorizer;
-	private final ApiSourceDependencyService apiSourceDependencyService;
 	private final ApiSourceDependencyBatchSaveService apiSourceDependencyBatchSaveService;
-	private final JavaClassifiedDataContainer container;
 	private final ReentrantLock lock = new ReentrantLock();
 
 	public Map<ControllerFile, List<ApiInfo>> findApiInfo(FindApiInfoApiRequest request) {
@@ -65,7 +63,7 @@ public class ApiEndpointResolveFacade {
 
 			//사용자 프로젝트 언어 및 프레임워크에 따라 달라집니다.
 			//if(metaData.getProjectFramework().equals(ProjectFramework.SPRINGBOOT))
-			apis = dependencyAnalyzer.findDependency(controllerFile.getClassName());
+			apis = dependencyAnalyzer.findDependency(controllerFile.getClassName(), container);
 
 			for (API api : apis) {
 				String gitCloneUrl = metaData.getGitRepoData().getCloneUrl();
@@ -95,7 +93,7 @@ public class ApiEndpointResolveFacade {
 			metaData.getProjectRootPath().getPath());
 	}
 
-	private JavaClassifiedDataContainer getContainerDoubleCheckLock(ProjectMetaData metaData) {
+	private JavaClassifiedDataContainer getContainerDoubleCheckLock(ProjectMetaData metaData, JavaClassifiedDataContainer container) {
 		if (container.getStatus() == JavaClassifiedDataContainerStatus.INIT) {
 			return container;
 		}
@@ -115,7 +113,7 @@ public class ApiEndpointResolveFacade {
 		return container;
 	}
 
-	private JavaClassifiedDataContainer getContainerLock(ProjectMetaData metaData) {
+	private JavaClassifiedDataContainer getContainerLock(ProjectMetaData metaData, JavaClassifiedDataContainer container) {
 		lock.lock();
 		try {
 			// 락 내부에서 다시 한 번 확인 (double-check)

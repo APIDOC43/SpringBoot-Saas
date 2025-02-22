@@ -12,16 +12,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import lombok.Getter;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 
 /**
  * 의존성을 수집하는데 핵심이 되는 데이터 클래스입니다.
  */
 @Getter
-@Component
-@RequestScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class JavaClassifiedDataContainer {
 
 	private final Map<String, String> specialAnnotations = new ConcurrentHashMap<>();

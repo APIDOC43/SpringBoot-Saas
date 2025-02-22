@@ -33,17 +33,16 @@ import org.springframework.stereotype.Component;
 public class DependencyAnalyzer {
 
 
-	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
 	private final DependencyExplorer dependencyExplorer;
 
 
 	/**
 	 * 하나의 컨트롤러 클래스의 모든 API 메서드를 추적하여 하나의 API가 실행될 때 필요한 파일 경로를 수집합니다.
 	 */
-	public List<API> findDependency(String className) throws Exception {
+	public List<API> findDependency(String className, JavaClassifiedDataContainer container) throws Exception {
 		List<API> APIs = new ArrayList<>();
 
-		String filePath = javaClassifiedDataContainer.getClassToFilePath().get(className);//controller file path
+		String filePath = container.getClassToFilePath().get(className);//controller file path
 		if (filePath == null) {
 			return null;
 		}
@@ -78,7 +77,7 @@ public class DependencyAnalyzer {
 
 
 				// 컨트롤러 클래스의 의존성도 추적
-				dependencyExplorer.findClassDependencies(className, requiredFiles, visitedClasses);
+				dependencyExplorer.findClassDependencies(className, requiredFiles, visitedClasses, container);
 
 				// 메소드 파라미터 의존성 추적 [지원하는 모든 파라미터 어노테이션 및 MultipartFile 처리]
 				for (Parameter param : method.getParameters()) {
@@ -92,14 +91,14 @@ public class DependencyAnalyzer {
 					// 파라미터 어노테이션이 지원되거나 타입이 MultipartFile인 경우 처리
 					if (isSupported || param.getType().asString().equals("MultipartFile")) {
 						String paramType = param.getType().asString();
-						dependencyExplorer.findClassDependencies(paramType, requiredFiles, visitedClasses);
+						dependencyExplorer.findClassDependencies(paramType, requiredFiles, visitedClasses, container);
 					}
 				}
 
 				// 메서드의 반환 타입에서 의존성 추적
 				if (method.getType() != null) {
 					String returnType = method.getType().asString();
-					dependencyExplorer.findClassDependencies(returnType, requiredFiles, visitedClasses);
+					dependencyExplorer.findClassDependencies(returnType, requiredFiles, visitedClasses, container);
 				}
 
 				// 중복을 방지하고 정렬된 리스트로 변환

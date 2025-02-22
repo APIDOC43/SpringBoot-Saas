@@ -64,7 +64,7 @@ public class DependencyExtractorByMethod {
 
 
 			// 컨트롤러 클래스의 의존성도 추적
-			dependencyExplorer.findClassDependencies(className, requiredFiles, visitedClasses);
+			dependencyExplorer.findClassDependencies(className, requiredFiles, visitedClasses, dataContainer);
 
 			// 메소드 파라미터 의존성 추적 [지원하는 모든 파라미터 어노테이션 및 MultipartFile 처리]
 			for (Parameter param : method.getParameters()) {
@@ -78,14 +78,14 @@ public class DependencyExtractorByMethod {
 				// 파라미터 어노테이션이 지원되거나 타입이 MultipartFile인 경우 처리
 				if (isSupported || param.getType().asString().equals("MultipartFile")) {
 					String paramType = param.getType().asString();
-					dependencyExplorer.findClassDependencies(paramType, requiredFiles, visitedClasses);
+					dependencyExplorer.findClassDependencies(paramType, requiredFiles, visitedClasses, dataContainer);
 				}
 			}
 
 			// 메서드의 반환 타입에서 의존성 추적
 			if (method.getType() != null) {
 				String returnType = method.getType().asString();
-				dependencyExplorer.findClassDependencies(returnType, requiredFiles, visitedClasses);
+				dependencyExplorer.findClassDependencies(returnType, requiredFiles, visitedClasses, dataContainer);
 			}
 			//메소드 네임 이랑 매핑
 			// 중복을 방지하고 정렬된 리스트로 변환

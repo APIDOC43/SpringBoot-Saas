@@ -26,7 +26,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ExpressionResolver {
-	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
 
 
 	/**
@@ -54,31 +53,31 @@ public class ExpressionResolver {
 	 * 블록 스코프: {}로 감싸진 블록 내부에서만 유효한 변수
 	 */
 
-	public Optional<String> resolveExpressionType(Expression expr, String currentClassName) {
+	public Optional<String> resolveExpressionType(Expression expr, String currentClassName,JavaClassifiedDataContainer container) {
 		if (expr == null) {
 			// 스코프가 없는 경우 현재 클래스에서 메서드를 찾습니다.
 			return Optional.of(currentClassName);
 		} else if (expr.isNameExpr()) {
 			String name = expr.asNameExpr().getNameAsString();
 			// 스코프가 클래스 이름인지 확인
-			if (javaClassifiedDataContainer.getClassToFilePath().containsKey(name)) {
+			if (container.getClassToFilePath().containsKey(name)) {
 				return Optional.of(name); // 클래스 이름인 경우
-			} else if (javaClassifiedDataContainer.getInterfaceImplementations().containsKey(name)) {
+			} else if (container.getInterfaceImplementations().containsKey(name)) {
 				return Optional.of(name); // 인터페이스 이름인 경우
 			} else {
 				// 변수 이름인 경우 변수의 타입을 추론
-				return resolveVariableType(expr, name, currentClassName);
+				return resolveVariableType(expr, name, currentClassName,container);
 			}
 		} else if (expr.isFieldAccessExpr()) {
 			// 재귀적으로 스코프 클래스 이름을 해결
 			FieldAccessExpr fieldAccessExpr = expr.asFieldAccessExpr();
-			return resolveExpressionType(fieldAccessExpr.getScope(), currentClassName);
+			return resolveExpressionType(fieldAccessExpr.getScope(), currentClassName,container);
 		} else if (expr.isThisExpr()) {
 			return Optional.of(currentClassName);
 		} else if (expr.isMethodCallExpr()) {
 			// 스코프가 메서드 호출인 경우 재귀적으로 처리
 			MethodCallExpr methodCallExpr = expr.asMethodCallExpr();
-			return resolveExpressionType(methodCallExpr.getScope().orElse(null), currentClassName);
+			return resolveExpressionType(methodCallExpr.getScope().orElse(null), currentClassName,container);
 		} else if (expr.isSuperExpr()) {
 			return Optional.of(currentClassName);
 		} else if (expr.isObjectCreationExpr()) {
@@ -88,7 +87,7 @@ public class ExpressionResolver {
 		return Optional.empty();
 	}
 
-	private Optional<String> resolveVariableType(Node node, String varName, String currentClassName) {
+	private Optional<String> resolveVariableType(Node node, String varName, String currentClassName, JavaClassifiedDataContainer container) {
 		// 현재 노드에서 부모를 탐색하여 변수 선언을 찾습니다.
 		Optional<Node> parentNode = node.getParentNode();
 		while (parentNode.isPresent()) {
@@ -113,7 +112,7 @@ public class ExpressionResolver {
 			parentNode = parent.getParentNode();
 		}
 		// 클래스 필드에서 변수 선언 검색
-		String filePath = javaClassifiedDataContainer.getClassToFilePath().get(currentClassName);
+		String filePath = container.getClassToFilePath().get(currentClassName);
 		if (filePath != null) {
 			try {
 				String content = new String(Files.readAllBytes(Paths.get(filePath)));

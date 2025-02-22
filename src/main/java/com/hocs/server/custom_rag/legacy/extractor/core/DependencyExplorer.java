@@ -33,7 +33,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class DependencyExplorer {
-	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
 	private final ExpressionResolver expressionResolver;
 	private final GenericTypeResolver genericTypeResolver;
 
@@ -44,7 +43,7 @@ public class DependencyExplorer {
 	 * @param requiredFiles 수집된 파일 경로를 저장할 집합
 	 * @param visitedClasses 이미 방문한 클래스를 추적하여 순환 참조를 방지
 	 */
-	public void findClassDependencies(String className, Set<String> requiredFiles, Set<String> visitedClasses) throws Exception {
+	public void findClassDependencies(String className, Set<String> requiredFiles, Set<String> visitedClasses, JavaClassifiedDataContainer container) throws Exception {
 		if (className == null || className.isEmpty() || visitedClasses.contains(className)) {
 			return;
 		}
@@ -60,7 +59,7 @@ public class DependencyExplorer {
 				actualClassName = actualClassName.substring(actualClassName.lastIndexOf('.') + 1);
 			}
 
-			String filePath = javaClassifiedDataContainer.getClassToFilePath().get(actualClassName);
+			String filePath = container.getClassToFilePath().get(actualClassName);
 			if (filePath == null) {
 				continue;
 			}
@@ -79,15 +78,15 @@ public class DependencyExplorer {
 			TypeDeclaration<?> typeDecl = cu.getType(0);
 			if (GroupingStrategy.isClassOrInterfacee(typeDecl)) {
 				recursiveCaseInClassOrInterface(requiredFiles, visitedClasses, actualClassName,
-					(ClassOrInterfaceDeclaration) typeDecl);
+					(ClassOrInterfaceDeclaration) typeDecl, container);
 
 			} else if (typeDecl instanceof EnumDeclaration) {
 				recursiveCaseInEnum(requiredFiles, visitedClasses, actualClassName,
-					(EnumDeclaration) typeDecl);
+					(EnumDeclaration) typeDecl, container);
 
 			} else if (typeDecl instanceof RecordDeclaration) {
 				recursiveCaseInRecord(requiredFiles, visitedClasses, actualClassName,
-					(RecordDeclaration) typeDecl);
+					(RecordDeclaration) typeDecl, container);
 			}
 
 			// 다른 TypeDeclaration 타입도 필요에 따라 처리 가능
@@ -102,16 +101,16 @@ public class DependencyExplorer {
 	 * @param recordDecl Record 타입
 	 */
 	private void recursiveCaseInRecord(Set<String> requiredFiles, Set<String> visitedClasses,
-		String actualClassName, RecordDeclaration recordDecl) throws Exception {
+		String actualClassName, RecordDeclaration recordDecl, JavaClassifiedDataContainer container) throws Exception {
 
 		// Record 필드 타입 추적
 		for (Parameter parameter : recordDecl.getParameters()) {
 			String parameterType = parameter.getType().asString();
-			findClassDependencies(parameterType, requiredFiles, visitedClasses);
+			findClassDependencies(parameterType, requiredFiles, visitedClasses, container);
 		}
 
 		// Record에 정의된 메서드가 있다면 메서드 호출 추적
-		methodTrace(requiredFiles, visitedClasses, actualClassName, recordDecl.getMethods());
+		methodTrace(requiredFiles, visitedClasses, actualClassName, recordDecl.getMethods(),container);
 	}
 
 	/**
@@ -122,10 +121,10 @@ public class DependencyExplorer {
 	 * @param enumDecl Enum 타입
 	 */
 	private void recursiveCaseInEnum(Set<String> requiredFiles, Set<String> visitedClasses,
-		String actualClassName, EnumDeclaration enumDecl) throws Exception {
+		String actualClassName, EnumDeclaration enumDecl, JavaClassifiedDataContainer container) throws Exception {
 
 		// Enum에 정의된 메서드가 있다면 메서드 호출 추적
-		methodTrace(requiredFiles, visitedClasses, actualClassName, enumDecl.getMethods());
+		methodTrace(requiredFiles, visitedClasses, actualClassName, enumDecl.getMethods(),container);
 	}
 
 	/**
@@ -136,16 +135,16 @@ public class DependencyExplorer {
 	 * @param classOrInterfaceDeclaration Class 또는 Interface 타입
 	 */
 	private void recursiveCaseInClassOrInterface(Set<String> requiredFiles, Set<String> visitedClasses,
-		String actualClassName, ClassOrInterfaceDeclaration classOrInterfaceDeclaration) throws Exception {
+		String actualClassName, ClassOrInterfaceDeclaration classOrInterfaceDeclaration,JavaClassifiedDataContainer container) throws Exception {
 
 		// 멤버 필드 타입 추적
 		for (FieldDeclaration field : classOrInterfaceDeclaration.getFields()) {
 			String fieldType = field.getElementType().asString();
-			findClassDependencies(fieldType, requiredFiles, visitedClasses);
+			findClassDependencies(fieldType, requiredFiles, visitedClasses, container);
 		}
 
 		// 메서드 호출을 추적하여 필요한 파일 경로 수집
-		methodTrace(requiredFiles, visitedClasses, actualClassName, classOrInterfaceDeclaration.getMethods());
+		methodTrace(requiredFiles, visitedClasses, actualClassName, classOrInterfaceDeclaration.getMethods(),container);
 	}
 
 
@@ -159,15 +158,15 @@ public class DependencyExplorer {
 	 * @param methods 추적할 메서드 목록
 	 */
 	private void methodTrace(Set<String> requiredFiles, Set<String> visitedClasses,
-		String actualClassName, List<MethodDeclaration> methods ) throws Exception {
+		String actualClassName, List<MethodDeclaration> methods, JavaClassifiedDataContainer container ) throws Exception {
 		for (MethodDeclaration method : methods) {
 			// 변수 선언에서 타입 추적 추가
 			List<String> variableDeclarations = findVariableDeclarations(method);
 			for (String variableDeclaration : variableDeclarations) {
-				findClassDependencies(variableDeclaration, requiredFiles, visitedClasses);
+				findClassDependencies(variableDeclaration, requiredFiles, visitedClasses, container);
 			}
 
-			findMethodCallDependencies(actualClassName, method.getNameAsString(), requiredFiles, new HashSet<>());
+			findMethodCallDependencies(actualClassName, method.getNameAsString(), requiredFiles, new HashSet<>(),container);
 		}
 	}
 
@@ -202,14 +201,14 @@ public class DependencyExplorer {
 	 * @param requiredFiles 수집된 파일 경로를 저장할 집합
 	 * @param visitedMethods 순환호출 방지
 	 */
-	public void findMethodCallDependencies(String className, String methodName, Set<String> requiredFiles, Set<String> visitedMethods) throws Exception {
+	public void findMethodCallDependencies(String className, String methodName, Set<String> requiredFiles, Set<String> visitedMethods, JavaClassifiedDataContainer container) throws Exception {
 		String methodSignature = className + "." + methodName;
 		if (visitedMethods.contains(methodSignature)) {
 			return;
 		}
 		visitedMethods.add(methodSignature);
 
-		String filePath = javaClassifiedDataContainer.getClassToFilePath().get(className);
+		String filePath = container.getClassToFilePath().get(className);
 		if (filePath == null) {
 			return;
 		}
@@ -239,30 +238,30 @@ public class DependencyExplorer {
 				List<MethodCallExpr> methodCalls = body.findAll(MethodCallExpr.class);
 				for (MethodCallExpr callExpr : methodCalls) {
 					try {
-						Optional<String> scopeClassNameOpt = expressionResolver.resolveExpressionType(callExpr.getScope().orElse(null), className);
+						Optional<String> scopeClassNameOpt = expressionResolver.resolveExpressionType(callExpr.getScope().orElse(null), className, container);
 
 						if (scopeClassNameOpt.isPresent()) {
 							String calledMethodName = callExpr.getNameAsString();
 							String scopeClassName = scopeClassNameOpt.get();
 
-							String calledFilePath = javaClassifiedDataContainer.getClassToFilePath().get(
+							String calledFilePath = container.getClassToFilePath().get(
 								scopeClassName);
 							if (calledFilePath != null) {
 								requiredFiles.add(calledFilePath);
 								// 인터페이스인 경우 구현체를 모두 추적
-								if (javaClassifiedDataContainer.getInterfaceImplementations().containsKey(scopeClassName)) {
-									Set<String> implementations = javaClassifiedDataContainer.getInterfaceImplementations().getOrDefault(scopeClassName, Collections.emptySet());
+								if (container.getInterfaceImplementations().containsKey(scopeClassName)) {
+									Set<String> implementations = container.getInterfaceImplementations().getOrDefault(scopeClassName, Collections.emptySet());
 									for (String implClass : implementations) {
-										String implFilePath = javaClassifiedDataContainer.getClassToFilePath().get(implClass);
+										String implFilePath = container.getClassToFilePath().get(implClass);
 										if (implFilePath != null) {
 											requiredFiles.add(implFilePath);
 											// 구현 클래스의 메서드 호출도 추적
-											findMethodCallDependencies(implClass, calledMethodName, requiredFiles, visitedMethods);
+											findMethodCallDependencies(implClass, calledMethodName, requiredFiles, visitedMethods,container);
 										}
 									}
 								} else {
 									// 클래스인 경우 메서드 호출을 재귀적으로 추적
-									findMethodCallDependencies(scopeClassName, calledMethodName, requiredFiles, visitedMethods);
+									findMethodCallDependencies(scopeClassName, calledMethodName, requiredFiles, visitedMethods,container);
 								}
 							}
 						}
@@ -275,9 +274,9 @@ public class DependencyExplorer {
 				List<FieldAccessExpr> fieldAccessExprs = body.findAll(FieldAccessExpr.class);
 				for (FieldAccessExpr fieldAccessExpr : fieldAccessExprs) {
 					try {
-						Optional<String> scopeClassName = expressionResolver.resolveExpressionType(fieldAccessExpr.getScope(), className);
+						Optional<String> scopeClassName = expressionResolver.resolveExpressionType(fieldAccessExpr.getScope(), className,container);
 						if (scopeClassName.isPresent()) {
-							String fieldFilePath = javaClassifiedDataContainer.getClassToFilePath().get(scopeClassName.get());
+							String fieldFilePath = container.getClassToFilePath().get(scopeClassName.get());
 							if (fieldFilePath != null) {
 								requiredFiles.add(fieldFilePath);
 							}

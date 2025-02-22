@@ -23,29 +23,27 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JavaClassifiedDataGenerator {
 
-	private final JavaClassifiedDataContainer javaClassifiedDataContainer;
-
 	public JavaClassifiedDataContainer init(List<File> files) throws IOException {
-
+		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
 		for (File file : files) {
 			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
 			try {
 				CompilationUnit cu = StaticJavaParser.parse(content);
-
 				// 클래스, 인터페이스, 열거형, 레코드 등을 모두 처리합니다.
-				SortAndSave(file.getAbsolutePath(), cu);
+				SortAndSave(file.getAbsolutePath(), cu, container);
 			} catch (Exception e) {
 				System.err.println("Failed to parse file: " + file.getAbsolutePath());
 				e.printStackTrace();
 			}
 		}
-		javaClassifiedDataContainer.setStatusToInit();
-		return javaClassifiedDataContainer;
+		container.setStatusToInit();
+		return container;
 	}
 
 
 
-	private void SortAndSave(String absolutePath, CompilationUnit cu) {
+	private void SortAndSave(String absolutePath, CompilationUnit cu,
+		JavaClassifiedDataContainer javaClassifiedDataContainer) {
 		cu.findAll(TypeDeclaration.class).forEach(typeDecl -> {
 			String typeName = typeDecl.getNameAsString();
 
