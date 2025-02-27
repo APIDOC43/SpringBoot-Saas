@@ -1,9 +1,11 @@
 package com.hocs.server.common.domain;
 
 import java.util.Objects;
+import lombok.Data;
 import lombok.Getter;
 
 @Getter
+@Data
 public class ApiInfo {
 	private final String httpMethod; //GET, POST ...
 	private final String endpoint;

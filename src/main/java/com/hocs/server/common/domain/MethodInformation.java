@@ -1,9 +1,13 @@
 package com.hocs.server.common.domain;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.google.common.base.Objects;
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Data
+@NoArgsConstructor
 public class MethodInformation {
 	private String signature;// ex: sayHello(int int)
 

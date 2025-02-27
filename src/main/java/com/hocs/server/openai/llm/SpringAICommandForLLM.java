@@ -47,21 +47,21 @@ public class SpringAICommandForLLM {
 		//createOasPathSection
 		String promptStr = PromptMessageHub.createOasPathSection(apiMetadata,srcRelationErrorFormat);
 		ChatClientPromptRequestSpec requestPath = client.prompt(new Prompt(promptStr));
-//		String pathContent = getResultContent(requestPath.call());
-		String pathContent = FakeResponse.pathContent();
+		String pathContent = getResultContent(requestPath.call());
+//		String pathContent = FakeResponse.pathContent();
 
 
 		//createOasDescriptionDetail
 		String validPrompt = PromptMessageHub.createOasDescriptionDetail(apiMetadata,pathContent);
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
-//		String result = getResultContent(validRequest.call());
-		String result = FakeResponse.createDescrionion();
+		String result = getResultContent(validRequest.call());
+//		String result = FakeResponse.createDescrionion();
 
 		//validErrorResponseFormat
 		String formatValidPrompt = PromptMessageHub.validErrorResponseFormat(srcRelationErrorFormat,result);
 		ChatClientPromptRequestSpec formatValidRequest = client.prompt(new Prompt(formatValidPrompt));
-//		result = getResultContent(formatValidRequest.call());
-		result = FakeResponse.fomatValid();
+		result = getResultContent(formatValidRequest.call());
+//		result = FakeResponse.fomatValid();
 
 		String str = llmResponseUtil.cleanYamlContent(result);
 		PathAndComponents parse = OpenAPIParser.parse(str);
@@ -97,8 +97,8 @@ public class SpringAICommandForLLM {
 		String contents = PromptMessageHub.integrationSchema(schemas);
 		ChatClientPromptRequestSpec requestPath = client.prompt(
 			new Prompt(contents));
-		String content = FakeResponse.fomatValid();
-//		String content = getResultContent(requestPath.call());
+//		String content = FakeResponse.fomatValid();
+		String content = getResultContent(requestPath.call());
 		return llmResponseUtil.cleanYamlContent(content);
 
 	}

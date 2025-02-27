@@ -10,6 +10,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class GenerateReceiptClientRequest {
 	@NotNull
-	private long metadataId;
+	private Long metadataId;
 	private List<ApiInfo> excludeApiInfo;
 }

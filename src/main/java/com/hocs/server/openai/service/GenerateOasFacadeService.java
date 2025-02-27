@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -110,22 +111,30 @@ public class GenerateOasFacadeService {
 		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
+		int maxConcurrentTasks = 4;
+		Semaphore semaphore = new Semaphore(maxConcurrentTasks); // 허용할 동시 작업 수
 		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
 			for (APIMetadata metadata : apiMetadata) {
-				futures.add(CompletableFuture.runAsync(() ->
-						generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList, exceptionFormatSrc)
-					, executor));
+				semaphore.acquire();  // 작업 시작 전에 permit 획득
+				futures.add(CompletableFuture.runAsync(() -> {
+					try {
+						generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList, exceptionFormatSrc);
+					} finally {
+						semaphore.release(); // 작업 종료 후 반드시 release
+					}
+				}, executor));
 			}
-
 			CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 			executor.shutdownNow();
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
 		}
 
 		//path integeration
 		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
 		//schema integration
-//		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
-		Map<String, List<Schema>> integrationSchemaMap = schemasMap;
+		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
+//		Map<String, List<Schema>> integrationSchemaMap = schemasMap;
 
 		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
 		String result = merge(schemasMap, integrationPaths);
