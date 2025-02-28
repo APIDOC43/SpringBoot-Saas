@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class OasRepositoryCustomImpl implements OasRepositoryCustom {
@@ -20,6 +21,7 @@ public class OasRepositoryCustomImpl implements OasRepositoryCustom {
 	private MongoTemplate mongoTemplate;
 
 	@Override
+	@Transactional
 	public void bulkWrite(List<OAS> mergedEntities) {
 		// UNORDERED 모드로 BulkOperations 생성
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, OAS.class);
