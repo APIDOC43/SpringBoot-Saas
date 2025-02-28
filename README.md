@@ -42,10 +42,8 @@ https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f6
 프로젝트 총괄  (기획, 아키텍처 설계, 구현, 마케팅),
 - 코드파서 서버 개발(CustomRAG)
 - LLM 서버 개발 및 AI 모델 통합 (Spring Boot)
- - SaaS 서버 개발 
-- SSG (Static Site Generator) 서버 개발 (Node.js, EJS)
+- SaaS 서버 개발 
 - 클라우드 인프라 구축 및 관리 (AWS)
 - 사용자 인터페이스 (UI/UX) 디자인 
-- 프로젝트 문서화 및 기술 문서 작성
 - 사용자 피드백 수집 및 분석
 
