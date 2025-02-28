@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestQueueService {
 
-	// in-memory 버퍼 (내부 동시성은 ConcurrentLinkedQueue가 제공하지만, 외부 락은 MySQL named lock 사용)
 	private final Queue<RateLimitRequest> requestQueue = new ConcurrentLinkedQueue<>();
 
 	public void addRequest(RateLimitRequest request) {
