@@ -84,21 +84,13 @@ public class ApiDocPiplineService {
 
 
 		File cloneDir = metaData.getProjectRootPath().getToFile();
-		try (ExecutorService executorService = Executors.newFixedThreadPool(5)) {
-			RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		try (ExecutorService executorService = Executors.newFixedThreadPool(4)) {
 			List<CompletableFuture<Void>> futures = new ArrayList<>();
 
 			for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
 				CompletableFuture<Void> future = CompletableFuture
-					.supplyAsync(() -> {
-						try{
-						RequestContextHolder.setRequestAttributes(requestAttributes);
-						return apiEndpointCollectorPortInPipline.getApiEndpoints(
-							userId, metaData, defaultBranchName, controllerFile, requestId);
-						}finally {
-							RequestContextHolder.resetRequestAttributes();
-						}
-					}, executorService)
+					.supplyAsync(() -> apiEndpointCollectorPortInPipline.getApiEndpoints(
+						userId, metaData, defaultBranchName, controllerFile, requestId), executorService)
 					.thenAccept(apiMetadata -> {
 						try {
 							llmService.generateV1(userId, apiMetadata, cloneDir, filenamesRelatedException, requestId);
