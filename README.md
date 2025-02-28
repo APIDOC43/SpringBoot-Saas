@@ -2,9 +2,6 @@
 https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f63869f
 
 ---
-## 리팩토링 진행중
-https://steadfast-sofa-4b2.notion.site/195eeae70b8580e2913bf8c43565d435?pvs=74
-
 
 ## APIDOC43: 완전 자동화된 API 문서 솔루션
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
@@ -37,11 +34,6 @@ https://steadfast-sofa-4b2.notion.site/195eeae70b8580e2913bf8c43565d435?pvs=74
 - API 문서 작성 및 유지보수 시간 **감소**
 - 문서의 **정확성과 일관성 개선**
 - 팀 간 **커뮤니케이션 향상**
-
----
-## 파이프라인
-<img width="1364" alt="스크린샷 2025-02-21 오후 1 08 02" src="https://github.com/user-attachments/assets/ac88fc87-63fd-40b5-b960-e30e3a30be2d" />
-
 
 ---
 ## Developer
