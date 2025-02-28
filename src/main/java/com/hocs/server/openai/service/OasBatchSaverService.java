@@ -1,16 +1,15 @@
 package com.hocs.server.openai.service;
 
 import com.hocs.server.openai.domain.output.OAS;
-import com.hocs.server.openai.domain.output.OasInfo;
 import com.hocs.server.openai.domain.output.PathItem;
 import com.hocs.server.openai.domain.output.Schema;
 import com.hocs.server.openai.repository.OasRepositoryCustom;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -19,39 +18,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OasBatchSaverService {
 
-	private final List<OAS> entityBuffer = Collections.synchronizedList(new ArrayList<>());
-	private final static ReentrantLock lock = new ReentrantLock();
-	private static int addcnt = 0;
-	private static int savecnt = 0;
+	// BlockingQueue를 사용하여 생산자-소비자 패턴 구현 (용량은 상황에 맞게 조정)
+	private final BlockingQueue<OAS> entityBuffer = new ArrayBlockingQueue<>(1000);
 
 	@Autowired
 	private OasRepositoryCustom repository;
 
-	// 엔티티를 버퍼에 추가
+	// 엔티티를 버퍼에 추가 (Producer)
 	public void addEntity(OAS entity) {
-		lock.lock();
 		try {
-			addcnt++;
-			entityBuffer.add(entity);
-		}finally {
-			lock.unlock();
+			// 큐가 꽉 차면 put() 호출 시 대기하므로 안전하게 처리됨
+			entityBuffer.put(entity);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
-	// 버퍼에 쌓인 엔티티들을 한 번에 저장
+	// 버퍼에 쌓인 엔티티들을 주기적으로 배치 저장 (Consumer)
 	@Transactional
 	@Scheduled(fixedDelay = 30000)
 	public void flushEntities() {
-		lock.lock();
-		try {
-			if (!entityBuffer.isEmpty()) {
-				List<OAS> entitiesToSave = new ArrayList<>(entityBuffer);
-				entityBuffer.clear();
-				List<OAS> mergedEntities = mergeEntitiesById(entitiesToSave);
-				repository.bulkWrite(mergedEntities);
-			}
-		} finally {
-			lock.unlock();
+		List<OAS> entitiesToSave = new ArrayList<>();
+		// drainTo()는 내부적으로 락을 사용하여 원자적으로 모든 요소를 가져오고 큐를 비움
+		entityBuffer.drainTo(entitiesToSave);
+		if (!entitiesToSave.isEmpty()) {
+			List<OAS> mergedEntities = mergeEntitiesById(entitiesToSave);
+			repository.bulkWrite(mergedEntities);
 		}
 	}
 

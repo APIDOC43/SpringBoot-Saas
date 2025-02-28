@@ -1,6 +1,7 @@
 package com.hocs.server.custom_rag.legacy.extractor.respository.mongo;
 
 import com.hocs.server.custom_rag.legacy.extractor.domain.APISourceDependencyInfo;
+import com.mongodb.bulk.BulkWriteResult;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -17,7 +18,7 @@ public class APISourceDependencyRepositoryCustomImpl implements APISourceDepende
 	private MongoTemplate mongoTemplate;
 
 	@Override
-	public void bulkWrite(List<APISourceDependencyInfo> mergedEntities) {
+	public int bulkWrite(List<APISourceDependencyInfo> mergedEntities) {
 		// UNORDERED 모드로 BulkOperations 생성
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, APISourceDependencyInfo.class);
 
@@ -26,9 +27,9 @@ public class APISourceDependencyRepositoryCustomImpl implements APISourceDepende
 			Query query = new Query(Criteria.where("_id").is(entity.getId()));
 			Update update = new Update();
 
-			// apiSourceDependencies 필드에 새로운 API들을 추가 ($push와 $each 사용)
+			// apiSourceDependencies 필드에 새로운 API들을 추가
 			if (entity.getApiSourceDependencies() != null && !entity.getApiSourceDependencies().isEmpty()) {
-				update.push("apiSourceDependencies").each(entity.getApiSourceDependencies().toArray());
+				update.addToSet("apiSourceDependencies").each(entity.getApiSourceDependencies().toArray());
 			}
 
 			// 다른 필드들도 업데이트
@@ -43,7 +44,11 @@ public class APISourceDependencyRepositoryCustomImpl implements APISourceDepende
 			bulkOps.upsert(query, update);
 		}
 		// 모든 bulk 연산 실행
-		bulkOps.execute();
+		if (!mergedEntities.isEmpty()) {
+			BulkWriteResult result = bulkOps.execute();
+			return result.getModifiedCount() + result.getUpserts().size();
+		}
+		return 0;
 	}
 }
 

@@ -4,5 +4,5 @@ import com.hocs.server.custom_rag.legacy.extractor.domain.APISourceDependencyInf
 import java.util.List;
 
 public interface APISourceDependencyRepositoryCustom {
-	void bulkWrite(List<APISourceDependencyInfo> mergedEntities);
+	int bulkWrite(List<APISourceDependencyInfo> mergedEntities);
 }
