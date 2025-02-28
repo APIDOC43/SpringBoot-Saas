@@ -16,6 +16,7 @@ public class Bucket4jRateLimitRequestService {
 	private final Bucket bucket;
 	private final RequestQueueService requestQueueService;
 	private final ApiDocPiplineService pipelineService;
+	private final Object lock = new Object();
 
 
 	/**
@@ -45,8 +46,16 @@ public class Bucket4jRateLimitRequestService {
 	 * - 처리 완료 후 토큰 공급합니다.
 	 */
 	public void processQueuedRequests() {
-		while (!requestQueueService.isEmpty() && bucket.tryConsume(1)) {
-			RateLimitRequest request = requestQueueService.pollRequest();
+		while (true) {
+			RateLimitRequest request;
+			// 큐와 토큰 버킷에 대한 연산을 원자적으로 처리
+			synchronized (lock) {
+				if (requestQueueService.isEmpty() || !bucket.tryConsume(1)) {
+					break;
+				}
+				request = requestQueueService.pollRequest();
+			}
+
 			if (request != null) {
 				System.out.println("대기 큐 요청 처리: 토큰 소비됨");
 				RateLimitRequestDataImpl data = (RateLimitRequestDataImpl) request.getData();
