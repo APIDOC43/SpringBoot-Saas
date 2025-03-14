@@ -1,3 +1,7 @@
+# 프로젝트 진행중
+2025.03월 : 리팩토링 진행중
+
+
 ## 프로젝트 소개 및 동기 
 [https://steadfast-sofa-4b2.notion.site/1-SW-APIDOC43-15beeae70b85806bbaaffc011f63869f](https://steadfast-sofa-4b2.notion.site/SW-APIDOC43-1a8eeae70b858047b285d93bd603304b?pvs=4)
 
