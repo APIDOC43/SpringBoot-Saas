@@ -1,20 +1,25 @@
-package com.hocs.server.api_spec_generator.util;
+package com.hocs.server.pipline_orchestrator.service.out;
 
 import java.io.File;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-public class HttpClient {
-	private final static String BASE_URL = "http://localhost:8080";
-	public static String findHtmlRequest(String filename) {
+@Service
+public class OasSendClient {
+
+	@Value("${path.saas.baseurl}")
+	private String BASE_URL;
+	public String findHtmlRequest(String filename) {
 		RestTemplate restTemplate = new RestTemplate();
 		String url = BASE_URL+"/demo/content";
 
@@ -36,7 +41,7 @@ public class HttpClient {
 	}
 
 	/** sass server에 전송**/
-	public static void toSaas(File projectDir, String userId) {
+	public void toSaas(File projectDir, String userId) {
 		// 업로드할 파일 경로
 		File file = new File(projectDir.getAbsolutePath() + "/output_file-fix.yaml");
 
@@ -76,10 +81,6 @@ public class HttpClient {
 
 		// 응답 출력
 		log.info("Response: {}",response.getBody());
-	}
-
-	public static void main(String[] args) {
-		toSaas(new File("/Users/hong/Desktop/hong/soma/alone/practice/saas-server/hocsserver"), "hong");
 	}
 
 }

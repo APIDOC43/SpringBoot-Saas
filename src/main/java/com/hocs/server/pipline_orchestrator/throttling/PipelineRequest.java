@@ -1,26 +1,26 @@
-package com.hocs.server.pipline_orchestrator.ratelimit;
+package com.hocs.server.pipline_orchestrator.throttling;
 
 import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
-public class RateLimitRequest {
+public class PipelineRequest {
 	private final LocalDateTime arrivalTime;
 
-	private final RateLimitRequestData data;
+	private final PipelineRequestData data;
 
-	public RateLimitRequest(LocalDateTime arrivalTime)
+	public PipelineRequest(LocalDateTime arrivalTime)
 	{
 		this.arrivalTime = arrivalTime;
 		this.data = null;
 	}
 
-	public RateLimitRequest(LocalDateTime arrivalTime, RateLimitRequestData data) {
+	public PipelineRequest(LocalDateTime arrivalTime, PipelineRequestData data) {
 		this.arrivalTime = arrivalTime;
 		this.data = data;
 	}
 
-	public RateLimitRequestData getData() {
+	public PipelineRequestData getData() {
 		return data;
 	}
 

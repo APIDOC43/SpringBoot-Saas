@@ -16,7 +16,6 @@ import org.springframework.util.DigestUtils;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-/** Not Yet **/
 public class DocGeneratePiplineTask extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

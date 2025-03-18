@@ -1,4 +1,4 @@
-package com.hocs.server.pipline_orchestrator.ratelimit;
+package com.hocs.server.pipline_orchestrator.throttling;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -8,13 +8,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class RequestQueueService {
 
-	private final Queue<RateLimitRequest> requestQueue = new ConcurrentLinkedQueue<>();
+	private final Queue<PipelineRequest> requestQueue = new ConcurrentLinkedQueue<>();
 
-	public void addRequest(RateLimitRequest request) {
+	public void addRequest(PipelineRequest request) {
 		requestQueue.add(request);
 	}
 
-	public RateLimitRequest pollRequest() {
+	public PipelineRequest pollRequest() {
 		return requestQueue.poll();
 	}
 
@@ -22,7 +22,7 @@ public class RequestQueueService {
 		return requestQueue.isEmpty();
 	}
 
-	public RateLimitRequest peek() {
+	public PipelineRequest peek() {
 		return requestQueue.peek();
 	}
 }
