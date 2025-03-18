@@ -7,7 +7,14 @@
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
 
 **APIDOC43**은 개발자의 생산성을 극대화하고 비즈니스 성장에 기여하는 API 문서 자동화 서비스입니다.
-
+```
+├── HocsserverApplication.java   // 애플리케이션의 메인 진입점
+├── api_spec_generator           // OAS (OpenAPI-spec) 생성 모듈 with LLM
+├── code_parser                  // 소스 코드 파싱 및 분석 모듈 With Java-parser libarary
+├── common                       // 공통 유틸리티, 도메인 모델, 공통 기능 모듈 
+├── pipline_orchestrator         // 파이프라인 오케스트레이션 및 작업 조율 모듈: async
+└── saas_platform                // 클라이언트 대상 SaaS 플랫폼 서비스 모듈
+```
 ---
 
 ## **주요 기능**
