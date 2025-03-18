@@ -26,9 +26,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ApiDocPipelineService {
-
 	private final ApiEndpointCollectorPortInPipline apiEndpointCollectorPortInPipline;
-	private final GenerateOasFacadeService llmService;
+	private final GenerateOasFacadeService llmService; //internal call로 분리
 	private final OasSendClient oasSendClient;
 
 	//deprecated
@@ -85,45 +84,82 @@ public class ApiDocPipelineService {
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
 		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
-			CompletableFuture<Void> future = CompletableFuture
-				.supplyAsync(() -> {
-					// API 엔드포인트 수집
-					return apiEndpointCollectorPortInPipline.getApiEndpoints(userId, metaData,
-						defaultBranchName, controllerFile, requestId);
-				}, executorService)
-				.handle((result, ex) -> {
-					if (ex != null) {
-						log.error("Error occurred in async [getApiEndpoints] for controller file: "
-							+ controllerFile.getClassName(), ex);
-						// 예외 발생 시 별도의 후속 처리
-					}
-					return result;
-				})
-				.thenAccept(apiMetadata -> {
-					// API 문서 생성
-					try {
-						llmService.generateV1(userId, apiMetadata, cloneDir,
-							filenamesRelatedException, requestId);
-					} catch (IOException e) {
-						throw new CompletionException(e);
-					}
-				})
-				// handle를 사용해 예외와 정상 결과를 모두 처리
-				.handle((result, ex) -> {
-					if (ex != null) {
-						log.error("Error occurred in generate_OAS task for controller file: "
-							+ controllerFile.getClassName(), ex);
-						// 예외 발생 시 별도의 후속 처리
-					}
-					return null;
-				});
+			CompletableFuture<Void> future =
+				getApiEndpoint(
+					userId,
+					metaData,
+					defaultBranchName,
+					requestId,
+					executorService,
+					controllerFile
+				)
+
+					//task 2 : API Endpoint 하나씩 LLM을 통해 명세를 생성합니다.
+					.thenCompose( apiMetaDatas ->
+						generateApiSpec(
+							userId,
+							filenamesRelatedException,
+							requestId,
+							cloneDir,
+							apiMetaDatas
+						)
+					);
+
 			futures.add(future);
 		}
 
 		// 모든 비동기 작업이 완료될 때까지 대기합니다.
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-		executorService.shutdownNow();
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+			.exceptionally(this::handleFinalJoinException)  // 최종 예외 전파 방지
+			.join();
+		executorService.shutdown();
 		// Task 3: OAS 데이터를 렌더링합니다.
 		oasSendClient.toSaas(cloneDir, userId);
+	}
+
+
+	private CompletableFuture<Void> generateApiSpec(String userId, String[] filenamesRelatedException, String requestId,
+		File cloneDir, List<APIMetadata> apiMetaDatas) {
+		if (apiMetaDatas == null) {// 이전 단계에서 실패한 경우 후속 작업 생략
+			return null;
+		}
+		// API 문서 생성
+		return CompletableFuture.runAsync(() -> {
+			try {
+				llmService.generateV1(userId, apiMetaDatas, cloneDir, filenamesRelatedException, requestId);
+			} catch (IOException e) {
+				throw new CompletionException(e);
+			}
+		}).exceptionally(ex -> {
+			handleGenerateApiSpecUnknownException(requestId,userId,apiMetaDatas,ex);
+			return null;
+		});
+	}
+
+	private CompletableFuture<List<APIMetadata>> getApiEndpoint(String userId, ProjectMetaData metaData,
+		String defaultBranchName, String requestId, ExecutorService executorService,
+		ControllerFile controllerFile) {
+		return CompletableFuture
+			.supplyAsync(() -> { // API 엔드포인트 수집
+				return apiEndpointCollectorPortInPipline.getApiEndpoints(userId, metaData,
+					defaultBranchName, controllerFile, requestId);
+			}, executorService)
+			.exceptionally(ex -> { // 실패 했을 경우 작업 컨텍스트 저장 후 null 반환
+				handleEndpointCollectorException(userId,metaData,controllerFile,ex);
+				return null;
+			});
+	}
+
+	private void handleGenerateApiSpecUnknownException(String requestId, String userId, List<APIMetadata> apiMetaDatas, Throwable ex) {
+		//필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
+	}
+
+	private void handleEndpointCollectorException(String userId, ProjectMetaData metaData,
+		ControllerFile controllerFile, Throwable ex) {
+		//필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
+	}
+
+	private Void handleFinalJoinException(Throwable ex) {
+		return null;
 	}
 }
