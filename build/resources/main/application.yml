@@ -1,58 +1,39 @@
-server:
-  port: 8080
+path:
+  generate-doc-html-dir: "/home/ubuntu/WAS/src/main/resources/static"
+  SSG-root: "/home/ubuntu/static-site-generator/"
+  clone-dir: "dd"
 
 spring:
   application:
-    name: hocsserver
-
-  web:
-    resources:
-      cache:
-        cachecontrol:
-          no-store: true
-
-
-
-  thymeleaf:
-    cache: false
-  datasource:
-    hikari:
-      jdbc-url: jdbc:mysql://svm-sdgb-mysql.ch6oqkwmak5u.ap-northeast-2.rds.amazonaws.com/sdgb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
-      username: admin
-      password: 'sdgb2024^^'
-      driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://svm-sdgb-mysql.ch6oqkwmak5u.ap-northeast-2.rds.amazonaws.com/sdgb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+    name: apidoc43
+  #TODO ?? commoon-domain ? Entity? ?????? ????. ?? ???? ??? ??
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
     open-in-view: false
+  datasource:
+    url: jdbc:mysql://localhost:3306/sdgb?serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: ''
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/test
 
   security:
     oauth2:
       client:
         registration:
           github:
-            client-id: Iv23ligxWlL8uTvy1AE6     # GitHub App? Client ID
-            client-secret: f62e583ce24c212faa6706d1348a5ce26ab1c2df  # GitHub App? Client Secret
-            scope: repo
-            client-name: GitHub
-            authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/github"
-        provider:
-          github:
-            authorization-uri: https://github.com/login/oauth/authorize
-            token-uri: https://github.com/login/oauth/access_token
-            user-info-uri: https://api.github.com/user
-            user-name-attribute: login
+            client-id: <your-client-id>
+            client-secret: <your-client-secret>
 
-  webhook:
-    secret: your_webhook_secret
 
 openai:
-  api-key: "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"
+  api-key: "f"

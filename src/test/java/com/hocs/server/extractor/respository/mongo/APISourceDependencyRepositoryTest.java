@@ -2,13 +2,13 @@ package com.hocs.server.extractor.respository.mongo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hocs.server.custom_rag.legacy.extractor.domain.AOP;
-import com.hocs.server.custom_rag.legacy.extractor.domain.API;
-import com.hocs.server.custom_rag.legacy.extractor.domain.APISourceDependencyInfo;
-import com.hocs.server.custom_rag.legacy.extractor.domain.ApiEndpoint;
-import com.hocs.server.custom_rag.legacy.extractor.domain.ExceptionHandler;
-import com.hocs.server.custom_rag.legacy.extractor.domain.GlobalSourceDependency;
-import com.hocs.server.custom_rag.legacy.extractor.respository.mongo.APISourceDependencyRepository;
+import com.hocs.server.code_parser.core.domain.AOP;
+import com.hocs.server.code_parser.core.domain.API;
+import com.hocs.server.code_parser.core.domain.APISourceDependencyInfo;
+import com.hocs.server.code_parser.core.domain.ApiEndpoint;
+import com.hocs.server.code_parser.core.domain.ExceptionHandler;
+import com.hocs.server.code_parser.core.domain.GlobalSourceDependency;
+import com.hocs.server.code_parser.legacy.extractor.respository.mongo.APISourceDependencyRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;

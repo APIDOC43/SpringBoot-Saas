@@ -3,14 +3,14 @@ package com.hocs.server.util;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hocs.server.openai.domain.output.PathAndComponents;
-import com.hocs.server.openai.util.OpenAPIParser;
-import com.hocs.server.openai.domain.output.MediaType;
-import com.hocs.server.openai.domain.output.Operation;
-import com.hocs.server.openai.domain.output.Parameter;
-import com.hocs.server.openai.domain.output.PathItem;
-import com.hocs.server.openai.domain.output.Response;
-import com.hocs.server.openai.domain.output.Schema;
+import com.hocs.server.api_spec_generator.domain.output.PathAndComponents;
+import com.hocs.server.api_spec_generator.util.OpenAPIParser;
+import com.hocs.server.api_spec_generator.domain.output.MediaType;
+import com.hocs.server.api_spec_generator.domain.output.Operation;
+import com.hocs.server.api_spec_generator.domain.output.Parameter;
+import com.hocs.server.api_spec_generator.domain.output.PathItem;
+import com.hocs.server.api_spec_generator.domain.output.Response;
+import com.hocs.server.api_spec_generator.domain.output.Schema;
 import org.junit.jupiter.api.Test;
 
 public class PathAndComponentsParserTest {

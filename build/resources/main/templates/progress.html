@@ -24,10 +24,10 @@
 
     @keyframes run {
       0% {
-        transform: translateX(-50px);
+        transform: translateX(-10px);
       }
       100% {
-        transform: translateX(700px);
+        transform: translateX(450px);
       }
     }
 
@@ -67,7 +67,7 @@
           }
         })
         .catch(error => console.error('Error:', error));
-      }, 2000); // 2초마다 요청을 보냅니다
+      }, 1000); // 2초마다 요청을 보냅니다
     }
     function generateUUID() {
       return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
