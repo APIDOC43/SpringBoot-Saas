@@ -52,9 +52,7 @@
 홍석준 : [@hoding](https://github.com/seokjun7410)
 
 프로젝트 총괄  (기획, 아키텍처 설계, 구현, 마케팅),
-- 코드파서 서버 개발(CustomRAG)
-- LLM 서버 개발 및 AI 모델 통합 (Spring Boot)
-- SaaS 서버 개발 
+- API 명세 생성 파이프라인 개발 
 - 클라우드 인프라 구축 및 관리 (AWS)
 - 사용자 인터페이스 (UI/UX) 디자인 
 - 사용자 피드백 수집 및 분석
