@@ -18,10 +18,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class ApiSourceDependencyBatchSaveService {
 
-	private final BlockingQueue<APISourceDependencyInfo> entityBuffer = new ArrayBlockingQueue<>(1000);
-	private final BlockingQueue<APISourceDependencyInfo> retryQueue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<APISourceDependencyInfo> entityBuffer = new ArrayBlockingQueue<>(3000,true);
+	private final BlockingQueue<APISourceDependencyInfo> retryQueue =  new ArrayBlockingQueue<>(3000,true);
 	private final Map<String, Integer> retryCountMap = new ConcurrentHashMap<>();
 	private static final int MAX_RETRY = 3;
+	private static final int MAX_DRAIN_VALUE = 1000;
 
 	@Autowired
 	private APISourceDependencyRepositoryCustomImpl repository;
@@ -44,7 +45,7 @@ public class ApiSourceDependencyBatchSaveService {
 	@Scheduled(fixedDelay = 30000)
 	public void flushEntities() {
 		List<APISourceDependencyInfo> entitiesToSave = new ArrayList<>();
-		entityBuffer.drainTo(entitiesToSave);
+		entityBuffer.drainTo(entitiesToSave,MAX_DRAIN_VALUE);
 
 		if (!entitiesToSave.isEmpty()) {
 			List<APISourceDependencyInfo> mergedEntities = mergeEntitiesById(entitiesToSave);
@@ -96,7 +97,7 @@ public class ApiSourceDependencyBatchSaveService {
 	@Scheduled(fixedDelay = 300000)  // 5분마다 재시도 실행
 	public void retryFailedEntities() {
 		List<APISourceDependencyInfo> retryEntities = new ArrayList<>();
-		retryQueue.drainTo(retryEntities);
+		retryQueue.drainTo(retryEntities,MAX_DRAIN_VALUE);
 
 		if (!retryEntities.isEmpty()) {
 			int successCount = repository.bulkWrite(retryEntities);
