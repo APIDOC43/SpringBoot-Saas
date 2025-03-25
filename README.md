@@ -58,6 +58,6 @@
 - 사용자 피드백 수집 및 분석
 
 ## Appendix
-랜딩페이지 : https://apidoc43.softr.app/
-소개 및 회고 글 : https://www.notion.so/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=4
+- 랜딩페이지 : https://apidoc43.softr.app/
+- 소개 및 회고 글 : [https://www.notion.so/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=4](https://steadfast-sofa-4b2.notion.site/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=74)
 
