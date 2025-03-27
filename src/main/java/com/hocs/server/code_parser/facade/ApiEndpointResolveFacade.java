@@ -59,28 +59,34 @@ public class ApiEndpointResolveFacade {
 			//사용자 프로젝트 언어 및 프레임워크에 따라 달라집니다.
 			//if(metaData.getProjectFramework().equals(ProjectFramework.SPRINGBOOT))
 			apis = dependencyAnalyzer.findDependency(controllerFile.getClassName(), container);
-
-			for (API api : apis) {
-				String gitCloneUrl = metaData.getGitRepoData().getCloneUrl();
-				if (gitCloneUrl.endsWith(".git")) {
-					gitCloneUrl = gitCloneUrl.split("\\.")[0];
-				}
-
-				api.setLink(
-					gitCloneUrl + "/blob/" + defaultBranchName + "/" + controllerFile.getPath());
-			}
-
-			GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
-			APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
-				.create(requestId, userId, apis, globalSourceDependency);
-
-			apiSourceDependencyBatchSaveService.addEntity(apiSourceDependencyInfo);
-
-			return apiSourceDependencyInfo;
-
 		} catch (Exception e) {
+			log.info("dependencyAnalyzer.findDependency Exception");
 			throw new RuntimeException(e);
 		}
+
+		for (API api : apis) {
+			String gitCloneUrl = metaData.getGitRepoData().getCloneUrl();
+			if (gitCloneUrl.endsWith(".git")) {
+				gitCloneUrl = gitCloneUrl.split("\\.")[0];
+			}
+
+			api.setLink(
+				gitCloneUrl + "/blob/" + defaultBranchName + "/" + controllerFile.getPath());
+		}
+
+		GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
+		APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
+			.create(requestId, userId, apis, globalSourceDependency);
+
+		try {
+			apiSourceDependencyBatchSaveService.addEntity(apiSourceDependencyInfo);
+		}catch (InterruptedException e){
+			throw new RuntimeException("Batch save InterruptedException");
+		}
+
+		return apiSourceDependencyInfo;
+
+
 	}
 
 

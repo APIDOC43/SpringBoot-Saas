@@ -1,7 +1,9 @@
 package com.hocs.server.code_parser.repository;
 
 import com.hocs.server.code_parser.core.domain.APISourceDependencyInfo;
-import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.MongoBulkWriteException;
+import com.mongodb.bulk.BulkWriteError;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;
@@ -18,7 +20,7 @@ public class APISourceDependencyRepositoryCustomImpl implements APISourceDepende
 	private MongoTemplate mongoTemplate;
 
 	@Override
-	public int bulkWrite(List<APISourceDependencyInfo> mergedEntities) {
+	public List<APISourceDependencyInfo> bulkWrite(List<APISourceDependencyInfo> mergedEntities) {
 		// UNORDERED 모드로 BulkOperations 생성
 		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, APISourceDependencyInfo.class);
 
@@ -43,12 +45,21 @@ public class APISourceDependencyRepositoryCustomImpl implements APISourceDepende
 			// upsert: 조건에 맞는 문서가 없으면 새로 생성
 			bulkOps.upsert(query, update);
 		}
-		// 모든 bulk 연산 실행
-		if (!mergedEntities.isEmpty()) {
-			BulkWriteResult result = bulkOps.execute();
-			return result.getModifiedCount() + result.getUpserts().size();
+
+		List<APISourceDependencyInfo> failedEntities = new ArrayList<>();
+
+		try {
+			bulkOps.execute();
+		} catch (MongoBulkWriteException e) {
+			List<BulkWriteError> errors = e.getWriteErrors();
+
+			for (BulkWriteError error : errors) {
+				int index = error.getIndex();
+				 failedEntities.add(mergedEntities.get(index));
+			}
 		}
-		return 0;
+
+		return failedEntities;
 	}
 }
 

@@ -3,7 +3,9 @@ package com.hocs.server.api_spec_generator.repository;
 import com.hocs.server.api_spec_generator.domain.output.OAS;
 import com.hocs.server.api_spec_generator.domain.output.PathItem;
 import com.hocs.server.api_spec_generator.domain.output.Schema;
-import com.mongodb.bulk.BulkWriteResult;
+import com.mongodb.MongoBulkWriteException;
+import com.mongodb.bulk.BulkWriteError;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +23,13 @@ public class OasRepositoryCustomImpl implements OasRepositoryCustom {
 	private MongoTemplate mongoTemplate;
 
 	@Override
-	public int bulkWrite(List<OAS> mergedEntities) {
+	public List<OAS> bulkWrite(List<OAS> mergedEntities) {
+
+		// 모든 bulk 연산 실행 후 실패 건수를 반환
+		List<OAS> failedEntities = new ArrayList<>();
+
 		if (mergedEntities == null || mergedEntities.isEmpty()) {
-			return 0;
+			return failedEntities;
 		}
 
 		// UNORDERED 모드로 BulkOperations 생성
@@ -65,8 +71,17 @@ public class OasRepositoryCustomImpl implements OasRepositoryCustom {
 			bulkOps.upsert(query, update);
 		}
 
-		// 모든 bulk 연산 실행 후 성공 건수를 반환
-		BulkWriteResult result = bulkOps.execute();
-		return result.getModifiedCount() + result.getUpserts().size();
+		try {
+			bulkOps.execute();
+		} catch (MongoBulkWriteException e) {
+			List<BulkWriteError> errors = e.getWriteErrors();
+
+			for (BulkWriteError error : errors) {
+				int index = error.getIndex();
+				failedEntities.add(mergedEntities.get(index));
+			}
+		}
+
+		return failedEntities;
 	}
 }

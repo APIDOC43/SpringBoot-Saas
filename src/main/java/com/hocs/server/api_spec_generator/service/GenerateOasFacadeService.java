@@ -87,7 +87,11 @@ public class GenerateOasFacadeService {
 			pathList,
 			integrationSchemaMap);
 
-		oasBatchSaverService.addEntity(oas);
+		try {
+			oasBatchSaverService.addEntity(oas);
+		}catch (InterruptedException e){
+			throw new RuntimeException("Batch save InterruptedException");
+		}
 
 		log.info("oas-Result = " + oas);
 
@@ -146,7 +150,11 @@ public class GenerateOasFacadeService {
 			pathList,
 			integrationSchemaMap);
 
+		try {
 			oasBatchSaverService.addEntity(oas);
+		}catch (InterruptedException e){
+			throw new RuntimeException("Batch save InterruptedException");
+		}
 	}
 
 	private String merge(Map<String, List<Schema>> schemasMap,
