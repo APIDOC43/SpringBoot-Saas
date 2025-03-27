@@ -25,44 +25,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class ApiDocPipelineService {
+
 	private final ApiEndpointCollectorPortInPipline apiEndpointCollectorPortInPipline;
 	private final GenerateOasFacadeService llmService; //internal call로 분리
 	private final OasSendClient oasSendClient;
-
-	//deprecated
-	public void execute(
-		String userId,
-		ProjectMetaData metaData,
-		String[] filenamesRelatedException,
-		String defaultBranchName,
-		List<ApiInfo> excludeApiInfoInPipline) throws Exception
-	{
-		String requestId = UUID.randomUUID().toString();
-
-		//task 0;
-		Map<ControllerFile, List<ApiInfoInPipline>> apiEndpointInfo = apiEndpointCollectorPortInPipline.findApiInfo(
-			metaData.getCodingLanguage(),
-			metaData.getProjectFramework(),
-			metaData.getProjectRootPath(),
-			excludeApiInfoInPipline,
-			100);
-
-		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
-			//task 1
-			//CustomRAG 하나의 컨트롤러 파일에서 Endpoint별 API 정보를 추출합니다.
-			List<APIMetadata> apiMetadata = apiEndpointCollectorPortInPipline.getApiEndpoints(
-				userId, metaData, defaultBranchName, controllerFile, requestId);
-
-			//task 2
-			//LLM을 이용하여 OAS 데이터를 생성합니다.
-			File cloneDir = metaData.getProjectRootPath().getToFile();
-			llmService.generate(userId, apiMetadata, cloneDir);
-
-			//task 3
-			//OAS데이터를 렌더링합니다.
-			oasSendClient.toSaas(cloneDir, userId);
-		}
-	}
 
 	@Async("ExternalAsyncExecutor")
 	public void executeAsync(
@@ -84,24 +50,21 @@ public class ApiDocPipelineService {
 
 		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
 			CompletableFuture<Void> future =
-				getApiEndpoint(
+				getApiEndpoint(  //task 1 : Controller 파일 별로 API Endpoint에 대한 생성에 필요한 정보를 수집합니다.
 					userId,
 					metaData,
 					defaultBranchName,
 					requestId,
 					controllerFile
-				)
-
-					//task 2 : API Endpoint 하나씩 LLM을 통해 명세를 생성합니다.
-					.thenCompose( apiMetaDatas ->
-						generateApiSpec(
-							userId,
-							filenamesRelatedException,
-							requestId,
-							cloneDir,
-							apiMetaDatas
-						)
-					);
+				).thenCompose(apiMetaDatas -> //task 2 : API Endpoint 하나씩 LLM을 통해 명세를 생성합니다.
+					generateApiSpec(
+						userId,
+						filenamesRelatedException,
+						requestId,
+						cloneDir,
+						apiMetaDatas
+					)
+				);
 
 			futures.add(future);
 		}
@@ -116,7 +79,8 @@ public class ApiDocPipelineService {
 	}
 
 
-	private CompletableFuture<Void> generateApiSpec(String userId, String[] filenamesRelatedException, String requestId,
+	private CompletableFuture<Void> generateApiSpec(String userId,
+		String[] filenamesRelatedException, String requestId,
 		File cloneDir, List<APIMetadata> apiMetaDatas) {
 		if (apiMetaDatas == null) {// 이전 단계에서 실패한 경우 후속 작업 생략
 			return null;
@@ -124,17 +88,19 @@ public class ApiDocPipelineService {
 		// API 문서 생성
 		return CompletableFuture.runAsync(() -> {
 			try {
-				llmService.generateV1(userId, apiMetaDatas, cloneDir, filenamesRelatedException, requestId);
+				llmService.generateV1(userId, apiMetaDatas, cloneDir, filenamesRelatedException,
+					requestId);
 			} catch (IOException e) {
 				throw new CompletionException(e);
 			}
 		}).exceptionally(ex -> {
-			handleGenerateApiSpecUnknownException(requestId,userId,apiMetaDatas,ex);
+			handleGenerateApiSpecUnknownException(requestId, userId, apiMetaDatas, ex);
 			return null;
 		});
 	}
 
-	private CompletableFuture<List<APIMetadata>> getApiEndpoint(String userId, ProjectMetaData metaData,
+	private CompletableFuture<List<APIMetadata>> getApiEndpoint(String userId,
+		ProjectMetaData metaData,
 		String defaultBranchName, String requestId, ControllerFile controllerFile) {
 		return CompletableFuture
 			.supplyAsync(() -> { // API 엔드포인트 수집
@@ -142,18 +108,19 @@ public class ApiDocPipelineService {
 					defaultBranchName, controllerFile, requestId);
 			})
 			.exceptionally(ex -> { // 실패 했을 경우 작업 컨텍스트 저장 후 null 반환
-				handleEndpointCollectorException(userId,metaData,controllerFile,ex);
+				handleEndpointCollectorException(userId, metaData, controllerFile, ex);
 				return null;
 			});
 	}
 
-	private void handleGenerateApiSpecUnknownException(String requestId, String userId, List<APIMetadata> apiMetaDatas, Throwable ex) {
-		//필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
+	private void handleGenerateApiSpecUnknownException(String requestId, String userId,
+		List<APIMetadata> apiMetaDatas, Throwable ex) {
+		//TODO 필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
 	}
 
 	private void handleEndpointCollectorException(String userId, ProjectMetaData metaData,
 		ControllerFile controllerFile, Throwable ex) {
-		//필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
+		//TODO 필요한 컨텍스트 저장 후, 이후 사용자 요청시 재시도
 	}
 
 	private Void handleFinalJoinException(Throwable ex) {
