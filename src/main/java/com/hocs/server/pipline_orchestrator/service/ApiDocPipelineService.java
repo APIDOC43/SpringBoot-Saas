@@ -16,10 +16,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -65,6 +64,7 @@ public class ApiDocPipelineService {
 		}
 	}
 
+	@Async("ExternalAsyncExecutor")
 	public void executeAsync(
 		String userId, ProjectMetaData metaData,
 		String[] filenamesRelatedException,
@@ -80,7 +80,6 @@ public class ApiDocPipelineService {
 			excludeApiInfoInPipline, 100);
 
 		File cloneDir = metaData.getProjectRootPath().getToFile();
-		ExecutorService executorService = Executors.newFixedThreadPool(4);
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
 		for (ControllerFile controllerFile : apiEndpointInfo.keySet()) {
@@ -90,7 +89,6 @@ public class ApiDocPipelineService {
 					metaData,
 					defaultBranchName,
 					requestId,
-					executorService,
 					controllerFile
 				)
 
@@ -112,7 +110,7 @@ public class ApiDocPipelineService {
 		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
 			.exceptionally(this::handleFinalJoinException)  // 최종 예외 전파 방지
 			.join();
-		executorService.shutdown();
+
 		// Task 3: OAS 데이터를 렌더링합니다.
 		oasSendClient.toSaas(cloneDir, userId);
 	}
@@ -137,13 +135,12 @@ public class ApiDocPipelineService {
 	}
 
 	private CompletableFuture<List<APIMetadata>> getApiEndpoint(String userId, ProjectMetaData metaData,
-		String defaultBranchName, String requestId, ExecutorService executorService,
-		ControllerFile controllerFile) {
+		String defaultBranchName, String requestId, ControllerFile controllerFile) {
 		return CompletableFuture
 			.supplyAsync(() -> { // API 엔드포인트 수집
 				return apiEndpointCollectorPortInPipline.getApiEndpoints(userId, metaData,
 					defaultBranchName, controllerFile, requestId);
-			}, executorService)
+			})
 			.exceptionally(ex -> { // 실패 했을 경우 작업 컨텍스트 저장 후 null 반환
 				handleEndpointCollectorException(userId,metaData,controllerFile,ex);
 				return null;

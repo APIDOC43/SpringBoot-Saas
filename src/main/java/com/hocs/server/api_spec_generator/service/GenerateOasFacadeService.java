@@ -24,13 +24,11 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -97,8 +95,9 @@ public class GenerateOasFacadeService {
 
 	}
 
+	@Async("InnerAsyncExecutor")
 	public void generateV1(String userId, List<APIMetadata> apiMetadata, File projectDir,
-		String[] exceptionFiles,String requestId) throws IOException {
+		String[] exceptionFiles, String requestId) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
 
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
@@ -114,27 +113,23 @@ public class GenerateOasFacadeService {
 		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
 		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-		int maxConcurrentTasks = 4;
-		Semaphore semaphore = new Semaphore(maxConcurrentTasks); // 허용할 동시 작업 수
-		try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-			for (APIMetadata metadata : apiMetadata) {
-				semaphore.acquire();  // 작업 시작 전에 permit 획득
-				futures.add(CompletableFuture.runAsync(() -> {
-					try {
-						generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList, exceptionFormatSrc);
-					} finally {
-						semaphore.release(); // 작업 종료 후 반드시 release
+		for (APIMetadata metadata : apiMetadata) {
+
+			futures.add(CompletableFuture.runAsync(() -> {
+					generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList,
+						exceptionFormatSrc);
+				})
+				.whenComplete((result, throwable) -> {
+					if (throwable != null) {
+						log.error("Error occurred in async task", throwable);
 					}
-				}, executor));
-			}
-			CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-			executor.shutdownNow();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
+				}));
 		}
+		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
 		//path integeration
-		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
+		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(
+			pathList);
 		//schema integration
 		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
 //		Map<String, List<Schema>> integrationSchemaMap = schemasMap;
