@@ -35,7 +35,11 @@ public class PipelineThrottleService {
 			PipelineTask task = tasks.get(i);
 			Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
 			if (semaphore.tryAcquire()) {
-				pipelineExecute(request.getTaskType(), task, semaphore);
+				try {
+					pipelineExecute(request.getTaskType(), task, semaphore);
+				}finally {
+					semaphore.release();
+				}
 			} else {
 				log.info("[{}] 스로틀링! 큐에 적재됩니다. RequestId={}", Thread.currentThread().getName(),
 					request.getDataRequestId());
@@ -56,7 +60,6 @@ public class PipelineThrottleService {
 				throw new RuntimeException(e);
 			} finally {
 				log.info("[{}] 자원 해제 실행 semaphore.release()", Thread.currentThread().getName());
-				semaphore.release();
 				processQueuedRequests(task);
 			}
 		},executor);
@@ -64,7 +67,7 @@ public class PipelineThrottleService {
 
 
 	/**
-	 * 대기 중인 요청들을 처리합니다. - 큐에 요청이 있고, 세마포어에 토큰 소비가 가능하면 요청을 꺼내 처리합니다. - 처리 완료 후 토큰 공급합니다.
+	 * 대기 중인 요청들을 처리합니다. - 큐에 요청이 있고, 세마포어에 토큰 소비가 가능하면 요청을 꺼내 처리합니다. - 처리 완료 후 release합니다.
 	 */
 	public void processQueuedRequests(PipelineTask succeed) {
 		while (true) {
@@ -80,8 +83,12 @@ public class PipelineThrottleService {
 
 			// 큐와 토큰 버킷에 대한 연산을 원자적으로 처리
 			if (semaphore.tryAcquire()) {
-				log.info("대기 큐 요청 처리: 토큰 소비됨");
-				pipelineExecute(taskContext.getTaskType(), task, semaphore);
+				try {
+					log.info("대기 큐 요청 처리: 토큰 소비됨");
+					pipelineExecute(taskContext.getTaskType(), task, semaphore);
+				}finally {
+					semaphore.release();
+				}
 			} else {
 				break;
 			}
