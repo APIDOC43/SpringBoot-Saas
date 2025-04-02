@@ -67,7 +67,10 @@ public abstract class BatchSaveService<T> {
 			if (retryCount < MAX_RETRY) {
 				retryCountMap.put(id, retryCount + 1);
 				try {
-					retryQueue.put(entity);
+					boolean offered = retryQueue.offer(entity, OFFER_TIMEOUT_SEC, TimeUnit.SECONDS);
+					if (!offered) { //timeout
+						moveToFailedTable(entity);
+					}
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
 				}

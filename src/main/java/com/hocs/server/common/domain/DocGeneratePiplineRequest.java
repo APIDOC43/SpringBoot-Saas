@@ -16,7 +16,7 @@ import org.springframework.util.DigestUtils;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class DocGeneratePiplineTask extends BaseEntity {
+public class DocGeneratePiplineRequest extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -28,7 +28,7 @@ public class DocGeneratePiplineTask extends BaseEntity {
 	@JoinColumn(name = "project_metadata_id")
 	private ProjectMetaData projectMetaData;
 
-	public DocGeneratePiplineTask(String userId, ProjectMetaData projectMetaData) {
+	public DocGeneratePiplineRequest(String userId, ProjectMetaData projectMetaData) {
 		this.userId = userId;
 		this.requestId = generateIdempotencyKey(projectMetaData.getGitRepoData());
 		this.projectMetaData = projectMetaData;

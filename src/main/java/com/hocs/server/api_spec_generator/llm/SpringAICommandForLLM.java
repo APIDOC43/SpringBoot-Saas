@@ -42,26 +42,22 @@ public class SpringAICommandForLLM {
 	public PathAndComponents requestOasApiSnippet(ChatClient client, APIMetadata apiMetadata, int time,String srcRelationErrorFormat)
 		throws JsonProcessingException {
 		threadSleep(time);
-		log.info("-------------------------------");
+		log.info("[{}]-------------------------------",Thread.currentThread().getName());
 
 		//createOasPathSection
 		String promptStr = PromptMessageHub.createOasPathSection(apiMetadata,srcRelationErrorFormat);
 		ChatClientPromptRequestSpec requestPath = client.prompt(new Prompt(promptStr));
 		String pathContent = getResultContent(requestPath.call());
-//		String pathContent = FakeResponse.pathContent();
-
 
 		//createOasDescriptionDetail
 		String validPrompt = PromptMessageHub.createOasDescriptionDetail(apiMetadata,pathContent);
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
 		String result = getResultContent(validRequest.call());
-//		String result = FakeResponse.createDescrionion();
 
 		//validErrorResponseFormat
 		String formatValidPrompt = PromptMessageHub.validErrorResponseFormat(srcRelationErrorFormat,result);
 		ChatClientPromptRequestSpec formatValidRequest = client.prompt(new Prompt(formatValidPrompt));
 		result = getResultContent(formatValidRequest.call());
-//		result = FakeResponse.fomatValid();
 
 		String str = llmResponseUtil.cleanYamlContent(result);
 		PathAndComponents parse = OpenAPIParser.parse(str);
@@ -82,8 +78,6 @@ public class SpringAICommandForLLM {
 
 	}
 
-
-
 	private void threadSleep(int sleep) {
 		try {
 			Thread.sleep(sleep);
@@ -92,12 +86,10 @@ public class SpringAICommandForLLM {
 		}
 	}
 
-
 	public String integrationSchema(List<Schema> schemas, ChatClient client) {
 		String contents = PromptMessageHub.integrationSchema(schemas);
 		ChatClientPromptRequestSpec requestPath = client.prompt(
 			new Prompt(contents));
-//		String content = FakeResponse.fomatValid();
 		String content = getResultContent(requestPath.call());
 		return llmResponseUtil.cleanYamlContent(content);
 
@@ -105,7 +97,7 @@ public class SpringAICommandForLLM {
 
 	public ChatClient createChatClient4o() {
 		OpenAiApi openAiApi = new OpenAiApi(
-			apiKey); // 실제 API 키로 교체하세요
+			apiKey);
 		ChatModel chatModel = new OpenAiChatModel(openAiApi,
 			OpenAiChatOptions.builder().withModel(GPT_4_O).build());
 
@@ -120,11 +112,8 @@ public class SpringAICommandForLLM {
 
 		String validPrompt = PromptMessageHub.findRelationExceptionFormat(output);
 		ChatClientPromptRequestSpec validRequest = client.prompt(new Prompt(validPrompt));
-//		String result = getResultContent(validRequest.call());
-		String result = "";
+		String result = getResultContent(validRequest.call());
 		String[] split = result.split(",");
-
-
 		return split;
 	}
 }

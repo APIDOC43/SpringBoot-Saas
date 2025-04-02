@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Getter
 @Data
@@ -35,5 +36,12 @@ public class MethodInformation {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(signature);
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this)
+			.append("signature", signature)
+			.toString();
 	}
 }

@@ -8,6 +8,7 @@ import com.hocs.server.common.domain.ProjectFramework;
 import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.pipline_orchestrator.domain.ApiInfoInPipline;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
+import com.hocs.server.pipline_orchestrator.ratelimit.PipelineTask;
 import java.util.List;
 import java.util.Map;
 
@@ -21,11 +22,11 @@ public interface ApiEndpointCollectorPortInPipline {
 		int firstPageSize);
 
 
-	List<APIMetadata> getApiEndpoints(
+	APIMetadata getApiEndpoint(
 		String userId,
 		ProjectMetaData metaData,
 		String defaultBranchName,
-		ControllerFile controllerFile,
+		PipelineTask task,
 		String requestId);
 
 }

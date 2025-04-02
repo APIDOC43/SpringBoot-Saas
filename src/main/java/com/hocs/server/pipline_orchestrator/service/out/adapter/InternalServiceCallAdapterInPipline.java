@@ -11,6 +11,7 @@ import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.common.mapper.APISourceDependencyInfoToAPIEndpoint;
 import com.hocs.server.pipline_orchestrator.domain.ApiInfoInPipline;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
+import com.hocs.server.pipline_orchestrator.ratelimit.PipelineTask;
 import com.hocs.server.pipline_orchestrator.service.out.port.ApiEndpointCollectorPortInPipline;
 import com.hocs.server.saas_platform.common.annotation.Adapter;
 import com.hocs.server.saas_platform.service.external.ApiEndpointCollector.adapter.FindApiInfoApiRequest;
@@ -41,13 +42,13 @@ public class InternalServiceCallAdapterInPipline implements ApiEndpointCollector
 	}
 
 	@Override
-	public List<APIMetadata> getApiEndpoints(String userId, ProjectMetaData metaData,
-		String defaultBranchName, ControllerFile controllerFile, String requestId) {
+	public APIMetadata getApiEndpoint(String userId, ProjectMetaData metaData,
+		String defaultBranchName, PipelineTask task, String requestId) {
 
-		APISourceDependencyInfo apiSourceDependencyInfo = service.findAPIMetadata(userId, metaData,
-			defaultBranchName, controllerFile, requestId);
+		APISourceDependencyInfo apiSourceDependencyInfo = service.findAPIMetadataByTask(userId, metaData,
+			defaultBranchName, task, requestId);
 
-		return APISourceDependencyInfoToAPIEndpoint.mapToAPIEndpoint(apiSourceDependencyInfo);
+		return APISourceDependencyInfoToAPIEndpoint.mapToAPIEndpoint(apiSourceDependencyInfo).get(0);
 	}
 
 	private static HashMap<ControllerFile, List<ApiInfoInPipline>> mapping(

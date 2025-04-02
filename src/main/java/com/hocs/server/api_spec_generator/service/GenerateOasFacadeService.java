@@ -14,96 +14,36 @@ import com.hocs.server.api_spec_generator.domain.output.Schema;
 import com.hocs.server.api_spec_generator.llm.SpringAICommandForLLM;
 import com.hocs.server.api_spec_generator.llm.exception.ApiEntriesNullException;
 import com.hocs.server.api_spec_generator.util.FileManager;
-import com.hocs.server.common.domain.ClientProjectPath;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class GenerateOasFacadeService {
-
+	//TODO: 바인딩 실패시 재시도 최대치 등 정책필요
+	//메소드 책임분리 리팩토링 필ㄹ요
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
 	private final ExceptionFormatService exceptionFormatService;
 	private final OasIntegrationService oasIntegrationService;
 	private final OasBatchSaverService oasBatchSaverService;
 
-	public void generate(String userId, List<APIMetadata> apiMetadata, File projectDir) throws IOException {
-		String projectRootPath = projectDir.getAbsolutePath();
-
-		ChatClient client = springAiCommandForLLM.createChatClient4o();
-
-		/** output.yaml to APIMetadata **/
-		if (apiMetadata == null || apiMetadata.size() == 0) {
-			throw new ApiEntriesNullException("APIMetadata is empty");
-		}
-
-		String exceptionFormatSrc = exceptionFormatService.findRelatedExceptionSrc(new ClientProjectPath(Path.of(projectRootPath)), client);
-
-		Map<String, List<Schema>> schemasMap = new ConcurrentHashMap<>();
-		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
-
-		int totalTasks = apiMetadata.size(); // 작업 개수 제한
-
-		List<CompletableFuture<Void>> futures = apiMetadata.stream()
-			.limit(totalTasks)
-			.map(apiEndpoint -> CompletableFuture.runAsync(() ->
-				generateOasPathSchemaSnippet(client, apiEndpoint, schemasMap, pathList, exceptionFormatSrc)
-			)).collect(Collectors.toList());
-
-		// 모든 CompletableFuture 완료 대기
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
-
-		//path integeration
-		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(pathList);
-		//schema integration
-//		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
-		Map<String, List<Schema>> integrationSchemaMap = schemasMap;
-
-		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
-		String result = merge(schemasMap, integrationPaths);
-
-		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
-
-		OAS oas = OAS.create(
-			userId,
-			OasInfo.create(userId, "", "", "", "", "3.0.1"),
-			pathList,
-			integrationSchemaMap);
-
-		try {
-			oasBatchSaverService.addEntity(oas);
-		}catch (InterruptedException e){
-			throw new RuntimeException("Batch save InterruptedException");
-		}
-
-		log.info("oas-Result = " + oas);
-
-	}
-
-	@Async("InnerAsyncExecutor")
-	public void generateV1(String userId, List<APIMetadata> apiMetadata, File projectDir,
+	public void generate(String userId, APIMetadata apiMetadata, File projectDir,
 		String[] exceptionFiles, String requestId) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
-
 		ChatClient client = springAiCommandForLLM.createChatClient4o();
 
 		/** output.yaml to APIMetadata **/
-		if (apiMetadata == null || apiMetadata.size() == 0) {
+		if (apiMetadata == null) {
 			throw new ApiEntriesNullException("APIMetadata is empty");
 		}
 
@@ -111,28 +51,15 @@ public class GenerateOasFacadeService {
 
 		Map<String, List<Schema>> schemasMap = new ConcurrentHashMap<>();
 		Map<String, List<Map<String, PathItem>>> pathList = new ConcurrentHashMap<>();
-		List<CompletableFuture<Void>> futures = new ArrayList<>();
 
-		for (APIMetadata metadata : apiMetadata) {
-
-			futures.add(CompletableFuture.runAsync(() -> {
-					generateOasPathSchemaSnippet(client, metadata, schemasMap, pathList,
-						exceptionFormatSrc);
-				})
-				.whenComplete((result, throwable) -> {
-					if (throwable != null) {
-						log.error("Error occurred in async task", throwable);
-					}
-				}));
-		}
-		CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+		generateOasPathSchemaSnippet(client, apiMetadata, schemasMap, pathList,
+			exceptionFormatSrc);
 
 		//path integeration
 		List<Map<String, PathItem>> integrationPaths = oasIntegrationService.pathIntegration(
 			pathList);
 		//schema integration
 		Map<String, List<Schema>> integrationSchemaMap = oasIntegrationService.schemaIntegration(client, schemasMap);
-//		Map<String, List<Schema>> integrationSchemaMap = schemasMap;
 
 		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
 		String result = merge(schemasMap, integrationPaths);
@@ -147,7 +74,7 @@ public class GenerateOasFacadeService {
 
 		try {
 			oasBatchSaverService.addEntity(oas);
-		}catch (InterruptedException e){
+		} catch (InterruptedException e) {
 			throw new RuntimeException("Batch save InterruptedException");
 		}
 	}
@@ -196,9 +123,10 @@ public class GenerateOasFacadeService {
 	private void generateOasPathSchemaSnippet(ChatClient client, APIMetadata apiMetadata,
 		Map<String, List<Schema>> schemasMap,
 		Map<String, List<Map<String, PathItem>>> pathList, String exceptionFormatSrc) {
-
-		PathAndComponents pathAndComponents = oasApiSnippet(client, apiMetadata, exceptionFormatSrc);
-		pathAndComponents.getPaths().values().forEach(f -> f.setX_link(apiMetadata.getAbsolutePath()));
+		PathAndComponents pathAndComponents = oasApiSnippet(client, apiMetadata,
+			exceptionFormatSrc);
+		pathAndComponents.getPaths().values()
+			.forEach(f -> f.setX_link(apiMetadata.getAbsolutePath()));
 
 		Components components = pathAndComponents.getComponents();
 		if (components != null && components.getSchemas() != null) {
@@ -213,7 +141,8 @@ public class GenerateOasFacadeService {
 		});
 	}
 
-	private PathAndComponents oasApiSnippet(ChatClient client, APIMetadata apiMetadata, String exceptionFormatSrc) {
+	private PathAndComponents oasApiSnippet(ChatClient client, APIMetadata apiMetadata,
+		String exceptionFormatSrc) {
 
 		PathAndComponents pathAndComponents = null;
 		try {
