@@ -1,26 +1,29 @@
 ```mermaid
 sequenceDiagram
-    participant C as PipelineIngress
-    participant S as RateLimitService
-    participant B as Bucket
-    participant Q as RequestQueue
-    participant D as Dispatcher
+    participant I as Ingress (요청 진입)
+    participant T as ThrottleService
+    participant S as Semaphore (토큰)
+    participant E as Executor (비동기 실행)
     participant P as PipelineService
 
-    C->>S: handleNewRequest(request)
-    S->>B: tryConsume(1)
-    alt 토큰이 있다면
-        note right of S: 토큰 소비
-        S->>D: dispatch(request)
-        D->>D: Fast/Heavy 작업판단 후 파이프라인 선택
-        D->>P: 파이프라인 실행<br>(executeAsync)
-        P-->>D: 파이프라인 완료
-        D-->>S: Future 완료 이벤트
-        note right of S: 토큰 복원
-        S->>B: addTokens(1)
-    else 토큰이 없다면
-        note right of S: 토큰 부족, 대기
-        S->>Q: Queue에 작업 추가
+    I->>T: submit(request)
+    T->>S: tryAcquire()
+    alt 토큰 있음
+        note right of S: 토큰 소비됨
+        T->>E: runAsync(task)
+        E->>P: execute(task)
+        alt 작업 성공
+            P-->>E: success
+            E->>S: release()
+            E->>T: processQueuedRequests(): 대기큐 소비
+        else 작업 실패
+            P-->>E: failure
+            note right of E: 실패 테이블에 기록
+            E->>S: release()
+            E->>T: processQueuedRequests(): 대기큐 소비
+        end
+    else 토큰 없음
+        T->>T: 큐에 적재
+        note right of T: 대기 큐에 저장됨
     end
-
 ```
