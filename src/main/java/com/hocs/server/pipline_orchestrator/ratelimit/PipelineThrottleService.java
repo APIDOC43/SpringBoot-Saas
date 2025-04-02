@@ -21,8 +21,7 @@ public class PipelineThrottleService {
 
 
 	/**
-	 * 새로운 요청을 처리합니다. - Bucket에서 토큰을 바로 소비할 수 있으면 파이프라인 실행 후 작업 완료 시 토큰을 공급합니다. - 토큰이 부족하면 요청을 내부 큐에
-	 * 추가합니다.
+	 * 새로운 요청을 처리합니다. - 세마포어에서 바로 소비할 수 있으면 파이프라인 실행 후 작업 완료 시 release 합니다. - 토큰이 부족하면 요청을 내부 큐에 추가합니다.
 	 */
 	public void submit(ThrottleRequest request) {
 		RateLimitRequestData data = request.getData();
@@ -65,7 +64,7 @@ public class PipelineThrottleService {
 
 
 	/**
-	 * 대기 중인 요청들을 처리합니다. - 큐에 요청이 있고, Bucket에서 토큰 소비가 가능하면 요청을 꺼내 처리합니다. - 처리 완료 후 토큰 공급합니다.
+	 * 대기 중인 요청들을 처리합니다. - 큐에 요청이 있고, 세마포어에 토큰 소비가 가능하면 요청을 꺼내 처리합니다. - 처리 완료 후 토큰 공급합니다.
 	 */
 	public void processQueuedRequests(PipelineTask succeed) {
 		while (true) {
