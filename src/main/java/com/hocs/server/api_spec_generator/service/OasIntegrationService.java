@@ -25,7 +25,7 @@ public class OasIntegrationService {
 		for (String key : schemasMap.keySet()) {
 			List<Schema> schemas = schemasMap.get(key);
 			if (schemas.size() >= 2) {
-				temp.put(key, removeDuplicatesByLLM(chatClient4o, key, schemas).get(key));
+//				temp.put(key, removeDuplicatesByLLM(chatClient4o, key, schemas).get(key));
 			}
 		}
 		return temp;
