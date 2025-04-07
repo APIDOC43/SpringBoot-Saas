@@ -36,7 +36,7 @@ public class PipelineThrottleService {
 			Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
 			if (semaphore.tryAcquire()) {
 				try {
-					pipelineExecute(request.getTaskType(), task, semaphore);
+					pipelineExecute(TaskContextStore.get(request.getDataRequestId()), task);
 				}finally {
 					semaphore.release();
 				}
@@ -48,8 +48,8 @@ public class PipelineThrottleService {
 		}
 	}
 
-	private void pipelineExecute(TaskType type, PipelineTask task, Semaphore semaphore) {
-		Executor executor = resolver.getInnerExecutor(type);
+	private void pipelineExecute(TaskContext context, PipelineTask task) {
+		Executor executor = resolver.getInnerExecutor(context.getTaskType());
 		CompletableFuture.runAsync(() -> {
 			try {
 				pipelineService.execute(task);
@@ -57,6 +57,7 @@ public class PipelineThrottleService {
 				log.info("[{}] 테스크실패, 실패 테이블에 저장 RequestId={}", Thread.currentThread().getName(),
 					task.getRequestId());
 				//TODO 실패테이블 저장
+				taskFailedProcess(context,task);
 				throw new RuntimeException(e);
 			} finally {
 				log.info("[{}] 자원 해제 실행 semaphore.release()", Thread.currentThread().getName());
@@ -64,7 +65,6 @@ public class PipelineThrottleService {
 			}
 		},executor);
 	}
-
 
 	/**
 	 * 대기 중인 요청들을 처리합니다. - 큐에 요청이 있고, 세마포어에 토큰 소비가 가능하면 요청을 꺼내 처리합니다. - 처리 완료 후 release합니다.
@@ -85,7 +85,7 @@ public class PipelineThrottleService {
 			if (semaphore.tryAcquire()) {
 				try {
 					log.info("대기 큐 요청 처리: 토큰 소비됨");
-					pipelineExecute(taskContext.getTaskType(), task, semaphore);
+					pipelineExecute(taskContext, task);
 				}finally {
 					semaphore.release();
 				}
@@ -94,5 +94,11 @@ public class PipelineThrottleService {
 			}
 
 		}
+	}
+
+	/**
+	 * 테스크 실패 시 대응 전략 (미정)
+	 */
+	private void taskFailedProcess(TaskContext context, PipelineTask task) {
 	}
 }
