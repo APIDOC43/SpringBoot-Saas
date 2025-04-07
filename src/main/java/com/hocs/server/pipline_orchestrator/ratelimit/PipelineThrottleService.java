@@ -52,7 +52,7 @@ public class PipelineThrottleService {
 		Executor executor = resolver.getInnerExecutor(type);
 		CompletableFuture.runAsync(() -> {
 			try {
-				pipelineService.execute(task, type);
+				pipelineService.execute(task);
 			} catch (IOException e) {
 				log.info("[{}] 테스크실패, 실패 테이블에 저장 RequestId={}", Thread.currentThread().getName(),
 					task.getRequestId());

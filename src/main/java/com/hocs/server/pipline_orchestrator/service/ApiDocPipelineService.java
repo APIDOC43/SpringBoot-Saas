@@ -25,13 +25,11 @@ public class ApiDocPipelineService {
 	private final GenerateOasFacadeService llmService; //internal call로 분리
 	private final OasSendClient oasSendClient;
 
-	public void execute(PipelineTask task, TaskType taskType) throws IOException {
+	public void execute(PipelineTask task) throws IOException {
 
-		log.info("[{}] 파이프라인 실행 시작 (type={}, userId={})", Thread.currentThread().getName(),
-			taskType,
-			task.getApiInfo().getMethodSignature());
+		log.info("[{}] 파이프라인 실행 시작 (methodSignature={}, requestId={})", Thread.currentThread().getName(),
+			task.getApiInfo().getMethodSignature(),task.getRequestId());
 
-		//TODO:레포정보기반으로 requestID전달 받도록 수정해야됨. 임시적dㅇ로 여기서 생성
 		String requestId = task.getRequestId();
 
 		TaskContext context = TaskContextStore.get(task.getRequestId());
