@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OasBatchSaverService extends BatchSaveService<OAS>{
 	private static final long FLUSH_DELAY_MS = 30000;
-	private static final long RETRY_DELAY_MS = 300000;
+	private static final long RETRY_DELAY_MS = 30000;
 
 	private final OasRepositoryCustom repository;
 
