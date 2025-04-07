@@ -38,8 +38,8 @@ public class OasBatchSaverService extends BatchSaveService<OAS>{
 	}
 
 	@Override
-	protected String getId(OAS entity) {
-		return entity.getId();
+	protected String getSnippetId(OAS entity) {
+		return entity.getSnippetId();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class OasBatchSaverService extends BatchSaveService<OAS>{
 				OAS existing = mergedMap.get(id);
 				Map<String, List<Map<String, PathItem>>> mergedPathList = mergePathList(existing.getPathList(), oas.getPathList());
 				Map<String, List<Schema>> mergedSchemasMap = mergeSchemasMap(existing.getSchemasMap(), oas.getSchemasMap());
-				OAS mergedOas = OAS.create(id, existing.getInfo(), mergedPathList, mergedSchemasMap);
+				OAS mergedOas = OAS.create(id, id, existing.getInfo(), mergedPathList, mergedSchemasMap);
 				mergedMap.put(id, mergedOas);
 			} else {
 				mergedMap.put(id, oas);

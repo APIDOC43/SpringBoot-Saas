@@ -49,8 +49,8 @@ public class ApiSourceDependencyBatchSaveService  extends  BatchSaveService<APIS
 
 
 	@Override
-	protected String getId(APISourceDependencyInfo entity) {
-		return entity.getId();
+	protected String getSnippetId(APISourceDependencyInfo entity) {
+		return entity.getSnippetId();
 	}
 
 	@Override
@@ -80,6 +80,7 @@ public class ApiSourceDependencyBatchSaveService  extends  BatchSaveService<APIS
 					apiList.addAll(entity.getApiSourceDependencies());
 				}
 				APISourceDependencyInfo newEntity = APISourceDependencyInfo.create(
+					entity.getId(),
 					entity.getId(),
 					entity.getUserId(),
 					apiList,

@@ -22,6 +22,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,7 +80,7 @@ public class ApiEndpointResolveFacade {
 
 		GlobalSourceDependency globalSourceDependency = container.getGlobalDependencies(userId);
 		APISourceDependencyInfo apiSourceDependencyInfo = APISourceDependencyInfo
-			.create(requestId, userId, apis, globalSourceDependency);
+			.create(requestId, UUID.randomUUID().toString(), userId, apis, globalSourceDependency);
 
 		try {
 			apiSourceDependencyBatchSaveService.addEntity(apiSourceDependencyInfo);

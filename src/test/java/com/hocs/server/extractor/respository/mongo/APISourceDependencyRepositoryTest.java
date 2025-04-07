@@ -46,6 +46,7 @@ class APISourceDependencyRepositoryTest {
 
 		apiDependency = APISourceDependencyInfo.create(
 			UUID.randomUUID().toString(),
+			UUID.randomUUID().toString(),
 			"testUser",
 			List.of(testAPI),
 			global);

@@ -61,7 +61,7 @@ public abstract class BatchSaveService<T> {
 	 */
 	private void handleFailedEntities(List<T> failedEntities) {
 		for (T entity : failedEntities) {
-			String id = getId(entity);
+			String id = getSnippetId(entity);
 			int retryCount = retryCountMap.getOrDefault(id, 0);
 
 			if (retryCount < MAX_RETRY) {
@@ -82,7 +82,7 @@ public abstract class BatchSaveService<T> {
 		}
 	}
 
-	protected abstract String getId(T entity);
+	protected abstract String getSnippetId(T entity);
 
 	protected abstract List<T> mergeEntitiesById(List<T> entities);
 

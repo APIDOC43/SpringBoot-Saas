@@ -19,6 +19,7 @@ public class APISourceDependencyInfo extends MongoBaseEntity {
 	@Id
 	private String id;
 	private String userId;
+	private String snippetId;
 
 	@Field("apis")
 	private List<API> apiSourceDependencies;
@@ -26,9 +27,9 @@ public class APISourceDependencyInfo extends MongoBaseEntity {
 	@Field("global")
 	private GlobalSourceDependency global;
 
-	public static APISourceDependencyInfo create(String id, String userId,
+	public static APISourceDependencyInfo create(String id, String snippetId, String userId,
 		List<API> apiSourceDependencies,
 		GlobalSourceDependency global) {
-		return new APISourceDependencyInfo(id, userId, apiSourceDependencies,global);
+		return new APISourceDependencyInfo(id, snippetId, userId, apiSourceDependencies,global);
 	}
 }

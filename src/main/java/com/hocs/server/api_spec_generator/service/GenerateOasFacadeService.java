@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,7 @@ public class GenerateOasFacadeService {
 
 		OAS oas = OAS.create(
 			requestId,
+			UUID.randomUUID().toString(),
 			OasInfo.create(userId, "", "", "", "", "3.0.1"),
 			pathList,
 			integrationSchemaMap);

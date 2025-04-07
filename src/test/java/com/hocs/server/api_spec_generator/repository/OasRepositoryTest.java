@@ -56,7 +56,7 @@ class OasRepositoryTest {
 		PathItem pathItem = PathItem.create(operation, null, null, null, null, null, null, null, "link", Map.of("x-field", "fieldValue"));
 		Map<String, List<Map<String, PathItem>>> pathList = Map.of("paths", List.of(Map.of("/test", pathItem)));
 
-		oas = OAS.create("1", info, pathList, Map.of("components", List.of(schema)));
+		oas = OAS.create("1", "1",info, pathList, Map.of("components", List.of(schema)));
 	}
 
 	@Test

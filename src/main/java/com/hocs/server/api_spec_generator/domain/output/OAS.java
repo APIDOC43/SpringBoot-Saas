@@ -18,14 +18,15 @@ public class OAS extends MongoBaseEntity {
 
 	@Id
 	private String id;
+	private String snippetId;
 
 	private OasInfo info;
 	private Map<String, List<Map<String, PathItem>>> pathList;
 	private Map<String, List<Schema>> schemasMap;
 
-	public static OAS create(String id, OasInfo info,
+	public static OAS create(String id, String snippetId, OasInfo info,
 		Map<String, List<Map<String, PathItem>>> pathList,
 		Map<String, List<Schema>> schemasMap) {
-		return new OAS(id, info, pathList, schemasMap);
+		return new OAS(id,snippetId, info, pathList, schemasMap);
 	}
 }
