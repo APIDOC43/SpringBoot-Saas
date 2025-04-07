@@ -32,6 +32,11 @@ public class ApiSourceDependencyBatchSaveService  extends  BatchSaveService<APIS
 		super.retryFailedEntities();
 	}
 
+	@Override
+	public void addEntity(APISourceDependencyInfo entity) throws InterruptedException {
+		super.addEntity(entity);
+	}
+
 	/**
 	 * 실패한 엔티티를 별도 DB에 저장하고 알림 전송
 	 */

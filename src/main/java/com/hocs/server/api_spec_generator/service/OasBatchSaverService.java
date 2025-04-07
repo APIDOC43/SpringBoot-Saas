@@ -22,6 +22,11 @@ public class OasBatchSaverService extends BatchSaveService<OAS>{
 
 	private final OasRepositoryCustom repository;
 
+	@Override
+	public void addEntity(OAS entity) throws InterruptedException {
+		super.addEntity(entity);
+	}
+
 	@Scheduled(fixedDelay = FLUSH_DELAY_MS)
 	public void flushEntities() {
 		super.flush();
