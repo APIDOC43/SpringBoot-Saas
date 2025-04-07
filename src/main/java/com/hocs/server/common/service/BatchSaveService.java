@@ -70,6 +70,7 @@ public abstract class BatchSaveService<T> {
 					boolean offered = retryQueue.offer(entity, OFFER_TIMEOUT_SEC, TimeUnit.SECONDS);
 					if (!offered) { //timeout
 						moveToFailedTable(entity);
+						retryCountMap.remove(id);
 					}
 				} catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
