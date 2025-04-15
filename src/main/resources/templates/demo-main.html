@@ -190,7 +190,7 @@
     const repoUrl = document.getElementById("repoUrlInput").value;
     if (repoUrl) {
       // const queryUrl = `/demo/progress?repoUrl=${encodeURIComponent(repoUrl)}`;
-      const queryUrl = `/demo/metadata?repoUrl=${encodeURIComponent(repoUrl)}`;
+      const queryUrl = `/demo/api/selection?repoUrl=${encodeURIComponent(repoUrl)}`;
       window.location.href = queryUrl;
     } else {
       alert("Git URL을 입력해주세요.");

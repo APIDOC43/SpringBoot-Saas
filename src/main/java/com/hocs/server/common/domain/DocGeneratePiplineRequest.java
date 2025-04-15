@@ -1,5 +1,7 @@
 package com.hocs.server.common.domain;
 
+import static com.hocs.server.common.service.GenerateIdempotencyKeyService.*;
+
 import com.hocs.server.saas_platform.domain.BaseEntity;
 import com.hocs.server.saas_platform.domain.GitRepoData;
 import jakarta.persistence.Entity;
@@ -32,10 +34,5 @@ public class DocGeneratePiplineRequest extends BaseEntity {
 		this.userId = userId;
 		this.requestId = generateIdempotencyKey(projectMetaData.getGitRepoData());
 		this.projectMetaData = projectMetaData;
-	}
-
-	private String generateIdempotencyKey(GitRepoData gitRepoData) {
-		String data = String.join("|", gitRepoData.getCloneUrl(), gitRepoData.getRepoName(), gitRepoData.getOwnerName());
-		return DigestUtils.md5DigestAsHex(data.getBytes());
 	}
 }

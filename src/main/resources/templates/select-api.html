@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>API Info 입력 폼</title>
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --primary-dark: #357ABD;
+      --bg: #F7F9FC;
+      --card-bg: #FFFFFF;
+      --border: #E1E4E8;
+      --text: #333333;
+      --subtext: #666666;
+    }
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background: var(--bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px;
+    }
+    .container { width:100%; max-width:700px; }
+    .form-container {
+      background: var(--card-bg);
+      padding:32px; border-radius:12px;
+      box-shadow:0 4px 16px rgba(0,0,0,0.08);
+      margin-bottom:24px;
+    }
+    .form-container h2 {
+      text-align:center; margin-bottom:24px;
+      font-size:24px; font-weight:600;
+      color: var(--primary-dark);
+    }
+    .form-group { margin-bottom:16px; }
+    .form-group label {
+      display:block; margin-bottom:8px;
+      font-size:14px; font-weight:500;
+      color: var(--subtext);
+    }
+    .form-group input,
+    .form-group select {
+      width:100%; padding:12px 16px;
+      font-size:14px; border:1px solid var(--border);
+      border-radius:6px; background:#fff;
+      transition:border-color .3s, box-shadow .3s;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--primary);
+      box-shadow:0 0 0 3px rgba(74,144,226,0.2);
+      outline:none;
+    }
+    .button {
+      width:100%; padding:14px; font-size:16px;
+      font-weight:600; color:#fff;
+      background:var(--primary); border:none;
+      border-radius:6px; cursor:pointer;
+      transition:background .3s;
+    }
+    .button:hover { background:var(--primary-dark); }
+
+    .loading-overlay {
+      display: none;       /* 기본엔 숨김 */
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;    /* flex 속성이 필요하니 JS에서 display:flex로 토글 */
+      justify-content: center;
+    }
+    .loading-overlay span {
+      color:#fff; font-size:20px; font-weight:500;
+    }
+
+    .response-list {
+      background:var(--card-bg); border:1px solid var(--border);
+      border-radius:8px; padding:16px;
+      max-height:400px; overflow-y:auto;
+    }
+    .controller-card {
+      border-bottom:1px solid var(--border);
+      padding:12px 0;
+    }
+    .controller-header,
+    .api-item {
+      display:grid; grid-template-columns:24px 1fr;
+      align-items:center; column-gap:12px;
+    }
+    .controller-header { margin-bottom:8px; }
+    .api-item { margin-left:32px; padding:6px 0; }
+    .controller-header input,
+    .api-item input { width:18px; height:18px; }
+    .api-item label { font-size:13px; color:var(--subtext); }
+    .api-item code {
+      font-family:monospace; background:#f0f0f0;
+      padding:2px 4px; border-radius:4px; margin-left:4px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="loading-overlay" id="loadingOverlay">
+    <span>잠시만 기다려주세요...</span>
+  </div>
+
+  <div class="form-container">
+    <h2>API Info 입력</h2>
+    <div class="form-group">
+      <label for="language">Coding Language</label>
+      <select id="language" required>
+        <option value="">-- 선택 --</option>
+        <option value="JAVA">JAVA</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="projectFramework">Project Framework</label>
+      <select id="projectFramework" required>
+        <option value="">-- 선택 --</option>
+        <option value="SPRINGBOOT">SPRINGBOOT</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="coreSrcRootPath">Core Src Root Path</label>
+      <input type="text" id="coreSrcRootPath" required value="/src/main/java">
+    </div>
+    <button class="button" onclick="submitForm()">제출</button>
+  </div>
+
+  <div id="responseArea">
+    <div class="response-list" id="responseList"></div>
+    <button class="button" id="generateButton"
+            style="display:none; margin-top:12px;"
+            onclick="sendGenerateRequest()">
+      생성하기
+    </button>
+  </div>
+</div>
+
+<script>
+  const DEMO_API     = '/apis/document/endpoint/demo/v1';
+  const GENERATE_API = '/apis/document/generation/reception/v1';
+  const LIST_VIEW    = '/list/v1';
+
+  let lastResponseData = null;
+  let lastRequestData  = {};
+  let lastUserId       = '';
+
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(location.search);
+    return results
+      ? decodeURIComponent(results[1].replace(/\+/g, ' '))
+      : '';
+  }
+
+  function showLoading() {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+  }
+  function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+  }
+
+  // 1) API 분석 호출
+  function submitForm() {
+    const req = {
+      language:         document.getElementById('language').value,
+      projectFramework: document.getElementById('projectFramework').value,
+      gitCloneUrl:      getUrlParameter('repoUrl'),
+      coreSrcRootPath:  document.getElementById('coreSrcRootPath').value
+    };
+    lastRequestData = req;
+    // UUID 생성
+    lastUserId = crypto.randomUUID();
+
+    showLoading();
+    fetch(DEMO_API, {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify(req)
+    })
+    .then(r => r.json())
+    .then(data => {
+      hideLoading();
+      renderResponse(data);
+    })
+    .catch(err => {
+      hideLoading();
+      console.error(err);
+      alert('전송 중 오류가 발생했습니다.');
+    });
+  }
+
+  // 2) 분석 결과 렌더링
+  function renderResponse(data) {
+    lastResponseData = data;
+    const listEl = document.getElementById('responseList');
+    const btn    = document.getElementById('generateButton');
+    listEl.innerHTML = '';
+    btn.style.display = 'block';
+
+    if (!data || data.status !== 2000 || !data.data) {
+      listEl.innerText = '올바르지 않은 응답입니다.';
+      btn.style.display = 'none';
+      return;
+    }
+
+    data.data.controllerResponses.forEach((ctrl, ci) => {
+      const card = document.createElement('div');
+      card.className = 'controller-card';
+
+      // 컨트롤러 헤더
+      const header = document.createElement('div');
+      header.className = 'controller-header';
+      const chkCtrl = document.createElement('input');
+      chkCtrl.type = 'checkbox';
+      chkCtrl.id   = `ctrl-${ci}`;
+      const lblCtrl = document.createElement('label');
+      lblCtrl.htmlFor = chkCtrl.id;
+      lblCtrl.textContent = ctrl.controllerFile.className;
+      header.append(chkCtrl, lblCtrl);
+      card.append(header);
+
+      // API 항목
+      ctrl.apiInfos.forEach((api, ai) => {
+        const row = document.createElement('div');
+        row.className = 'api-item';
+        const chkApi = document.createElement('input');
+        chkApi.type = 'checkbox';
+        chkApi.dataset.controllerIndex = ci;
+        chkApi.dataset.apiIndex        = ai;
+        const lblApi = document.createElement('label');
+        lblApi.innerHTML = `
+          [${api.httpMethod}] ${api.endpoint}
+          <code>→ ${api.methodSignature.signature}</code>
+        `;
+        row.append(chkApi, lblApi);
+        card.append(row);
+      });
+
+      // 컨트롤러 체크박스 토글
+      chkCtrl.addEventListener('change', () => {
+        card.querySelectorAll('.api-item input')
+            .forEach(cb => cb.checked = chkCtrl.checked);
+      });
+
+      listEl.append(card);
+    });
+  }
+
+  // 3) 생성 요청 & 뷰 이동
+  function sendGenerateRequest() {
+    if (!lastResponseData?.data) {
+      alert('먼저 API 분석을 실행해주세요.');
+      return;
+    }
+
+    // 선택되지 않은 API만 모으기
+    const excludeApiInfo = [];
+    lastResponseData.data.controllerResponses.forEach((ctrl, ci) => {
+      ctrl.apiInfos.forEach((api, ai) => {
+        const cb = document.querySelector(
+          `input[data-controller-index="${ci}"][data-api-index="${ai}"]`
+        );
+        if (!cb.checked) excludeApiInfo.push(api);
+      });
+    });
+
+    const payload = {
+      metadataId:      lastResponseData.data.metadataId,
+      userId:          lastUserId,
+      excludeApiInfo
+    };
+
+    showLoading();
+    fetch(GENERATE_API, {
+      method:  'POST',
+      headers: {'Content-Type': 'application/json'},
+      body:    JSON.stringify(payload)
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('요청 실패');
+      // list/v1 뷰로 이동 (userId 포함)
+      const params = new URLSearchParams({
+        metadataId:       payload.metadataId,
+        userId:           lastUserId,
+        language:         lastRequestData.language,
+        projectFramework: lastRequestData.projectFramework,
+        gitCloneUrl:      lastRequestData.gitCloneUrl,
+        coreSrcRootPath:  lastRequestData.coreSrcRootPath
+      });
+      window.location.href = `${LIST_VIEW}?${params.toString()}`;
+    })
+    .catch(err => {
+      hideLoading();
+      console.error(err);
+      alert('생성 요청 중 오류가 발생했습니다.');
+    });
+  }
+</script>
+</body>
+</html>

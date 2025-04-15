@@ -1,134 +1,121 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>API Call Progress</title>
+  <meta charset="UTF-8">
+  <title>문서 생성 진행 상황</title>
   <style>
-    #top-progress-container {
-      height: 80vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    body { margin:0; padding:20px;
+      font-family:"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+      background:#F7F9FC; display:flex;
+      flex-direction:column; align-items:center;
     }
-
-    #progress-container {
-      text-align: center;
+    h2 { color:#333; margin-bottom:16px; }
+    .info-box {
+      background:#fff; border:1px solid #E1E4E8; border-radius:8px;
+      padding:16px; width:100%; max-width:600px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.05);
+      margin-bottom:16px;
     }
-
-    #runner {
-      width: 100px;
-      height: 100px;
-      background-image: url('https://cdn.pixabay.com/animation/2024/05/04/22/05/22-05-59-607_512.gif');
-      background-size: cover;
-      animation: run 5s infinite linear;
+    .info-box p { margin:4px 0; color:#666; }
+    .refresh-button, .back-button, .view-button {
+      padding:10px 16px; margin:8px; border:none;
+      border-radius:6px; font-size:14px; cursor:pointer;
+      color:#fff;
     }
-
-    @keyframes run {
-      0% {
-        transform: translateX(-10px);
-      }
-      100% {
-        transform: translateX(450px);
-      }
+    .refresh-button { background:#4A90E2; }
+    .refresh-button:hover { background:#357ABD; }
+    .view-button { background:#28a745; }
+    .view-button:hover { background:#218838; }
+    .back-button { background:#6c757d; }
+    .back-button:hover { background:#5a6268; }
+    .progress-status {
+      font-size:18px; font-weight:bold; margin:16px 0;
     }
-
-    #percentage {
-      margin-top: 20px;
-      font-size: 20px;
-    }
+    .progress-status.PENDING     { color:#888; }
+    .progress-status.IN_PROGRESS { color:#007bff; }
+    .progress-status.COMPLETED   { color:#28a745; }
+    .progress-status.FAILED      { color:#dc3545; }
   </style>
-  <script>
-    function startProgress(userId) {
-      var elem = document.getElementById("percentage");
-      var statusText = document.getElementById("status-text");
-      let previousPercentage = 0; // 이전 퍼센티지 값을 저장할 변수
-
-      // 2초마다 서버에 GET 요청을 보냅니다
-      var id = setInterval(() => {
-        fetch(`/demo/progress/${userId}`)
-        .then(response => response.text())
-        .then(percentage => {
-          // 현재 값을 숫자로 변환
-          percentage = parseInt(percentage);
-
-          // 서버에서 받은 값을 percentage로 설정합니다
-          elem.innerHTML = percentage + '%';
-
-          // 퍼센티지가 줄어들면 상태 텍스트를 변경합니다
-          if (percentage < previousPercentage) {
-            statusText.innerHTML = "저장소 분석 완료 (DONE) \n 문서 생성중 \n ";
-          }
-
-          // 이전 값을 업데이트
-          previousPercentage = percentage;
-
-          // 퍼센티지가 100%에 도달하면 반복을 멈춥니다
-          if (percentage >= 100) {
-            clearInterval(id);
-          }
-        })
-        .catch(error => console.error('Error:', error));
-      }, 1000); // 2초마다 요청을 보냅니다
-    }
-    function generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = Math.random() * 16 | 0,
-            v = c === 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-      });
-    }
-    function callApi() {
-      var userId = generateUUID(); // 실제 사용자 ID로 변경 필요
-      startProgress(userId);
-      setTimeout(function () {
-        window.location.href = "/demo/clone/"+userId+"?repoUrl=" + getUrlParameter('repoUrl');
-      }); // 5초 대기 후 API 호출
-    }
-
-    function getUrlParameter(name) {
-      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-      var results = regex.exec(location.search);
-      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    }
-  </script>
-  <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,"/>
-
-  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
-  <script src="/js/parameterPaser.js"></script>
-
-  <!-- bootstrap cdn -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-        crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-          crossorigin="anonymous"></script>
-
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KXSTQMC5TC"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-KXSTQMC5TC');
-  </script>
 </head>
+<body>
+<h2>문서 생성 진행 상황</h2>
 
-<body onload="callApi()">
-<div>
-  <div class="main-container">
-    <div id="top-progress-container">
-      <div id="progress-container">
-        <h2 id="status-text">저장소 분석중</h2>
-        <h4>API 문서를 생성하고 있습니다. 잠시만 기다려주세요.</h4>
-        <p>체험하기에서는 3개의 API endpoint만 생성됩니다.</p>
-        <div id="runner"></div>
-        <div id="percentage">0%</div>
-      </div>
-    </div>
-  </div>
+<div class="info-box" id="requestInfo">
+  <p><strong>언어:</strong> <span id="infoLanguage">-</span></p>
+  <p><strong>프레임워크:</strong> <span id="infoFramework">-</span></p>
+  <p><strong>Git URL:</strong> <span id="infoGit">-</span></p>
+  <p><strong>Core Src Path:</strong> <span id="infoSrc">-</span></p>
+  <p><strong>Metadata ID:</strong> <span id="infoMetadata">-</span></p>
+  <p><strong>User ID:</strong> <span id="infoUser">-</span></p>
 </div>
+
+<button class="refresh-button" id="refreshButton">새로고침</button>
+<button class="view-button" id="viewDocButton" style="display:none;">생성된 문서 확인하기</button>
+<button class="back-button" onclick="history.back()">◀ 이전으로</button>
+
+<div class="progress-status" id="progressStatus">현재 상태: -</div>
+
+<script>
+  function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(location.search);
+    return results
+      ? decodeURIComponent(results[1].replace(/\+/g, ' '))
+      : '';
+  }
+
+  const metadataId      = getUrlParameter('metadataId');
+  const userId          = getUrlParameter('userId');
+  const language        = getUrlParameter('language');
+  const framework       = getUrlParameter('projectFramework');
+  const gitCloneUrl     = getUrlParameter('gitCloneUrl');
+  const coreSrcRootPath = getUrlParameter('coreSrcRootPath');
+
+  function renderRequestInfo() {
+    document.getElementById('infoLanguage').textContent  = language  || '-';
+    document.getElementById('infoFramework').textContent = framework || '-';
+    document.getElementById('infoGit').textContent       = gitCloneUrl|| '-';
+    document.getElementById('infoSrc').textContent       = coreSrcRootPath || '-';
+    document.getElementById('infoMetadata').textContent  = metadataId;
+    document.getElementById('infoUser').textContent      = userId;
+  }
+
+  function fetchProgress() {
+    fetch(`/apis/document/generation/progress/v1?metadataId=${metadataId}`)
+      .then(res => res.json())
+      .then(json => {
+        const status = json.status || 'UNKNOWN';
+        const el     = document.getElementById('progressStatus');
+        el.textContent = `현재 상태: ${status}`;
+        el.className   = 'progress-status ' + status;
+
+        const viewBtn = document.getElementById('viewDocButton');
+        if (status === 'CREATED') {
+          viewBtn.style.display = 'inline-block';
+        } else {
+          viewBtn.style.display = 'none';
+        }
+      })
+      .catch(err => {
+        console.error('진행 조회 실패', err);
+        alert('진행 상태를 불러오는 중 오류가 발생했습니다.');
+      });
+  }
+
+  // 버튼 이벤트 바인딩
+  document.getElementById('refreshButton')
+          .addEventListener('click', fetchProgress);
+
+  document.getElementById('viewDocButton')
+          .addEventListener('click', () => {
+    const params = new URLSearchParams({ userId, index: 0 });
+    window.location.href = `/demo/layout?${params.toString()}`;
+  });
+
+  // 초기 렌더
+  renderRequestInfo();
+  fetchProgress();
+</script>
 </body>
 </html>

@@ -3,13 +3,15 @@ package com.hocs.server.common.domain;
 import java.util.Objects;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Data
+@NoArgsConstructor
 public class ApiInfo {
-	private final String httpMethod; //GET, POST ...
-	private final String endpoint;
-	private final MethodInformation methodSignature; //methodName+param
+	private String httpMethod; //GET, POST ...
+	private String endpoint;
+	private MethodInformation methodSignature; //methodName+param
 	public ApiInfo(String httpMethod, String endpoint, MethodInformation methodSignature) {
 		this.httpMethod = httpMethod;
 		this.endpoint = endpoint;
