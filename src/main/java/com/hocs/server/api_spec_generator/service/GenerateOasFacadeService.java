@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class GenerateOasFacadeService {
 	//TODO: 바인딩 실패시 재시도 최대치 등 정책필요
-	//메소드 책임분리 리팩토링 필ㄹ요
+	//메소드 책임분리 리팩토링 필요
 
 	private final SpringAICommandForLLM springAiCommandForLLM;
 	private final ExceptionFormatService exceptionFormatService;
