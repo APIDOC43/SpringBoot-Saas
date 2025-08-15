@@ -1,14 +1,14 @@
 # 프로젝트 진행중
 - 2024.09월 ~ 12월 : PoC(Proof of Concept)를 위한 빠른 MVP 개발 및 발표
-- 2025.03월 : 리팩토링 진행중
+- 2025.03월 ~ 6월 : 리팩토링
+- 2025.08월 ~ 진행중 : 로그 수집 및 테스트 코드 작성 후 홈서버 배포
 
 ---
 
 ## APIDOC43: 완전 자동화된 API 문서 솔루션
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
-![image](https://github.com/user-attachments/assets/e77b825a-129f-405a-96f5-95e104c2faf3)
 
-**APIDOC43**은 개발자의 생산성을 극대화하고 비즈니스 성장에 기여하는 API 문서 자동화 서비스입니다.
+**APIDOC43**은 API 문서 자동화 서비스입니다.
 ```
 ├── HocsserverApplication.java   // 애플리케이션의 메인 진입점
 ├── api_spec_generator           // OAS (OpenAPI-spec) 생성 모듈 with LLM
@@ -17,7 +17,6 @@
 ├── pipline_orchestrator         // 파이프라인 오케스트레이션 및 작업 조율 모듈: async
 └── saas_platform                // 클라이언트 대상 SaaS 플랫폼 서비스 모듈
 ```
-
 
 
 ---
@@ -48,16 +47,7 @@
 - 팀 간 **커뮤니케이션 향상**
 
 ---
-## Developer
-홍석준 : [@hoding](https://github.com/seokjun7410)
-
-프로젝트 총괄  (기획, 아키텍처 설계, 구현, 마케팅),
-- API 명세 생성 파이프라인 개발 
-- 클라우드 인프라 구축 및 관리 (AWS)
-- 사용자 인터페이스 (UI/UX) 디자인 
-- 사용자 피드백 수집 및 분석
 
 ## Appendix
 - 랜딩페이지 : https://apidoc43.softr.app/
-- 소개 및 회고 글 : [https://www.notion.so/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=4](https://steadfast-sofa-4b2.notion.site/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=74)
 
