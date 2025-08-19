@@ -1,6 +1,8 @@
 package com.hocs.server.pipline_orchestrator.ratelimit;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hocs.server.common.service.GenericBatchFailureHandler;
 import com.hocs.server.pipline_orchestrator.service.ApiDocPipelineService;
 import java.io.IOException;
 import java.util.List;
@@ -18,6 +20,8 @@ public class PipelineThrottleService {
 
 	private final PipelineTypeResolver resolver;
 	private final ApiDocPipelineService pipelineService;
+	private final GenericBatchFailureHandler<RestartableTaskInfo> failureHandler;
+	private final ObjectMapper objectMapper;
 
 
 	/**
@@ -100,8 +104,65 @@ public class PipelineThrottleService {
 	}
 
 	/**
-	 * 테스크 실패 시 대응 전략 (미정)
+	 * 테스크 실패 시 대응 전략 - 재시작을 위한 정보 저장
+	 * - 실패 시 문서 생성을 중지하지 않고 계속 진행
+	 * - 재시도 없이 실패 테이블에 저장
+	 * - 이후 재시작할 수 있도록 필요한 모든 컨텍스트 정보 저장
 	 */
-	private void taskFailedProcess(TaskContext context, PipelineTask task) {
+	void taskFailedProcess(TaskContext context, PipelineTask task) {
+		try {
+			// 재시작을 위한 완전한 정보 생성
+			RestartableTaskInfo restartInfo = createRestartableTaskInfo(context, task);
+
+			// 고유한 엔티티 ID 생성 (requestId + controllerFile + apiInfo)
+			String entityId = generateEntityId(task);
+
+			log.warn("파이프라인 태스크 실패 - 재시작 정보 저장: RequestId={}, EntityId={}",
+					task.getRequestId(), entityId);
+
+			// 실패 테이블에 재시작 가능한 정보로 저장 (재시도 없음)
+			failureHandler.handleFailure(restartInfo, "PIPELINE_TASK", entityId, 0);
+
+		} catch (Exception e) {
+			// 실패 처리 자체가 실패해도 문서 생성은 계속 진행
+			log.error("실패 정보 저장 중 오류 발생 - RequestId={}, Error={}",
+					task.getRequestId(), e.getMessage());
+		}
+	}
+
+	/**
+	 * 재시작을 위한 완전한 태스크 정보 생성
+	 */
+	private RestartableTaskInfo createRestartableTaskInfo(TaskContext context, PipelineTask task) {
+		return RestartableTaskInfo.builder()
+			.task(TaskInfo.builder()
+				.requestId(task.getRequestId())
+				.controllerFile(task.getControllerFile())
+				.apiInfo(task.getApiInfo())
+				.build())
+			.context(ContextInfo.builder()
+				.userId(context.getUserId())
+				.defaultBranchName(context.getDefaultBranchName())
+				.filenamesRelatedException(context.getFilenamesRelatedException())
+				.projectMetaData(context.getProjectMetaData())
+				.taskType(context.getTaskType())
+				.taskSize(context.getTaskSize())
+				.build())
+			.restartInfo(RestartMetaInfo.builder()
+				.canRestart(true)
+				.failureReason("EXECUTION_FAILED_RESTARTABLE")
+				.failedAt(java.time.LocalDateTime.now())
+				.build())
+			.build();
+	}
+
+	/**
+	 * 고유한 엔티티 ID 생성
+	 */
+	private String generateEntityId(PipelineTask task) {
+		return String.format("%s_%s_%s",
+			task.getRequestId(),
+			task.getControllerFile().getClassName(),
+			task.getApiInfo().getMethodSignature().getSignature());
 	}
 }
