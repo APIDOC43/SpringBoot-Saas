@@ -14,9 +14,9 @@ public abstract class BatchSaveService<T> {
 	private final BlockingQueue<T> retryQueue = new ArrayBlockingQueue<>(3000, true);
 	private final Map<String, Integer> retryCountMap = new ConcurrentHashMap<>();
 
-	private static final int MAX_RETRY = 3;
 	private static final int MAX_DRAIN_VALUE = 1000;
 	private static final long OFFER_TIMEOUT_SEC = 10;
+	
 	/**
 	 * 메인 큐에 엔티티 추가 (Producer)*
 	 * 현재는 동일 ID의 중복 요청이 addEntity()로 들어오지 않는다고 보장됨.
@@ -43,6 +43,7 @@ public abstract class BatchSaveService<T> {
 			handleFailedEntities(failedEntities);
 		}
 	}
+	
 	/**
 	 * 재시도 큐에서 주기적으로 엔티티 처리
 	 */
@@ -57,19 +58,21 @@ public abstract class BatchSaveService<T> {
 	}
 
 	/**
-	 * 실패한 엔티티 처리 (재시도 또는 DB 저장)
+	 * 실패한 엔티티 처리 (재시도 또는 실패 테이블 저장)
 	 */
 	private void handleFailedEntities(List<T> failedEntities) {
+		int maxRetry = getMaxRetryAttempts();
+		
 		for (T entity : failedEntities) {
 			String id = getSnippetId(entity);
 			int retryCount = retryCountMap.getOrDefault(id, 0);
 
-			if (retryCount < MAX_RETRY) {
+			if (retryCount < maxRetry) {
 				retryCountMap.put(id, retryCount + 1);
 				try {
 					boolean offered = retryQueue.offer(entity, OFFER_TIMEOUT_SEC, TimeUnit.SECONDS);
 					if (!offered) { //timeout
-						moveToFailedTable(entity);
+						moveToFailedTable(entity, maxRetry);
 						retryCountMap.remove(id);
 					}
 				} catch (InterruptedException e) {
@@ -77,7 +80,7 @@ public abstract class BatchSaveService<T> {
 				}
 			} else {
 				retryCountMap.remove(id);
-				moveToFailedTable(entity);
+				moveToFailedTable(entity, maxRetry);
 			}
 		}
 	}
@@ -88,5 +91,7 @@ public abstract class BatchSaveService<T> {
 
 	protected abstract List<T> save(List<T> entities);
 
-	protected abstract void moveToFailedTable(T entity);
+	protected abstract void moveToFailedTable(T entity, int maxRetryAttempts);
+	
+	protected abstract int getMaxRetryAttempts();
 }

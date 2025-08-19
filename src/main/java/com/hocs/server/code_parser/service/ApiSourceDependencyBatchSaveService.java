@@ -4,13 +4,15 @@ import com.hocs.server.code_parser.core.domain.API;
 import com.hocs.server.code_parser.core.domain.APISourceDependencyInfo;
 import com.hocs.server.code_parser.repository.APISourceDependencyRepositoryCustomImpl;
 import com.hocs.server.common.service.BatchSaveService;
+import com.hocs.server.common.service.GenericBatchFailureHandler;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -19,6 +21,7 @@ public class ApiSourceDependencyBatchSaveService  extends  BatchSaveService<APIS
 	private static final long FLUSH_DELAY_MS = 30000;
 	private static final long RETRY_DELAY_MS = 300000;
 	private final APISourceDependencyRepositoryCustomImpl repository;
+	private final GenericBatchFailureHandler<APISourceDependencyInfo> failureHandler;
 
 	@Scheduled(fixedDelay = FLUSH_DELAY_MS)
 	@Override
@@ -37,14 +40,14 @@ public class ApiSourceDependencyBatchSaveService  extends  BatchSaveService<APIS
 		super.addEntity(entity);
 	}
 
-	/**
-	 * 실패한 엔티티를 별도 DB에 저장하고 알림 전송
-	 */
 	@Override
-	protected void moveToFailedTable(APISourceDependencyInfo failedEntity) {
-		System.err.println("최대 재시도 초과! 실패한 엔티티를 DB에 저장: " + failedEntity.getId());
-//		failedDependencyRepository.save(failedEntity);  // TODO:실패 관리 DB에 저장
-//		notificationService.sendFailureAlert(failedEntity);  // 알림 전송 (Slack, 이메일 등)
+	protected void moveToFailedTable(APISourceDependencyInfo failedEntity, int maxRetryAttempts) {
+		failureHandler.handleFailure(failedEntity, "APISourceDependency", failedEntity.getId(), maxRetryAttempts);
+	}
+
+	@Override
+	protected int getMaxRetryAttempts() {
+		return 3;
 	}
 
 

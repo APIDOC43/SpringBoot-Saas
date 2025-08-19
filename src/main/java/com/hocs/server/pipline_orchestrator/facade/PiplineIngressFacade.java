@@ -1,6 +1,8 @@
 package com.hocs.server.pipline_orchestrator.facade;
 
 import com.hocs.server.api_spec_generator.llm.SpringAICommandForLLM;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
+import com.hocs.server.code_parser.core.domain.ClientProjectType;
 import com.hocs.server.code_parser.facade.JavaClassifiedFacade;
 import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.common.domain.DocGeneratePiplineRequest;
@@ -17,6 +19,8 @@ import com.hocs.server.pipline_orchestrator.service.out.port.ApiEndpointCollecto
 import com.hocs.server.saas_platform.common.annotation.Facade;
 import com.hocs.server.saas_platform.domain.GitRepoData;
 import com.hocs.server.saas_platform.service.external.git.port.GitApiPort;
+
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,12 +37,15 @@ public class PiplineIngressFacade {
 	private final ApiEndpointCollectorPortInPipline apiEndpointCollectorPortInPipline;
 	private final JavaClassifiedFacade javaClassifiedFacade;
 	private final TaskClassifier taskClassifier;
+	private final GlobalJavaParser globalJavaParser;
 
 
 	public void ingress(DocGeneratePiplineRequest request, List<ApiInfo> excludeApiInfo)  {
 		//pipline start. 파이프라인 진입점.
-
+		//parser config 설정
 		ProjectMetaData metaData = request.getProjectMetaData();
+		globalJavaParser.configure(new File(metaData.getClonePath().toFile(),
+				ClientProjectType.SPRING_JAVA.srcRootPath()).toPath().toString());
 
 		ChatClient chatClient4o = springAICommandForLLM.createChatClient4o();
 		String[] filenamesRelatedException = springAICommandForLLM

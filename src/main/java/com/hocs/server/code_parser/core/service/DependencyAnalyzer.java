@@ -3,8 +3,8 @@ package com.hocs.server.code_parser.core.service;
 
 import static com.hocs.server.code_parser.core.util.HttpMethodUtil.haveHttpMethodAnnotation;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -34,8 +34,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DependencyAnalyzer {
 
-
 	private final DependencyExplorer dependencyExplorer;
+	private final GlobalJavaParser globalJavaParser;
 
 
 	/**
@@ -52,7 +52,7 @@ public class DependencyAnalyzer {
 		String srcContent = new String(Files.readAllBytes(Paths.get(filePath)));
 		CompilationUnit srcContentUnit;
 		try {
-			srcContentUnit = StaticJavaParser.parse(srcContent);
+			srcContentUnit = globalJavaParser.parse(srcContent);
 		} catch (Exception e) {
 			System.err.println("Failed to parse controller class: " + className);
 			e.printStackTrace();
@@ -127,7 +127,7 @@ public class DependencyAnalyzer {
 		String srcContent = new String(Files.readAllBytes(Paths.get(filePath)));
 		CompilationUnit srcContentUnit;
 		try {
-			srcContentUnit = StaticJavaParser.parse(srcContent);
+			srcContentUnit = globalJavaParser.parse(srcContent);
 		} catch (Exception e) {
 			System.err.println("Failed to parse controller class: " + className);
 			e.printStackTrace();

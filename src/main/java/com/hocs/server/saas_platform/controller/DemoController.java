@@ -63,8 +63,9 @@ public class DemoController {
 		return "demo-main";
 	}
 
-	@GetMapping("/demo/layout")
-	public String getLayOut(
+	@Deprecated
+	@GetMapping("/demo/layout/v1")
+	public String getLayOutV1(
 		@RequestParam(name = "userId") String userId,
 		@RequestParam(name = "index") Integer index,
 		Model model) {

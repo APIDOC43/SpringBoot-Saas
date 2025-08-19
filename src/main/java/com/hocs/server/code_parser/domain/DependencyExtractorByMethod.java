@@ -2,8 +2,8 @@ package com.hocs.server.code_parser.domain;
 
 import static com.hocs.server.code_parser.core.util.ParameterSupportAnnotations.supportedAnnotations;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.Parameter;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -25,13 +25,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-
 /**
  * 소스코드의 각 메소드를 기준으로 재귀적으로 의존성을 수집합니다.
  */
 public class DependencyExtractorByMethod {
 
 	private final DependencyExplorer dependencyExplorer;
+	private final GlobalJavaParser globalJavaParser;
 	public Map<MethodInformation,List<String>> findDependency(String className,JavaClassifiedDataContainer dataContainer) throws Exception {
 		Map<MethodInformation,List<String>> methodAndDependencyMap = new HashMap<>();
 		List<String> sortedPaths = null;
@@ -45,7 +45,7 @@ public class DependencyExtractorByMethod {
 		String srcContent = new String(Files.readAllBytes(Paths.get(filePath)));
 		CompilationUnit srcContentUnit;
 		try {
-			srcContentUnit = StaticJavaParser.parse(srcContent);
+			srcContentUnit = globalJavaParser.parse(srcContent);
 		} catch (Exception e) {
 			System.err.println("Failed to parse controller class: " + className);
 			e.printStackTrace();

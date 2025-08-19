@@ -1,0 +1,62 @@
+# 테스트용 데이터베이스 설정
+spring:
+  # H2 인메모리 데이터베이스 사용 (테스트용)
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop  # 테스트 시마다 테이블 재생성
+    show-sql: true          # SQL 쿼리 로그 출력
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+    open-in-view: false
+
+  # MongoDB 테스트 설정 (내장 MongoDB 사용)
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: test
+
+# 로깅 설정
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.hocs.server: DEBUG
+
+# 테스트용 경로 설정
+path:
+  generate-doc-html-dir: "/tmp/test-docs"
+  SSG-root: "/tmp/test-ssg"
+
+# 기타 테스트 설정
+openai:
+  api-key: "test-key"
+
+pipeline:
+  thread:
+    pool:
+      fast:
+        size: 2
+      heavy:
+        size: 2
+  queue:
+    heavy:
+      size: 10
+
+ratelimit:
+  bucket:
+    capacity: 5

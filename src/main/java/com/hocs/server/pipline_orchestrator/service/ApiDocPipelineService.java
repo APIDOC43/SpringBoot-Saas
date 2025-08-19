@@ -2,7 +2,9 @@ package com.hocs.server.pipline_orchestrator.service;
 
 import com.hocs.server.api_spec_generator.domain.input.APIMetadata;
 import com.hocs.server.api_spec_generator.service.GenerateOasFacadeService;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.hocs.server.code_parser.core.dataobject.JavaClassifiedStore;
+import com.hocs.server.code_parser.core.domain.ClientProjectType;
 import com.hocs.server.common.domain.ProjectMetaData;
 import com.hocs.server.pipline_orchestrator.ratelimit.PipelineTask;
 import com.hocs.server.pipline_orchestrator.ratelimit.TaskContext;
@@ -24,6 +26,7 @@ public class ApiDocPipelineService {
 	private final ApiEndpointCollectorPortInPipline apiEndpointCollectorPortInPipline;
 	private final GenerateOasFacadeService llmService; //internal call로 분리
 	private final OasSendClient oasSendClient;
+	private final GlobalJavaParser globalJavaParser;
 
 	public void execute(PipelineTask task) throws IOException {
 
@@ -34,13 +37,16 @@ public class ApiDocPipelineService {
 
 		TaskContext context = TaskContextStore.get(task.getRequestId());
 		ProjectMetaData metaData = context.getProjectMetaData();
+		globalJavaParser.configure(new File(metaData.getClonePath().toFile(),
+				ClientProjectType.SPRING_JAVA.srcRootPath()).toPath().toString());
+
 		String userId = context.getUserId();
 
 		File cloneDir = metaData.getProjectRootPath().getToFile();
 		//process 1 : API 에 대한 Metadata 수집
 		APIMetadata apiMetadata = apiEndpointCollectorPortInPipline.getApiEndpoint(userId, metaData,
 			context.getDefaultBranchName(), task, requestId);
-
+		log.info("process 1 done");
 		//process 2 : API Endpoint 하나씩 LLM을 통해 명세를 생성합니다.
 		if (apiMetadata == null) {
 			throw new RuntimeException("apiMetadata는 null일 수 없습니다.");
@@ -48,9 +54,10 @@ public class ApiDocPipelineService {
 
 		llmService.generate(userId, apiMetadata, cloneDir,
 			context.getFilenamesRelatedException(), requestId);
-
+		log.info("process 2 done");
 		//process3 : 생성된 API 명세를 정적 HTML로 렌더링
 		completeProcess(task,cloneDir,userId);
+		log.info("process 3 done");
 	}
 
 	public void completeProcess(PipelineTask task,  File cloneDir, String userId) {

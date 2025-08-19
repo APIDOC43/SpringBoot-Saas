@@ -18,4 +18,9 @@ public class APIEntries {
 			.map(m -> m.getPath().toFile())
 			.collect(Collectors.toList());
 	}
+
+	// 테스트 호환성을 위한 메소드
+	public List<SourceFile> getEntries() {
+		return this.sourceFileList;
+	}
 }

@@ -17,7 +17,7 @@ public class EndpointPathUtil {
 	 * @ex) GetMapping("/sign-up") -> httpMethod : "GET", methodPath
 	 */
 	public static ApiEndpoint generateApiEndpoint(String basePath, MethodDeclaration method) {
-
+		//TODO "/"이 없는데 붙는 경우 발생
 		String methodPath = "";
 		String httpMethod = "";
 		for (AnnotationExpr annotation : method.getAnnotations()) {
@@ -50,7 +50,7 @@ public class EndpointPathUtil {
 	/**
 	 * 어노테이션의 path또는 value값을 추출합니다.
 	 */
-	private static String extractPathOrValueFromAnnotation(AnnotationExpr annotation) {
+	public static String extractPathOrValueFromAnnotation(AnnotationExpr annotation) {
 		if (annotation.isSingleMemberAnnotationExpr()) {
 			return annotation.asSingleMemberAnnotationExpr().getMemberValue().toString().replaceAll("\"", "");
 		} else if (annotation.isNormalAnnotationExpr()) {
@@ -73,7 +73,7 @@ public class EndpointPathUtil {
 		if (basePath == null) basePath = "";
 		if (methodPath == null) methodPath = "";
 
-		if (!basePath.endsWith("/") && !methodPath.startsWith("/")) {
+		if (!basePath.endsWith("/") && !methodPath.startsWith("/") && !methodPath.isBlank()) {
 			return basePath + "/" + methodPath;
 		} else if (basePath.endsWith("/") && methodPath.startsWith("/")) {
 			return basePath + methodPath.substring(1);

@@ -40,6 +40,9 @@ public class StaticApiDocService {
 	}
 
 	public Path getContent(GetContentRequest request) {
+		if (request.getFilename() == null) {
+			return Paths.get(HTML_DIR);
+		}
 		return Paths.get(HTML_DIR, request.getFilename());
 	}
 

@@ -1,7 +1,7 @@
 package com.hocs.server.code_parser.core.service;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.EnumDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 public class DependencyExplorer {
 	private final ExpressionResolver expressionResolver;
 	private final GenericTypeResolver genericTypeResolver;
+	private final GlobalJavaParser globalJavaParser;
 
 
 	/**
@@ -68,7 +69,7 @@ public class DependencyExplorer {
 			String content = new String(Files.readAllBytes(Paths.get(filePath)));
 			CompilationUnit cu;
 			try {
-				cu = StaticJavaParser.parse(content);
+				cu = globalJavaParser.parse(content);
 			} catch (Exception e) {
 				System.err.println("Failed to parse class: " + actualClassName);
 				e.printStackTrace();
@@ -216,7 +217,7 @@ public class DependencyExplorer {
 		String content = new String(Files.readAllBytes(Paths.get(filePath)));
 		CompilationUnit cu;
 		try {
-			cu = StaticJavaParser.parse(content);
+			cu = globalJavaParser.parse(content);
 		} catch (Exception e) {
 			System.err.println("Failed to parse class: " + className);
 			e.printStackTrace();

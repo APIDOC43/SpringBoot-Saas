@@ -26,7 +26,7 @@ public class ExceptionFormatService {
 	public String read(String[] ExceptionSrc) throws IOException {
 		StringBuilder sb = new StringBuilder();
 		for (String src : ExceptionSrc) {
-			if(!src.equals(""))
+			if(!src.isEmpty())
 				sb.append(new String(Files.readAllBytes(Paths.get(src)))).append("\n");
 		}
 		return sb.toString();

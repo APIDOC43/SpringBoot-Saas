@@ -1,10 +1,12 @@
 package com.hocs.server.common.domain;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.google.common.base.Objects;
+
 import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import java.util.Objects;
 
 @Getter
 @Data
@@ -30,12 +32,12 @@ public class MethodInformation {
 			return false;
 		}
 		MethodInformation that = (MethodInformation) o;
-		return Objects.equal(signature, that.signature);
+		return Objects.equals(signature, that.signature);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hashCode(signature);
+		return Objects.hash(signature);
 	}
 
 	@Override

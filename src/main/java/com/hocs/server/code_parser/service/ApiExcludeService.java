@@ -1,7 +1,7 @@
 package com.hocs.server.code_parser.service;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.hocs.server.code_parser.core.domain.ApiEndpoint;
@@ -19,11 +19,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ApiExcludeService {
+
+	private final GlobalJavaParser globalJavaParser;
 
 	public Map<ControllerFile, List<ApiInfo>> excludeApi(List<File> controllerFiles, List<ApiInfo> excludeFile) {
 		Map<ControllerFile, List<ApiInfo>> apiInfos = new HashMap<>();
@@ -42,7 +46,7 @@ public class ApiExcludeService {
 				throw new RuntimeException(e);
 			}
 
-			CompilationUnit srcContentUnit = StaticJavaParser.parse(srcContent);
+			CompilationUnit srcContentUnit = globalJavaParser.parse(srcContent);
 			TypeDeclaration<?> classDeclaration = srcContentUnit.getType(0);
 			String baseUrl = EndpointPathUtil.findRequestMappingValue(classDeclaration);
 			for (MethodDeclaration method : classDeclaration.getMethods()) {

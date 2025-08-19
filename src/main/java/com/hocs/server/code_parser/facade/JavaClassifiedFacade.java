@@ -1,6 +1,6 @@
 package com.hocs.server.code_parser.facade;
 
-import com.hocs.server.code_parser.core.config.ExtractorConfig;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.hocs.server.code_parser.core.dataobject.JavaClassifiedDataContainer;
 import com.hocs.server.code_parser.core.dataobject.JavaClassifiedDataGenerator;
 import com.hocs.server.code_parser.core.dataobject.JavaClassifiedStore;
@@ -24,10 +24,6 @@ public class JavaClassifiedFacade {
 		Path SOURCE_ROOT = new File(clonedDir.toFile(),
 			ClientProjectType.SPRING_JAVA.srcRootPath()).toPath();
 		String SOURCE_ROOT_STR = SOURCE_ROOT.toString();
-
-		//paser config 설정
-		ExtractorConfig extractorConfig = new ExtractorConfig();
-		extractorConfig.setConfig(SOURCE_ROOT_STR);
 
 		// 모든 Java 파일의 경로를 수집합니다.
 		List<File> files = srcFileCollector.collectFiles(new File(SOURCE_ROOT_STR),

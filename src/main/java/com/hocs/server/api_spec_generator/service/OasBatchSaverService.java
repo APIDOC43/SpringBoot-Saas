@@ -5,22 +5,26 @@ import com.hocs.server.api_spec_generator.domain.output.PathItem;
 import com.hocs.server.api_spec_generator.domain.output.Schema;
 import com.hocs.server.api_spec_generator.repository.OasRepositoryCustom;
 import com.hocs.server.common.service.BatchSaveService;
+import com.hocs.server.common.service.GenericBatchFailureHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class OasBatchSaverService extends BatchSaveService<OAS>{
 	private static final long FLUSH_DELAY_MS = 30000;
 	private static final long RETRY_DELAY_MS = 30000;
 
 	private final OasRepositoryCustom repository;
+	private final GenericBatchFailureHandler<OAS> failureHandler;
 
 	@Override
 	public void addEntity(OAS entity) throws InterruptedException {
@@ -43,11 +47,13 @@ public class OasBatchSaverService extends BatchSaveService<OAS>{
 	}
 
 	@Override
-	protected void moveToFailedTable(OAS failedEntity) {
-		// TODO: 실패 관리 DB에 저장하거나 알림 전송 로직 추가
-		System.err.println("최대 재시도 초과! 실패한 엔티티를 DB에 저장: " + failedEntity.getId());
-//		failedDependencyRepository.save(failedEntity);  // TODO:실패 관리 DB에 저장
-//		notificationService.sendFailureAlert(failedEntity);  // 알림 전송 (Slack, 이메일 등)
+	protected void moveToFailedTable(OAS failedEntity, int maxRetryAttempts) {
+		failureHandler.handleFailure(failedEntity, "OAS", failedEntity.getId(), maxRetryAttempts);
+	}
+
+	@Override
+	protected int getMaxRetryAttempts() {
+		return 3;
 	}
 
 	@Override

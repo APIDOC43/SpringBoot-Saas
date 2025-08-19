@@ -20,6 +20,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(IllegalStateException.class)
 	public String handleIllegal(IllegalStateException ex) {
 		log.info("handleIllegal: {}", ex.getMessage());
+		ex.printStackTrace();
 		return "redirect:/demo/error/project";
 	}
 

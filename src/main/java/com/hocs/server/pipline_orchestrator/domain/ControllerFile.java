@@ -3,6 +3,7 @@ package com.hocs.server.pipline_orchestrator.domain;
 import com.hocs.server.code_parser.domain.SourceFile;
 import java.nio.file.Path;
 import java.util.Objects;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -12,6 +13,13 @@ public class ControllerFile extends SourceFile {
 	public ControllerFile(String path) {
 		super(Path.of(path));
 		this.className = path.substring(path.lastIndexOf('/')+1,path.lastIndexOf('.'));
+	}
+
+	@Builder
+	public ControllerFile(String filePath, String className) {
+		super(Path.of(filePath));
+		this.className = className != null ? className : 
+			filePath.substring(filePath.lastIndexOf('/')+1, filePath.lastIndexOf('.'));
 	}
 
 	// hashCode() 재정의

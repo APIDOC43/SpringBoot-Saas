@@ -1,7 +1,7 @@
 package com.hocs.server.code_parser.core.service;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ExpressionResolver {
+
+	private final GlobalJavaParser globalJavaParser;
 
 
 	/**
@@ -116,7 +118,7 @@ public class ExpressionResolver {
 		if (filePath != null) {
 			try {
 				String content = new String(Files.readAllBytes(Paths.get(filePath)));
-				CompilationUnit cu = StaticJavaParser.parse(content);
+				CompilationUnit cu = globalJavaParser.parse(content);
 				Optional<ClassOrInterfaceDeclaration> classOpt = cu.getClassByName(currentClassName);
 				if (classOpt.isPresent()) {
 					ClassOrInterfaceDeclaration classDecl = classOpt.get();

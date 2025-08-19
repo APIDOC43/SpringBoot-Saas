@@ -149,7 +149,7 @@ public class PromptMessageHub {
 			
 			
 			소스코드:			
-			"""+"apiEntry.getSrc()"+"\n"+srcRelatedError;
+			"""+srcRelatedError;
 	}
 
 	public static String findRelationExceptionFormat(String output) {

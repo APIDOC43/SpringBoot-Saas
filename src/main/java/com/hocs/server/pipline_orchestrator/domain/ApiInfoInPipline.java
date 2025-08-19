@@ -1,13 +1,16 @@
 package com.hocs.server.pipline_orchestrator.domain;
 
 import com.hocs.server.common.domain.MethodInformation;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ApiInfoInPipline {
 	private final String httpMethod; //GET, POST ...
 	private final String endpoint;
 	private final MethodInformation methodSignature; //methodName+param
+	
 	public ApiInfoInPipline(String httpMethod, String endpoint, MethodInformation methodSignature) {
 		this.httpMethod = httpMethod;
 		this.endpoint = endpoint;

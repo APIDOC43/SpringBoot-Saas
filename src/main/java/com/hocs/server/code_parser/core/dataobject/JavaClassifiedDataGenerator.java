@@ -1,7 +1,7 @@
 package com.hocs.server.code_parser.core.dataobject;
 
-import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
@@ -23,12 +23,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class JavaClassifiedDataGenerator {
 
+	private final GlobalJavaParser globalJavaParser;
+
 	public JavaClassifiedDataContainer init(List<File> files) throws IOException {
 		JavaClassifiedDataContainer container = new JavaClassifiedDataContainer();
 		for (File file : files) {
 			String content = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
 			try {
-				CompilationUnit cu = StaticJavaParser.parse(content);
+				CompilationUnit cu = globalJavaParser.parse(content);
 				// 클래스, 인터페이스, 열거형, 레코드 등을 모두 처리합니다.
 				SortAndSave(file.getAbsolutePath(), cu, container);
 			} catch (Exception e) {

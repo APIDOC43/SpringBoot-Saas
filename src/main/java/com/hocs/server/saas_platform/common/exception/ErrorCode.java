@@ -11,7 +11,10 @@ public enum ErrorCode {
 	IO_CREATE_DIR_FAIL("I00001", "폴더 생성에 실패하였습니다."),
 
 	//404
-	NOT_FOUND_EXCEPTION("N00001", "존재하지 않는 ID입니다.");
+	NOT_FOUND_EXCEPTION("N00001", "존재하지 않는 ID입니다."),
+
+	//400
+	INVALID_REQUEST_EXCEPTION("B00001", "잘못된 요청입니다.");
 
 	final String code;
 	final String message;

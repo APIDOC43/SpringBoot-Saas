@@ -65,8 +65,8 @@ public class GenerateOasFacadeService {
 		//OAS 객체로 다루게 되면 아래 과정은 필요없음.
 		String result = merge(schemasMap, integrationPaths);
 
-		FileManager.saveToFile(result, projectRootPath + "/output_file-fix.yaml");
-
+		FileManager.saveToFile(projectRootPath + "/output_file-fix.yaml",result);
+		log.info("save: "+projectRootPath + "/output_file-fix.yaml");
 		OAS oas = OAS.create(
 			requestId,
 			UUID.randomUUID().toString(),

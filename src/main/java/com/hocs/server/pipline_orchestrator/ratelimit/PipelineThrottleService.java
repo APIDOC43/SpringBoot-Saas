@@ -54,12 +54,15 @@ public class PipelineThrottleService {
 			try {
 				pipelineService.execute(task);
 			} catch (IOException e) {
-				log.info("[{}] 테스크실패, 실패 테이블에 저장 RequestId={}", Thread.currentThread().getName(),
+				log.error("[{}] 테스크실패, 실패 테이블에 저장 RequestId={}", Thread.currentThread().getName(),
 					task.getRequestId());
+				e.printStackTrace();
 				//TODO 실패테이블 저장
 				taskFailedProcess(context,task);
 				throw new RuntimeException(e);
-			} finally {
+			}catch (Exception e){
+				e.printStackTrace();
+			}finally {
 				log.info("[{}] 자원 해제 실행 semaphore.release()", Thread.currentThread().getName());
 				processQueuedRequests(task);
 			}
