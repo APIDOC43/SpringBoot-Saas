@@ -1,63 +1,93 @@
-# 프로젝트 진행중
-- 2024.09월 ~ 12월 : PoC(Proof of Concept)를 위한 빠른 MVP 개발 및 발표
-- 2025.03월 : 리팩토링 진행중
+# APIDOC43: API 문서 자동 생성
 
----
-
-## APIDOC43: 완전 자동화된 API 문서 솔루션
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
-![image](https://github.com/user-attachments/assets/e77b825a-129f-405a-96f5-95e104c2faf3)
 
-**APIDOC43**은 개발자의 생산성을 극대화하고 비즈니스 성장에 기여하는 API 문서 자동화 서비스입니다.
+**APIDOC43**은 LLM과 코드 분석을 결합한 API 문서 생성 서비스입니다.
+
 ```
-├── HocsserverApplication.java   // 애플리케이션의 메인 진입점
-├── api_spec_generator           // OAS (OpenAPI-spec) 생성 모듈 with LLM
-├── code_parser                  // 소스 코드 파싱 및 분석 모듈 With Java-parser libarary
-├── common                       // 공통 유틸리티, 도메인 모델, 공통 기능 모듈 
-├── pipline_orchestrator         // 파이프라인 오케스트레이션 및 작업 조율 모듈: async
-└── saas_platform                // 클라이언트 대상 SaaS 플랫폼 서비스 모듈
+├── api_spec_generator           // OpenAPI 명세 생성 모듈
+├── code_parser                  // Java 소스코드 파싱 모듈
+├── pipline_orchestrator         // 비동기 파이프라인 모듈
+└── saas_platform                // SaaS 플랫폼 모듈
 ```
 
+---
 
+## 핵심 구현
+
+### 1. 배치 저장 최적화 (DB I/O 82% 감소)
+```java
+@Scheduled(fixedDelay = 30000)
+public void flushEntities() {
+    super.flush(); // 30초마다 배치 처리
+}
+```
+**[OasBatchSaverService.java](src/main/java/com/hocs/server/api_spec_generator/service/OasBatchSaverService.java)**
+- ArrayBlockingQueue 기반 메모리 버퍼링
+- **쿼리 횟수**: 28회 → 5회 (82% 감소)
+- 재시도 메커니즘과 실패 처리 로직
+
+### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
+```java
+// 요청 유형별 스레드풀과 세마포어 분리 관리
+public void submit(ThrottleRequest request) {
+    Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
+    CompletableFuture.runAsync(() -> pipelineService.execute(task), executor);
+}
+```
+**[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
+- **처리 시간**: 202초 → 93초 (54% 단축)
+- Rate Limiting + Semaphore 기반 동시성 제어
+- 신규/기존 사용자 요청 분리 처리로 UX 개선
+
+### 3. 표현식 타입 추론
+```java
+// 메서드 체이닝 표현식의 타입을 재귀적으로 분석
+public Optional<String> resolveExpressionType(Expression expr, String currentClassName, 
+                                               JavaClassifiedDataContainer container)
+```
+**[ExpressionResolver.java](src/main/java/com/hocs/server/code_parser/core/service/ExpressionResolver.java)**
+- JavaParser AST를 활용한 스코프 체인 추적
+- 메서드 호출, 필드 접근, 객체 생성 표현식 분석
+
+### 4. 의존성 추적
+```java
+// DFS 알고리즘으로 메서드 호출 그래프 구축
+private void findMethodCallDependencies(String className, String methodName, 
+                                        Set<String> requiredFiles, Set<String> visitedMethods)
+```
+**[DependencyExplorer.java](src/main/java/com/hocs/server/code_parser/core/service/DependencyExplorer.java)**
+- 순환 참조 방지 (visitedMethods Set 사용)
+- 인터페이스-구현체 매핑 추적
+
+### 5. Spring 어노테이션 파싱
+```java
+// HTTP 매핑 어노테이션에서 메서드와 경로 추출
+public static ApiEndpoint generateApiEndpoint(String basePath, MethodDeclaration method)
+```
+**[EndpointPathUtil.java](src/main/java/com/hocs/server/code_parser/core/util/EndpointPathUtil.java)**
+- @GetMapping, @PostMapping 등 Spring 어노테이션 지원
+- 클래스/메서드 레벨 경로 결합
 
 ---
 
-## **주요 기능**
+## 성과
 
-1. **완전 자동화된 API 문서 생성**
-   - 코드 분석을 통해 정확하고 최신의 API 문서를 자동으로 생성합니다.
-
-2. **SaaS 기반 통합 관리 (진행중)**
-   - 분산된 API 문서를 손쉽게 통합하고 관리할 수 있습니다.
-
-3. **자연어 검색 (진행예정)**
-   - 방대한 API 문서에서 필요한 정보를 쉽게 찾을 수 있습니다.
-
-4. **다양한 분류체계 (진행예정)**
-   - 내부용, FE, BE, 관리자 등 다양한 목적의 API를 효율적으로 관리할 수 있습니다.
-
-5. **실시간 업데이트 (진행예정)**
-   - 코드 변경 시 자동으로 문서를 최신 상태로 유지합니다.
+- **처리 시간**: 202초 → 93초 (54% 단축)
+- **DB 쿼리**: 단위 요청당 28회 → 5회 (82% 감소)
+- **동시성**: ArrayBlockingQueue drainTo 메서드로 thread-safe 보장
+- **스레드풀 분리**: 신규/기존 사용자 대기시간 개선
 
 ---
 
-## **기대 효과**
-- 개발 생산성 최대 **30% 향상**
-- API 문서 작성 및 유지보수 시간 **감소**
-- 문서의 **정확성과 일관성 개선**
-- 팀 간 **커뮤니케이션 향상**
+## 기술 스택
+
+- Java 17, Spring Boot 3, JPA 3
+- MySQL 8, MongoDB
+- Docker, AWS
+- OpenAI API, JavaParser
 
 ---
-## Developer
-홍석준 : [@hoding](https://github.com/seokjun7410)
 
-프로젝트 총괄  (기획, 아키텍처 설계, 구현, 마케팅),
-- API 명세 생성 파이프라인 개발 
-- 클라우드 인프라 구축 및 관리 (AWS)
-- 사용자 인터페이스 (UI/UX) 디자인 
-- 사용자 피드백 수집 및 분석
-
-## Appendix
-- 랜딩페이지 : https://apidoc43.softr.app/
-- 소개 및 회고 글 : [https://www.notion.so/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=4](https://steadfast-sofa-4b2.notion.site/APIDOC43-1b4eeae70b8580cb9a01f40f61f1ef79?pvs=74)
-
+## 링크
+- 랜딩페이지: https://apidoc43.softr.app/
