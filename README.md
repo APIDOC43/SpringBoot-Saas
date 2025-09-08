@@ -38,6 +38,59 @@ sequenceDiagram
    Pipeline -->> Client: 전체 API 명세 반환
 ```
 
+## 핵심 구현
+
+### 1. 배치 저장 최적화 (DB I/O 82% 감소)
+```java
+@Scheduled(fixedDelay = 30000)
+public void flushEntities() {
+    super.flush(); // 30초마다 배치 처리
+}
+```
+**[OasBatchSaverService.java](src/main/java/com/hocs/server/api_spec_generator/service/OasBatchSaverService.java)**
+- ArrayBlockingQueue 기반 메모리 버퍼링
+- **쿼리 횟수**: 28회 → 5회 (82% 감소)
+- 재시도 메커니즘과 실패 처리 로직
+
+### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
+```java
+// 요청 유형별 스레드풀과 세마포어 분리 관리
+public void submit(ThrottleRequest request) {
+    Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
+    CompletableFuture.runAsync(() -> pipelineService.execute(task), executor);
+}
+```
+**[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
+- **처리 시간**: 202초 → 93초 (54% 단축)
+- Rate Limiting + Semaphore 기반 동시성 제어
+- 신규/기존 사용자 요청 분리 처리로 UX 개선
+
+
+---
+
+## 성과
+
+- **처리 시간**: 202초 → 93초 (54% 단축)
+- **DB 쿼리**: 단위 요청당 28회 → 5회 (82% 감소)
+- **동시성**: ArrayBlockingQueue drainTo 메서드로 thread-safe 보장
+- **스레드풀 분리**: 신규/기존 사용자 대기시간 개선
+
+---
+
+## 기술 스택
+
+- Java 17, Spring Boot 3, JPA 3
+- MySQL 8, MongoDB
+- Docker, AWS
+- OpenAI API, JavaParser
+
+---
+
+## 링크
+- 랜딩페이지: https://apidoc43.softr.app/
+
+---
+
 ### 배치처리 자세히
 ```mermaid
 sequenceDiagram
@@ -124,53 +177,3 @@ sequenceDiagram
     
     Ingress -->> Client: 전체 API 명세 반환
 ```
-## 핵심 구현
-
-### 1. 배치 저장 최적화 (DB I/O 82% 감소)
-```java
-@Scheduled(fixedDelay = 30000)
-public void flushEntities() {
-    super.flush(); // 30초마다 배치 처리
-}
-```
-**[OasBatchSaverService.java](src/main/java/com/hocs/server/api_spec_generator/service/OasBatchSaverService.java)**
-- ArrayBlockingQueue 기반 메모리 버퍼링
-- **쿼리 횟수**: 28회 → 5회 (82% 감소)
-- 재시도 메커니즘과 실패 처리 로직
-
-### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
-```java
-// 요청 유형별 스레드풀과 세마포어 분리 관리
-public void submit(ThrottleRequest request) {
-    Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
-    CompletableFuture.runAsync(() -> pipelineService.execute(task), executor);
-}
-```
-**[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
-- **처리 시간**: 202초 → 93초 (54% 단축)
-- Rate Limiting + Semaphore 기반 동시성 제어
-- 신규/기존 사용자 요청 분리 처리로 UX 개선
-
-
----
-
-## 성과
-
-- **처리 시간**: 202초 → 93초 (54% 단축)
-- **DB 쿼리**: 단위 요청당 28회 → 5회 (82% 감소)
-- **동시성**: ArrayBlockingQueue drainTo 메서드로 thread-safe 보장
-- **스레드풀 분리**: 신규/기존 사용자 대기시간 개선
-
----
-
-## 기술 스택
-
-- Java 17, Spring Boot 3, JPA 3
-- MySQL 8, MongoDB
-- Docker, AWS
-- OpenAI API, JavaParser
-
----
-
-## 링크
-- 랜딩페이지: https://apidoc43.softr.app/
