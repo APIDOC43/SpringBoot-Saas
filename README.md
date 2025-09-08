@@ -13,6 +13,117 @@
 
 ---
 
+## API 문서 생성과정
+
+### 간략 시퀀스
+```mermaid
+sequenceDiagram
+   participant Client as Client
+   participant Pipeline as 명세생성파이프라인
+   participant Collector as codePaser
+   participant LLM as LLM
+   
+   Client ->> Pipeline: 요청: Project
+    loop API controller 갯수만큼
+   Pipeline ->> Collector: 요청: Project code
+   
+   Collector -->> Pipeline: API Task 반환
+       end
+   loop API task 갯수만큼
+       Pipeline ->> LLM: API 정보 기반 명세 생성
+       
+       LLM -->> Pipeline: API 명세 반환
+   end
+   
+   Pipeline -->> Client: 전체 API 명세 반환
+```
+
+### 배치처리 자세히
+```mermaid
+sequenceDiagram
+    participant Pipeline as 파이프라인
+    participant Queue as 메모리큐
+    participant BatchSaver as 배치저장
+    participant DB as 데이터베이스
+    
+    loop API 처리
+        Pipeline ->> Queue: 데이터 추가 
+    end
+    
+    Note over Queue: 30초 대기 (버퍼링)
+    
+    BatchSaver ->> Queue: 1000개씩 일괄 수집
+    BatchSaver ->> DB: Bulk Insert
+    Note right of DB: 28회 → 5회 (82% 감소)
+```
+### 스레드풀 분리 자세히
+```mermaid
+sequenceDiagram
+    participant Request as 요청
+    participant Classifier as Task분류기
+    participant HeavyPool as Heavy스레드풀
+    participant FastPool as Fast스레드풀
+    participant LLM
+    
+    Request ->> Classifier: API 개수 확인
+    
+    alt 신규 사용자 (API 많음)
+        Classifier ->> HeavyPool: Heavy 작업 할당
+        HeavyPool ->> LLM: 대용량 처리
+    else 기존 사용자 (API 적음)
+        Classifier ->> FastPool: Fast 작업 할당
+        FastPool ->> LLM: 빠른 처리
+    end
+    
+    Note over FastPool: 기존 사용자 대기시간 개선
+```
+### 전체 시퀀스
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Ingress as PiplineIngressFacade
+    participant Classifier as TaskClassifier  
+    participant HeavyThrottle as Heavy스로틀링
+    participant FastThrottle as Fast스로틀링
+    participant CodeParser as codePaser
+    participant DependencyBatch as 의존성배치저장
+    participant LLM as LLM
+    participant OASBatch as OAS배치저장
+    
+    Client ->> Ingress: 요청: Project
+    
+    loop API controller 갯수만큼
+        Ingress ->> CodeParser: 요청: Project code
+        CodeParser ->> DependencyBatch: API 의존성 그래프 큐 추가
+        CodeParser -->> Ingress: API Task 반환
+    end
+    
+    Ingress ->> Classifier: Task 개수 기반 분류
+    Classifier -->> Ingress: TaskType (HEAVY/FAST)
+    
+    Note over DependencyBatch: 30초마다 의존성 배치 저장
+    DependencyBatch ->> DependencyBatch: 큐에서 배치 처리
+    
+    loop API task 갯수만큼
+        alt TaskType = HEAVY
+            Ingress ->> HeavyThrottle: API 명세 생성 요청
+            HeavyThrottle ->> LLM: API 정보 기반 명세 생성 (세마포어 제어)
+            LLM -->> HeavyThrottle: API 명세 반환
+            HeavyThrottle -->> Ingress: API 명세 반환
+        else TaskType = FAST  
+            Ingress ->> FastThrottle: API 명세 생성 요청
+            FastThrottle ->> LLM: API 정보 기반 명세 생성 (세마포어 제어)
+            LLM -->> FastThrottle: API 명세 반환
+            FastThrottle -->> Ingress: API 명세 반환
+        end
+        Ingress ->> OASBatch: 명세 데이터 큐 추가
+    end
+    
+    Note over OASBatch: 30초마다 OAS 배치 저장
+    OASBatch ->> OASBatch: 큐에서 배치 처리
+    
+    Ingress -->> Client: 전체 API 명세 반환
+```
 ## 핵심 구현
 
 ### 1. 배치 저장 최적화 (DB I/O 82% 감소)
@@ -40,34 +151,6 @@ public void submit(ThrottleRequest request) {
 - Rate Limiting + Semaphore 기반 동시성 제어
 - 신규/기존 사용자 요청 분리 처리로 UX 개선
 
-### 3. 표현식 타입 추론
-```java
-// 메서드 체이닝 표현식의 타입을 재귀적으로 분석
-public Optional<String> resolveExpressionType(Expression expr, String currentClassName, 
-                                               JavaClassifiedDataContainer container)
-```
-**[ExpressionResolver.java](src/main/java/com/hocs/server/code_parser/core/service/ExpressionResolver.java)**
-- JavaParser AST를 활용한 스코프 체인 추적
-- 메서드 호출, 필드 접근, 객체 생성 표현식 분석
-
-### 4. 의존성 추적
-```java
-// DFS 알고리즘으로 메서드 호출 그래프 구축
-private void findMethodCallDependencies(String className, String methodName, 
-                                        Set<String> requiredFiles, Set<String> visitedMethods)
-```
-**[DependencyExplorer.java](src/main/java/com/hocs/server/code_parser/core/service/DependencyExplorer.java)**
-- 순환 참조 방지 (visitedMethods Set 사용)
-- 인터페이스-구현체 매핑 추적
-
-### 5. Spring 어노테이션 파싱
-```java
-// HTTP 매핑 어노테이션에서 메서드와 경로 추출
-public static ApiEndpoint generateApiEndpoint(String basePath, MethodDeclaration method)
-```
-**[EndpointPathUtil.java](src/main/java/com/hocs/server/code_parser/core/util/EndpointPathUtil.java)**
-- @GetMapping, @PostMapping 등 Spring 어노테이션 지원
-- 클래스/메서드 레벨 경로 결합
 
 ---
 
