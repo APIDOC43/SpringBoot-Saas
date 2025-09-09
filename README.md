@@ -51,6 +51,26 @@ public void flushEntities() {
 - ArrayBlockingQueue 기반 메모리 버퍼링
 - **쿼리 횟수**: 28회 → 5회 (82% 감소)
 - 재시도 메커니즘과 실패 처리 로직
+```mermaid
+sequenceDiagram
+   participant Pipeline as 파이프라인
+   participant Queue as 메모리큐
+   participant BatchSaver as 배치저장
+   participant Merger as 엔티티병합
+   participant DB as 데이터베이스
+   
+   loop API 처리
+       Pipeline ->> Queue: 데이터 추가 
+   end
+   
+   Note over Queue: 30초 대기 (버퍼링)
+   
+   BatchSaver ->> Queue: 1000개씩 일괄 수집
+   BatchSaver ->> Merger: 동일 Request ID 기준 엔티티 병합
+   Merger -->> BatchSaver: 병합된 하나의 엔티티 반환
+   BatchSaver ->> DB: Bulk Insert
+   Note right of DB: 28회 → 5회 (82% 감소)
+```
 
 ### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
 ```java
@@ -64,7 +84,26 @@ public void submit(ThrottleRequest request) {
 - **처리 시간**: 202초 → 93초 (54% 단축)
 - Rate Limiting + Semaphore 기반 동시성 제어
 - 신규/기존 사용자 요청 분리 처리로 UX 개선
-
+```mermaid
+sequenceDiagram
+    participant Request as 요청
+    participant Classifier as Task분류기
+    participant HeavyPool as Heavy스레드풀
+    participant FastPool as Fast스레드풀
+    participant LLM
+    
+    Request ->> Classifier: API 개수 확인
+    
+    alt 신규 사용자 (API 많음)
+        Classifier ->> HeavyPool: Heavy 작업 할당
+        HeavyPool ->> LLM: 대용량 처리
+    else 기존 사용자 (API 적음)
+        Classifier ->> FastPool: Fast 작업 할당
+        FastPool ->> LLM: 빠른 처리
+    end
+    
+    Note over FastPool: 기존 사용자 대기시간 개선
+```
 
 ---
 
@@ -91,45 +130,7 @@ public void submit(ThrottleRequest request) {
 
 ---
 
-### 배치처리 자세히
-```mermaid
-sequenceDiagram
-    participant Pipeline as 파이프라인
-    participant Queue as 메모리큐
-    participant BatchSaver as 배치저장
-    participant DB as 데이터베이스
-    
-    loop API 처리
-        Pipeline ->> Queue: 데이터 추가 
-    end
-    
-    Note over Queue: 30초 대기 (버퍼링)
-    
-    BatchSaver ->> Queue: 1000개씩 일괄 수집
-    BatchSaver ->> DB: Bulk Insert
-    Note right of DB: 28회 → 5회 (82% 감소)
-```
-### 스레드풀 분리 자세히
-```mermaid
-sequenceDiagram
-    participant Request as 요청
-    participant Classifier as Task분류기
-    participant HeavyPool as Heavy스레드풀
-    participant FastPool as Fast스레드풀
-    participant LLM
-    
-    Request ->> Classifier: API 개수 확인
-    
-    alt 신규 사용자 (API 많음)
-        Classifier ->> HeavyPool: Heavy 작업 할당
-        HeavyPool ->> LLM: 대용량 처리
-    else 기존 사용자 (API 적음)
-        Classifier ->> FastPool: Fast 작업 할당
-        FastPool ->> LLM: 빠른 처리
-    end
-    
-    Note over FastPool: 기존 사용자 대기시간 개선
-```
+
 ### 전체 시퀀스
 ```mermaid
 sequenceDiagram
