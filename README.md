@@ -5,10 +5,10 @@
 **APIDOC43**은 LLM과 코드 분석을 결합한 API 문서 생성 서비스입니다.
 
 ```
-├── api_spec_generator           // OpenAPI 명세 생성 모듈
-├── code_parser                  // Java 소스코드 파싱 모듈
-├── pipline_orchestrator         // 비동기 파이프라인 모듈
-└── saas_platform                // SaaS 플랫폼 모듈
+├── api_spec_generator           // OpenAPI 명세 생성 
+├── code_parser                  // Java 소스코드 파싱
+├── pipline_orchestrator         // 비동기 파이프라인 
+└── saas_platform                // 문서관리 API (미개발)
 ```
 
 ---
