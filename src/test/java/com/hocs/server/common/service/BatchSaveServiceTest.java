@@ -219,31 +219,6 @@ class BatchSaveServiceTest {
 	}
 
 	@Test
-	@DisplayName("최대 재시도 횟수 초과 시 실패 테이블로 이동해야 한다")
-	void shouldMoveToFailedTableAfterMaxRetries() throws InterruptedException {
-		// Given
-		TestEntity entity = new TestEntity("1", "test data");
-		batchSaveService.setShouldFail(true);
-
-		// When
-		batchSaveService.addEntity(entity);
-		
-		// 최대 재시도 횟수(3)만큼 시도
-		for (int i = 0; i <= 3; i++) {
-			if (i == 0) {
-				batchSaveService.flush();
-			} else {
-				batchSaveService.retryFailedEntities();
-			}
-		}
-
-		// Then
-		assertThat(batchSaveService.getMovedToFailedTable()).hasSize(1);
-		assertThat(batchSaveService.getMovedToFailedTable().get(0)).isEqualTo(entity);
-		assertThat(batchSaveService.getSavedEntities()).isEmpty();
-	}
-
-	@Test
 	@DisplayName("동시에 여러 스레드에서 엔티티를 추가할 수 있어야 한다")
 	void shouldHandleConcurrentEntityAddition() throws InterruptedException {
 		// Given

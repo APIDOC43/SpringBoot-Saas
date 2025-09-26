@@ -3,6 +3,7 @@ package com.hocs.server.code_parser.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.hocs.server.common.domain.ApiInfo;
 import com.hocs.server.common.domain.MethodInformation;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
@@ -17,17 +18,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class ApiExcludeServiceTest {
 
     private ApiExcludeService apiExcludeService;
+    private GlobalJavaParser globalJavaParser = new GlobalJavaParser();
 
     @TempDir
     Path tempDir;
 
     @BeforeEach
     void setUp() {
-        apiExcludeService = new ApiExcludeService();
+        apiExcludeService = new ApiExcludeService(globalJavaParser);
     }
 
     @Test

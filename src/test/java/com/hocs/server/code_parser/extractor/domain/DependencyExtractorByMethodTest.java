@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.hocs.server.code_parser.domain.DependencyExtractorByMethod;
 import com.hocs.server.code_parser.core.service.SrcFileCollector;
-import com.hocs.server.code_parser.core.config.ExtractorConfig;
 import com.hocs.server.code_parser.core.dataobject.JavaClassifiedDataGenerator;
 import com.hocs.server.code_parser.core.domain.ClientProjectType;
 import com.hocs.server.common.domain.MethodInformation;
@@ -111,10 +110,6 @@ public class DependencyExtractorByMethodTest {
 		Path SOURCE_ROOT = new File(clonedDir.toFile(),
 			ClientProjectType.SPRING_JAVA.srcRootPath()).toPath();
 		String SOURCE_ROOT_STR = SOURCE_ROOT.toString();
-
-		//paser config 설정
-		ExtractorConfig extractorConfig = new ExtractorConfig();
-		extractorConfig.setConfig(SOURCE_ROOT_STR);
 
 		// 모든 Java 파일의 경로를 수집합니다.
 		List<File> files = srcFileCollector.collectFiles(new File(SOURCE_ROOT_STR),

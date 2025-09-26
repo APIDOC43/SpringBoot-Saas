@@ -2,6 +2,7 @@ package com.hocs.server.code_parser.extractor;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.hocs.server.code_parser.service.ApiExcludeService;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
 import com.hocs.server.common.domain.ApiInfo;
@@ -16,8 +17,9 @@ import java.util.Map;
 
 
 public class ApiInfoInPiplineExtractorServiceTest {
+	private GlobalJavaParser globalJavaParser = new GlobalJavaParser();
 
-	private final ApiExcludeService apiExcludeService = new ApiExcludeService();
+	private final ApiExcludeService apiExcludeService = new ApiExcludeService(globalJavaParser);
 
 	private File sampleControllerFile;
 

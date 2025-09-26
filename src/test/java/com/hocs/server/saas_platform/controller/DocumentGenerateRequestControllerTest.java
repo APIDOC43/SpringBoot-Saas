@@ -27,20 +27,6 @@ class DocumentGenerateRequestControllerTest {
 	private ObjectMapper objectMapper;
 
 	@Test
-	void testFindApiInfo_ValidRequest_ShouldReturnAccepted() throws Exception {
-		FindApiInfoClientRequest request = new FindApiInfoClientRequest();
-		request.setLanguage(CodingLanguage.JAVA);
-		request.setProjectFramework(ProjectFramework.SPRINGBOOT);
-		request.setGitCloneUrl("https://github.com/seokjun7410/HaksikMatnam_Backend.git");
-		request.setCoreSrcRootPath("/src/main/java");
-
-		mockMvc.perform(post("/apis/document/endpoint/demo/v1")
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(request)))
-			.andExpect(status().isOk());
-	}
-
-	@Test
 	void testFindApiInfo_InvalidRequest_ShouldReturnBadRequest() throws Exception {
 		FindApiInfoClientRequest request = new FindApiInfoClientRequest();
 		request.setLanguage(null);

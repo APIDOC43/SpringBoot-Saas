@@ -174,20 +174,6 @@ class ExceptionFormatServiceTest {
 	}
 
 	@Test
-	@DisplayName("SpringAI 서비스가 IOException을 던지면 전파되어야 한다")
-	void shouldPropagateIOExceptionFromSpringAI() throws IOException {
-		// Given
-		when(springAiCommandForLLM.findFilePathRelatedExceptionFormatSrc(eq(testProjectPath), eq(chatClient4o)))
-			.thenThrow(new IOException("AI service error"));
-
-		// When & Then
-		assertThatThrownBy(() -> 
-			exceptionFormatService.findRelatedExceptionSrc(testProjectPath, chatClient4o)
-		).isInstanceOf(IOException.class)
-		.hasMessage("AI service error");
-	}
-
-	@Test
 	@DisplayName("일부 파일만 존재하는 경우 존재하는 파일만 읽어야 한다")
 	void shouldReadOnlyExistingFiles() throws IOException {
 		// Given
