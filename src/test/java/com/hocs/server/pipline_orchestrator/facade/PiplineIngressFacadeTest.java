@@ -1,20 +1,9 @@
 package com.hocs.server.pipline_orchestrator.facade;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.hocs.server.api_spec_generator.llm.SpringAICommandForLLM;
+import com.hocs.server.code_parser.core.config.GlobalJavaParser;
 import com.hocs.server.code_parser.facade.JavaClassifiedFacade;
-import com.hocs.server.common.domain.ApiInfo;
-import com.hocs.server.common.domain.ClientProjectPath;
-import com.hocs.server.common.domain.CodingLanguage;
-import com.hocs.server.common.domain.DocGeneratePiplineRequest;
-import com.hocs.server.common.domain.ProjectFramework;
-import com.hocs.server.common.domain.ProjectMetaData;
+import com.hocs.server.common.domain.*;
 import com.hocs.server.pipline_orchestrator.domain.ApiInfoInPipline;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
 import com.hocs.server.pipline_orchestrator.ratelimit.PipelineThrottleService;
@@ -24,11 +13,6 @@ import com.hocs.server.pipline_orchestrator.ratelimit.ThrottleRequest;
 import com.hocs.server.pipline_orchestrator.service.out.port.ApiEndpointCollectorPortInPipline;
 import com.hocs.server.saas_platform.domain.GitRepoData;
 import com.hocs.server.saas_platform.service.external.git.port.GitApiPort;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,8 +22,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class PiplineIngressFacadeTest {
+
+    @Mock
+    private GlobalJavaParser globalJavaParser;
 
     @Mock
     private SpringAICommandForLLM springAICommandForLLM;

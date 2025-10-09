@@ -23,7 +23,7 @@ public class ProjectMetaDataService {
 	private final ClientProjectMetadataRepository clientProjectMetadataRepository;
 	
 	@Transactional
-	public Long saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, GitRepoData gitRepoData,
+	public ProjectMetaData saveProjectMetaData(CodingLanguage language , ProjectFramework projectFramework, String coreSrcRootPath, GitRepoData gitRepoData,
 		ClientProjectPath path) {
 		ProjectMetaData projectMetaData = new ProjectMetaData(
 			language,
@@ -35,7 +35,7 @@ public class ProjectMetaDataService {
 
 		//metadata save
 		ProjectMetaData save = clientProjectMetadataRepository.save(projectMetaData);
-		return save.getId();
+		return save;
 	}
 
 	// 테스트 호환성을 위한 메소드

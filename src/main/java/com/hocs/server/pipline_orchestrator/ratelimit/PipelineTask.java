@@ -8,11 +8,11 @@ import lombok.Data;
 public class PipelineTask {
 	private final ControllerFile controllerFile;
 	private final ApiInfoInPipline apiInfo;
-	private final String requestId;
+	private final String taskId;
 
-	public PipelineTask(ControllerFile controllerFile, ApiInfoInPipline apiInfo, String requestId) {
+	public PipelineTask(ControllerFile controllerFile, ApiInfoInPipline apiInfo, String taskId) {
 		this.controllerFile = controllerFile;
 		this.apiInfo = apiInfo;
-		this.requestId = requestId;
+		this.taskId = taskId;
 	}
 }

@@ -1,10 +1,11 @@
 package com.hocs.server.pipline_orchestrator.ratelimit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hocs.server.common.service.GenericBatchFailureHandler;
 import com.hocs.server.common.domain.MethodInformation;
+import com.hocs.server.common.service.GenericBatchFailureHandler;
 import com.hocs.server.pipline_orchestrator.domain.ApiInfoInPipline;
 import com.hocs.server.pipline_orchestrator.domain.ControllerFile;
+import com.hocs.server.pipline_orchestrator.service.UserService;
+import com.hocs.server.pipline_orchestrator.service.out.port.ApiEndpointCollectorPortInPipline;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -14,26 +15,24 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/**
- * taskFailedProcess 메서드 핵심 로직 검증
- * DRY 원칙: 최소한의 중요한 검증만
- */
+
 class TaskFailedProcessCoreTest {
 
     @Mock
     private GenericBatchFailureHandler<RestartableTaskInfo> failureHandler;
+    @Mock private UserService userService;
+    @Mock private ApiEndpointCollectorPortInPipline apiEndpointCollector;
 
     private PipelineThrottleService service;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        service = new PipelineThrottleService(null, null, failureHandler, new ObjectMapper());
+        service = new PipelineThrottleService(null, null, failureHandler, apiEndpointCollector, userService );
     }
 
     @Test
     void taskFailedProcess_핵심검증_재시도없이저장() {
-        // Given - 최소한의 테스트 데이터
         TaskContext context = new TaskContext("user", "main", new String[]{}, null, TaskType.HEAVY, 1);
         PipelineTask task = createSimpleTask();
 
@@ -63,7 +62,6 @@ class TaskFailedProcessCoreTest {
         assertDoesNotThrow(() -> service.taskFailedProcess(context, task));
     }
 
-    // DRY: 테스트 데이터 생성 헬퍼 메서드
     private PipelineTask createSimpleTask() {
         return new PipelineTask(
             new ControllerFile("/TestController.java"),

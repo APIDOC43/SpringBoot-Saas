@@ -37,3 +37,7 @@ out/
 .vscode/
 
 **/application.yml
+
+### Monitoring ###
+grafana/provisioning/dashboards/*.json
+!grafana/provisioning/dashboards/dashboard.yml

@@ -11,7 +11,7 @@ import com.hocs.server.api_spec_generator.domain.output.OasInfo;
 import com.hocs.server.api_spec_generator.domain.output.PathAndComponents;
 import com.hocs.server.api_spec_generator.domain.output.PathItem;
 import com.hocs.server.api_spec_generator.domain.output.Schema;
-import com.hocs.server.api_spec_generator.llm.SpringAICommandForLLM;
+import com.hocs.server.api_spec_generator.llm.LLMService;
 import com.hocs.server.api_spec_generator.llm.exception.ApiEntriesNullException;
 import com.hocs.server.api_spec_generator.util.FileManager;
 import java.io.File;
@@ -33,7 +33,7 @@ public class GenerateOasFacadeService {
 	//TODO: 바인딩 실패시 재시도 최대치 등 정책필요
 	//메소드 책임분리 리팩토링 필요
 
-	private final SpringAICommandForLLM springAiCommandForLLM;
+	private final LLMService llmService;
 	private final ExceptionFormatService exceptionFormatService;
 	private final OasIntegrationService oasIntegrationService;
 	private final OasBatchSaverService oasBatchSaverService;
@@ -41,7 +41,7 @@ public class GenerateOasFacadeService {
 	public void generate(String userId, APIMetadata apiMetadata, File projectDir,
 		String[] exceptionFiles, String requestId) throws IOException {
 		String projectRootPath = projectDir.getAbsolutePath();
-		ChatClient client = springAiCommandForLLM.createChatClient4o();
+		ChatClient client = llmService.createChatClient4o();
 
 		/** output.yaml to APIMetadata **/
 		if (apiMetadata == null) {
@@ -148,7 +148,7 @@ public class GenerateOasFacadeService {
 
 		PathAndComponents pathAndComponents = null;
 		try {
-			pathAndComponents = springAiCommandForLLM.requestOasApiSnippet(client, apiMetadata, 0,
+			pathAndComponents = llmService.requestOasApiSnippet(client, apiMetadata, 0,
 				exceptionFormatSrc);
 		} catch (JsonProcessingException e) {
 			sleep(3000);

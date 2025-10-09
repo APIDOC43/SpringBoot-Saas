@@ -12,7 +12,6 @@ public class DocGeneratePiplineTaskService {
 
 	private final DocGeneratePiplineTaskRepository repository;
 
-
 	@Transactional
 	public void save(DocGeneratePiplineRequest docGeneratePiplineRequest) {
 		repository.save(docGeneratePiplineRequest);

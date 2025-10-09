@@ -18,7 +18,7 @@ public class MongoConfig {
 	@Bean
 	public MongoClient mongoClient(MyCommandCounterListener listener) {
 		MongoClientSettings settings = MongoClientSettings.builder()
-			.applyConnectionString(new ConnectionString("mongodb://localhost:27017"))
+			.applyConnectionString(new ConnectionString("mongodb://mongodb:27017"))
 			.addCommandListener(listener)
 			.build();
 

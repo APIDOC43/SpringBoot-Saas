@@ -39,7 +39,7 @@ public class DocumentGenerateRequestController {
 	public ResponseEntity<?> documentGenerationReceipt(@RequestBody @Valid GenerateReceiptClientRequest request) {
 		long start = System.currentTimeMillis();
 
-		String userId = UUID.randomUUID().toString();
+		String userId = request.getUserId();
 		log.info("userId = " + userId);
 		documentGenerateService.generationReceipt(userId,request.getMetadataId(),request.getExcludeApiInfo());
 

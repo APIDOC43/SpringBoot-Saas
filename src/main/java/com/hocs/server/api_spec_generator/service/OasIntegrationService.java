@@ -2,7 +2,7 @@ package com.hocs.server.api_spec_generator.service;
 
 import com.hocs.server.api_spec_generator.domain.output.PathItem;
 import com.hocs.server.api_spec_generator.domain.output.Schema;
-import com.hocs.server.api_spec_generator.llm.SpringAICommandForLLM;
+import com.hocs.server.api_spec_generator.llm.LLMService;
 import com.hocs.server.api_spec_generator.util.OpenAPIParser;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,22 +10,25 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
 
 
 @Service
 @RequiredArgsConstructor
+@Profile("!fake")
 public class OasIntegrationService {
 
-	private final SpringAICommandForLLM springAiCommandForLLM;
+	private final LLMService llmService;
 
 	public HashMap<String, List<Schema>> schemaIntegration(ChatClient chatClient4o, Map<String, List<Schema>> schemasMap) {
 		HashMap<String, List<Schema>> temp = new HashMap<>();
 		for (String key : schemasMap.keySet()) {
 			List<Schema> schemas = schemasMap.get(key);
 			if (schemas.size() >= 2) {
-//				temp.put(key, removeDuplicatesByLLM(chatClient4o, key, schemas).get(key));
+				//TODO fake시 무시
+				temp.put(key, removeDuplicatesByLLM(chatClient4o, key, schemas).get(key));
 			}
 		}
 		return temp;
@@ -36,7 +39,7 @@ public class OasIntegrationService {
 		Map<String, List<Schema>> result = new HashMap<>();
 
 		try {
-			String integrationSchema = springAiCommandForLLM.integrationSchema(schemas, client);
+			String integrationSchema = llmService.integrationSchema(schemas, client);
 			Schema schema = OpenAPIParser.parseToSchema(integrationSchema);
 			ArrayList<Schema> temp = new ArrayList<>();
 			temp.add(schema);

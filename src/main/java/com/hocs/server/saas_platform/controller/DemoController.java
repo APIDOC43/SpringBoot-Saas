@@ -2,11 +2,14 @@ package com.hocs.server.saas_platform.controller;
 
 
 
+import com.hocs.server.api_spec_generator.domain.output.OAS;
+import com.hocs.server.api_spec_generator.service.OasIntegrationService;
 import com.hocs.server.pipline_orchestrator.service.out.OasSendClient;
 import com.hocs.server.saas_platform.controller.dto.ProgressDto;
 import com.hocs.server.saas_platform.controller.request.GetContentRequest;
 import com.hocs.server.saas_platform.domain.FilesData;
 import com.hocs.server.saas_platform.service.GenerationService;
+import com.hocs.server.saas_platform.service.OasService;
 import com.hocs.server.saas_platform.service.StaticApiDocService;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +36,7 @@ public class DemoController {
 
 	private final OasSendClient oasSendClient;
 	private final StaticApiDocService apiDocService;
+	private final OasService oasService;
 
 	@GetMapping("/demo")
 	public String demo(Model model) {
@@ -61,6 +65,17 @@ public class DemoController {
 		);
 		model.addAttribute("repoList", repoList);
 		return "demo-main";
+	}
+
+	@ResponseBody
+	@GetMapping("/demo/layout")
+	public List<OAS> getLayOut(
+			@RequestParam(name = "userId") String userId,
+			@RequestParam(name = "index") Integer index,
+			Model model) {
+
+		List<OAS> oasList = oasService.findAllByUserId(userId);
+		return oasList;
 	}
 
 	@Deprecated

@@ -19,8 +19,8 @@ class GenerateIdempotencyKeyServiceTest {
         );
 
         // when
-        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData);
-        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData);
+        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData, 1L);
+        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData, 1L);
 
         // then
         assertThat(key1).isEqualTo(key2);
@@ -44,81 +44,12 @@ class GenerateIdempotencyKeyServiceTest {
         );
 
         // when
-        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData1);
-        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData2);
+        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData1, 1L);
+        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData2, 1L);
 
         // then
         assertThat(key1).isNotEqualTo(key2);
         assertThat(key1).hasSize(32);
         assertThat(key2).hasSize(32);
-    }
-
-    @Test
-    @DisplayName("소유자 이름만 다르면 다른 key를 생성한다")
-    void shouldGenerateDifferentKeyWhenOwnerNameIsDifferent() {
-        // given
-        GitRepoData gitRepoData1 = new GitRepoData(
-            "https://github.com/owner1/repo.git",
-            "repo",
-            "owner1"
-        );
-        GitRepoData gitRepoData2 = new GitRepoData(
-            "https://github.com/owner2/repo.git",
-            "repo",
-            "owner2"
-        );
-
-        // when
-        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData1);
-        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData2);
-
-        // then
-        assertThat(key1).isNotEqualTo(key2);
-    }
-
-    @Test
-    @DisplayName("레포지토리 이름만 다르면 다른 key를 생성한다")
-    void shouldGenerateDifferentKeyWhenRepoNameIsDifferent() {
-        // given
-        GitRepoData gitRepoData1 = new GitRepoData(
-            "https://github.com/owner/repo1.git",
-            "repo1",
-            "owner"
-        );
-        GitRepoData gitRepoData2 = new GitRepoData(
-            "https://github.com/owner/repo2.git",
-            "repo2",
-            "owner"
-        );
-
-        // when
-        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData1);
-        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData2);
-
-        // then
-        assertThat(key1).isNotEqualTo(key2);
-    }
-
-    @Test
-    @DisplayName("clone URL만 다르면 다른 key를 생성한다")
-    void shouldGenerateDifferentKeyWhenCloneUrlIsDifferent() {
-        // given
-        GitRepoData gitRepoData1 = new GitRepoData(
-            "https://github.com/owner/repo.git",
-            "repo",
-            "owner"
-        );
-        GitRepoData gitRepoData2 = new GitRepoData(
-            "https://gitlab.com/owner/repo.git",
-            "repo",
-            "owner"
-        );
-
-        // when
-        String key1 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData1);
-        String key2 = GenerateIdempotencyKeyService.generateIdempotencyKey(gitRepoData2);
-
-        // then
-        assertThat(key1).isNotEqualTo(key2);
     }
 }

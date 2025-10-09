@@ -7,7 +7,6 @@ import com.hocs.server.code_parser.core.domain.APISourceDependencyInfo;
 import com.hocs.server.code_parser.core.domain.GlobalSourceDependency;
 import com.hocs.server.code_parser.core.service.DependencyAnalyzer;
 import com.hocs.server.code_parser.domain.APIEntries;
-import com.hocs.server.code_parser.repository.APISourceDependencyRepository;
 import com.hocs.server.code_parser.service.ApiEndpointCollectorService;
 import com.hocs.server.code_parser.service.ApiExcludeService;
 import com.hocs.server.code_parser.service.ApiSourceDependencyBatchSaveService;
@@ -50,7 +49,7 @@ public class ApiEndpointResolveFacade {
 
 	public APISourceDependencyInfo  findAPIMetadataByTask(String userId, ProjectMetaData metaData,
 		String defaultBranchName, PipelineTask task, String requestId) {
-		JavaClassifiedDataContainer container = JavaClassifiedStore.get(task.getRequestId());
+		JavaClassifiedDataContainer container = JavaClassifiedStore.get(task.getTaskId());
 
 		List<API> apis = new ArrayList<>();
 		try {

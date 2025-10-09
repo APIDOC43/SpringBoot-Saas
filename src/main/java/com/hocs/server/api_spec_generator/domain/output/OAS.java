@@ -1,5 +1,6 @@
 package com.hocs.server.api_spec_generator.domain.output;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.hocs.server.saas_platform.domain.MongoBaseEntity;
 import jakarta.persistence.Id;
 import java.util.List;
@@ -10,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Document(collection = "oas")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

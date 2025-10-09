@@ -22,7 +22,7 @@ public class AsyncConfig {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(HEAVY_PIPELINE_THREAD_POOL_SIZE);
 		executor.setMaxPoolSize(HEAVY_PIPELINE_THREAD_POOL_SIZE);
-		executor.setQueueCapacity(100);
+		executor.setQueueCapacity(0);
 		executor.setKeepAliveSeconds(30);
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 		executor.setThreadNamePrefix("HeavyAsyncExecutor-");
@@ -35,7 +35,7 @@ public class AsyncConfig {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(FAST_PIPELINE_THREAD_POOL_SIZE);
 		executor.setMaxPoolSize(FAST_PIPELINE_THREAD_POOL_SIZE);
-		executor.setQueueCapacity(100);
+		executor.setQueueCapacity(0);
 		executor.setKeepAliveSeconds(30);
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
 		executor.setThreadNamePrefix("FastAsyncExecutor-");

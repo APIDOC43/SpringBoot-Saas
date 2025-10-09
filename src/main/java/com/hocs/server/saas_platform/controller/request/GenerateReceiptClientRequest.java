@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 public class GenerateReceiptClientRequest {
 	@NotNull
 	private Long metadataId;
+	private String userId;
 	private List<ApiInfo> excludeApiInfo;
 }

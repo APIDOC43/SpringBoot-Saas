@@ -32,7 +32,7 @@ public class DocGeneratePiplineRequest extends BaseEntity {
 
 	public DocGeneratePiplineRequest(String userId, ProjectMetaData projectMetaData) {
 		this.userId = userId;
-		this.requestId = generateIdempotencyKey(projectMetaData.getGitRepoData());
+		this.requestId = generateIdempotencyKey(projectMetaData.getGitRepoData(), projectMetaData.getId());
 		this.projectMetaData = projectMetaData;
 	}
 }
