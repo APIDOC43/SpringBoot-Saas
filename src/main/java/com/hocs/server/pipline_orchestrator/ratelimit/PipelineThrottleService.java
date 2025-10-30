@@ -72,10 +72,10 @@ public class PipelineThrottleService {
                     exceptionProcess(context, task, ex);
                     return null;
                 }).whenComplete((result, ex) -> {
+                    semaphore.release();
                     if( ex == null){
                         processQueuedRequests(task);
                     }
-                    semaphore.release();
                 });
     }
 
@@ -97,11 +97,11 @@ public class PipelineThrottleService {
 
     private ApiMetadataResult getApiMetadata(PipelineTask task, String userId, PreProcessResult result) {
         APIMetadata metadata = apiEndpointCollector.getApiEndpoint(
-                userId,
-                result.metaData(),
-                result.context().getDefaultBranchName(),
-                task,
-                result.requestId()
+                        userId,
+                        result.metaData(),
+                        result.context().getDefaultBranchName(),
+                        task,
+                        result.requestId()
         );
         return new ApiMetadataResult(result, metadata);
     }

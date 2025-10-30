@@ -24,7 +24,7 @@ public class DocumentGenerateFacade {
 			metaData);
 
 		docGeneratePiplineTaskService.save(docGeneratePiplineRequest);
-
+		//TODO request하나로 해야지.
 		piplineExecutorPort.send(docGeneratePiplineRequest,excludeApiInfo);
 
 		return true;

@@ -10,8 +10,8 @@ import lombok.Data;
 public class RateLimitRequestData {
 
 	private DocGeneratePiplineRequest request;
-	private List<ApiInfo> excludeApiInfo;
-	private final ProjectMetaData metaData;
+	private List<ApiInfo> excludeApiInfo; //TODO remove
+	private final ProjectMetaData metaData; //TODO duplicate Remove
 	private final String[] filenamesRelatedException;
 	private final String defaultBranchName;
 	private final List<PipelineTask> tasks;
