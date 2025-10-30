@@ -23,7 +23,7 @@ public class JavaClassifiedDataContainer {
 	private final Map<String, String> classToFilePath = new ConcurrentHashMap<>();
 	private final Map<String, Set<String>> interfaceImplementations = new ConcurrentHashMap<>();
 	private final Set<String> controllerClasses = new ConcurrentSkipListSet<>();
-	private final Map<String, Set<String>> globalDependencies = new LinkedHashMap<>();
+	private final Map<String, Set<String>> globalDependencies = new ConcurrentHashMap<>();
 	private final Map<String, Set<String>> simpleClassNameToQualifiedNames = new ConcurrentHashMap<>();
 	private JavaClassifiedDataContainerStatus status = JavaClassifiedDataContainerStatus.NOT_INIT;
 
