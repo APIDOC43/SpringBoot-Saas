@@ -1,8 +1,9 @@
 # APIDOC43: API 문서 자동 생성
-
+- 초기 화면 설계
+  
 ![image](https://github.com/user-attachments/assets/f9d609a0-9d72-4df1-8af4-36e7959b705d)
 
-**APIDOC43**은 LLM과 코드 분석을 결합한 API 문서 생성 서비스입니다.
+**APIDOC43**은 정적 코드 기반 API 문서 생성 서비스입니다.
 
 ```
 ├── api_spec_generator           // OpenAPI 명세 생성 
@@ -15,8 +16,9 @@
 
 ## API 문서 생성과정
 
-### 간략 시퀀스
+### 시퀀스 다이어그램
 ```mermaid
+
 sequenceDiagram
    participant Client as Client
    participant Pipeline as 명세생성파이프라인
@@ -24,32 +26,35 @@ sequenceDiagram
    participant LLM as LLM
    
    Client ->> Pipeline: 요청: Project
-    loop API controller 갯수만큼
-   Pipeline ->> Collector: 요청: Project code
+    loop API별 관련된 소스코드 수집
+   Pipeline ->> Collector: OrderController.java
    
-   Collector -->> Pipeline: API Task 반환
+   Collector -->> Pipeline: API Tasks 반환
+   note over Collector: [API Task]<br><br>orderController.java <br> ㅤㅤㅤㄴ orderService.java <br>  ㅤㅤ ㅤㅤㄴ orderRepository.java <br>...
+        
        end
-   loop API task 갯수만큼
-       Pipeline ->> LLM: API 정보 기반 명세 생성
+   loop API tasks
+       Pipeline ->> LLM: API 명세 생성 요청
        
        LLM -->> Pipeline: API 명세 반환
    end
    
    Pipeline -->> Client: 전체 API 명세 반환
+
 ```
 
 ## 핵심 구현
 
-### 1. 배치 저장 최적화 (DB I/O 82% 감소)
+### 1. 배치 저장 최적화 (DB I/O 약80% 감소)
 ```java
 @Scheduled(fixedDelay = 30000)
-public void flushEntities() {
-    super.flush(); // 30초마다 배치 처리
+public void flushEntities() { // 30초마다 일괄 저장
+    ... 
 }
 ```
 **[OasBatchSaverService.java](src/main/java/com/hocs/server/api_spec_generator/service/OasBatchSaverService.java)**
 - ArrayBlockingQueue 기반 메모리 버퍼링
-- **쿼리 횟수**: 28회 → 5회 (82% 감소)
+- **쿼리 횟수**: 28회 → 4회 
 - 재시도 메커니즘과 실패 처리 로직
 ```mermaid
 sequenceDiagram
@@ -69,7 +74,7 @@ sequenceDiagram
    BatchSaver ->> Merger: 동일 Request ID 기준 엔티티 병합
    Merger -->> BatchSaver: 병합된 하나의 엔티티 반환
    BatchSaver ->> DB: Bulk Insert
-   Note right of DB: 28회 → 5회 (82% 감소)
+   Note right of DB: 28회 → 4회 (약 80% 감소)
 ```
 
 ### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
@@ -82,7 +87,7 @@ public void submit(ThrottleRequest request) {
 ```
 **[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
 - **처리 시간**: 202초 → 93초 (54% 단축)
-- Rate Limiting + Semaphore 기반 동시성 제어
+- ThreadPool + Semaphore 기반 동시성 제어
 - 신규/기존 사용자 요청 분리 처리로 UX 개선
 ```mermaid
 sequenceDiagram
@@ -96,7 +101,7 @@ sequenceDiagram
     
     alt 신규 사용자 (API 많음)
         Classifier ->> HeavyPool: Heavy 작업 할당
-        HeavyPool ->> LLM: 대용량 처리
+        HeavyPool ->> LLM: 오랜 시간 소요
     else 기존 사용자 (API 적음)
         Classifier ->> FastPool: Fast 작업 할당
         FastPool ->> LLM: 빠른 처리
@@ -104,15 +109,6 @@ sequenceDiagram
     
     Note over FastPool: 기존 사용자 대기시간 개선
 ```
-
----
-
-## 성과
-
-- **처리 시간**: 202초 → 93초 (54% 단축)
-- **DB 쿼리**: 단위 요청당 28회 → 5회 (82% 감소)
-- **동시성**: ArrayBlockingQueue drainTo 메서드로 thread-safe 보장
-- **스레드풀 분리**: 신규/기존 사용자 대기시간 개선
 
 ---
 
@@ -127,54 +123,3 @@ sequenceDiagram
 
 ## 링크
 - 랜딩페이지: https://apidoc43.softr.app/
-
----
-
-
-### 전체 시퀀스
-```mermaid
-sequenceDiagram
-    participant Client as Client
-    participant Ingress as PiplineIngressFacade
-    participant Classifier as TaskClassifier  
-    participant HeavyThrottle as Heavy스로틀링
-    participant FastThrottle as Fast스로틀링
-    participant CodeParser as codePaser
-    participant DependencyBatch as 의존성배치저장
-    participant LLM as LLM
-    participant OASBatch as OAS배치저장
-    
-    Client ->> Ingress: 요청: Project
-    
-    loop API controller 갯수만큼
-        Ingress ->> CodeParser: 요청: Project code
-        CodeParser ->> DependencyBatch: API 의존성 그래프 큐 추가
-        CodeParser -->> Ingress: API Task 반환
-    end
-    
-    Ingress ->> Classifier: Task 개수 기반 분류
-    Classifier -->> Ingress: TaskType (HEAVY/FAST)
-    
-    Note over DependencyBatch: 30초마다 의존성 배치 저장
-    DependencyBatch ->> DependencyBatch: 큐에서 배치 처리
-    
-    loop API task 갯수만큼
-        alt TaskType = HEAVY
-            Ingress ->> HeavyThrottle: API 명세 생성 요청
-            HeavyThrottle ->> LLM: API 정보 기반 명세 생성 (세마포어 제어)
-            LLM -->> HeavyThrottle: API 명세 반환
-            HeavyThrottle -->> Ingress: API 명세 반환
-        else TaskType = FAST  
-            Ingress ->> FastThrottle: API 명세 생성 요청
-            FastThrottle ->> LLM: API 정보 기반 명세 생성 (세마포어 제어)
-            LLM -->> FastThrottle: API 명세 반환
-            FastThrottle -->> Ingress: API 명세 반환
-        end
-        Ingress ->> OASBatch: 명세 데이터 큐 추가
-    end
-    
-    Note over OASBatch: 30초마다 OAS 배치 저장
-    OASBatch ->> OASBatch: 큐에서 배치 처리
-    
-    Ingress -->> Client: 전체 API 명세 반환
-```
