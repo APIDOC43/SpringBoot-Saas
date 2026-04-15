@@ -79,7 +79,7 @@ sequenceDiagram
 
 ### 2. 스레드풀 분리 
 
-```
+
 **[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
 - **처리 시간**: 202초 → 93초 (54% 단축)
 - 신규/기존 사용자 요청 분리 처리로 UX 개선
