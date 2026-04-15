@@ -77,17 +77,11 @@ sequenceDiagram
    Note right of DB: 28회 → 4회 (약 80% 감소)
 ```
 
-### 2. 비동기 처리 + 스레드풀 분리 (처리 시간 54% 단축)
-```java
-// 요청 유형별 스레드풀과 세마포어 분리 관리
-public void submit(ThrottleRequest request) {
-    Semaphore semaphore = resolver.getRelatedSemaphore(request.getTaskType());
-    CompletableFuture.runAsync(() -> pipelineService.execute(task), executor);
-}
+### 2. 스레드풀 분리 
+
 ```
 **[PipelineThrottleService.java](src/main/java/com/hocs/server/pipline_orchestrator/ratelimit/PipelineThrottleService.java)**
 - **처리 시간**: 202초 → 93초 (54% 단축)
-- ThreadPool + Semaphore 기반 동시성 제어
 - 신규/기존 사용자 요청 분리 처리로 UX 개선
 ```mermaid
 sequenceDiagram
