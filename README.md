@@ -8,7 +8,7 @@
 ```
 ├── api_spec_generator           // OpenAPI 명세 생성 
 ├── code_parser                  // Java 소스코드 파싱
-├── pipline_orchestrator         // 비동기 파이프라인 
+├── pipeline_orchestrator        // 비동기 파이프라인 
 └── saas_platform                // 문서관리 API (미개발)
 ```
 
@@ -22,7 +22,7 @@
 sequenceDiagram
    participant Client as Client
    participant Pipeline as 명세생성파이프라인
-   participant Collector as codePaser
+   participant Collector as codeParser
    participant LLM as LLM
    
    Client ->> Pipeline: 요청: Project
